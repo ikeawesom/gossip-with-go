@@ -1,5 +1,11 @@
+import NavBar from "./components/NavBar";
+
 function App() {
-  return <></>;
+  return (
+    <section>
+      <NavBar />
+    </section>
+  );
 }
 
 export default App;
