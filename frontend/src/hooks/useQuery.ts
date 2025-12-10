@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { searchQueryPeeks } from "../helpers";
+import { searchQueryPeeks } from "../lib/helpers";
 import { setQuery, queryAsync } from "../state/search/querySlice";
 import type { RootState, AppDispatch } from "../state/store";
 import type { QueryPeek } from "../types/query";

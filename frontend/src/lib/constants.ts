@@ -1,6 +1,11 @@
-import type { QueryPeek } from "./types/query";
+import type { QueryPeek } from "../types/query";
 
 export const APP_NAME = "GossipWithGo";
+
+export interface DefaultCustomProps {
+    className?: string;
+    children?: React.ReactNode;
+}
 
 export const TEMP_QUERY_RESULTS: QueryPeek[] = [
     {

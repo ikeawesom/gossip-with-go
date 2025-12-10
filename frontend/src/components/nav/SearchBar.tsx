@@ -1,4 +1,4 @@
-import { formatDate } from "../../helpers";
+import { formatDate } from "../../lib/helpers";
 import type { QueryPeek } from "../../types/query";
 import { useQuery } from "../../hooks/useQuery";
 

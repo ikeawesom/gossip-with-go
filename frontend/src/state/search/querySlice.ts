@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { QueryPeek, queryState } from "../../types/query";
-import { TEMP_QUERY_RESULTS } from "../../constants";
+import { TEMP_QUERY_RESULTS } from "../../lib/constants";
 
 
 const initialState: queryState = {
