@@ -1,6 +1,9 @@
 import type { JSX } from "react/jsx-dev-runtime";
 import type { QueryPeek } from "../types/query";
 
+export type HTMLProps<T extends keyof JSX.IntrinsicElements> =
+  React.ComponentPropsWithoutRef<T>;
+
 export function formatDate(timestamp: number): string {
   const months = [
     "Jan",
@@ -69,5 +72,23 @@ export function searchQueryPeeks(
     .map((item) => item.peek);
 }
 
-export type HTMLProps<T extends keyof JSX.IntrinsicElements> =
-  React.ComponentPropsWithoutRef<T>;
+export function maskEmail(email: string): string {
+  const [localPart, domain] = email.split('@');
+
+  if (!localPart || !domain) {
+    return email;
+  }
+
+  const firstChar = localPart[0];
+  const lastChar = localPart[localPart.length - 1];
+  const middleLength = localPart.length - 2;
+  const maskedLocal = middleLength > 0
+    ? `${firstChar}${'*'.repeat(middleLength)}${lastChar}`
+    : localPart;
+
+  const domainParts = domain.split('.');
+  const maskedDomainParts = domainParts.map(part => '*'.repeat(part.length));
+  const maskedDomain = maskedDomainParts.join('.');
+
+  return `${maskedLocal}@${maskedDomain}`;
+}
