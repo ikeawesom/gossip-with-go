@@ -6,9 +6,11 @@ import { store } from "./state/store";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 import { AuthPage, PostPage } from "./pages/index";
+import { Toaster } from "sonner";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <Toaster richColors position="top-center" />
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
