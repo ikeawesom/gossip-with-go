@@ -1,4 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { errorType, tokenType } from "./constants";
+import { defaultError } from "../../lib/constants";
 
 interface loginFormState {
     username: string;
@@ -14,25 +16,16 @@ const initialState: loginFormState = {
     isLoading: false,
 }
 
-interface errorType {
-    code: number;
-    message: string;
-}
+interface loginCfmEntry { username: string; password: string }
 
-interface tokenType {
-    jwt_token: string;
-    user_id: string;
-    name: string;
-}
-
-const defaultError: errorType = {
-    code: 0,
-    message: "An unknown error has occurred. Please try again later."
-}
-
-export const loginAsync = createAsyncThunk<tokenType, { username: string; password: string }, { rejectValue: errorType }>(
+export const loginAsync = createAsyncThunk<tokenType, loginCfmEntry, { rejectValue: errorType }>(
     "loginForm/login",
     async (credentials, { rejectWithValue }) => {
+        const { } = credentials
+        // handle login here
+        // ...
+
+        // simulate the login
         await new Promise((resolve) => setTimeout(resolve, 1000));
         const { data, error } = {
             data: { jwt_token: "mock-jwt-token", user_id: "000", name: "Ike" },
@@ -40,6 +33,7 @@ export const loginAsync = createAsyncThunk<tokenType, { username: string; passwo
             // { code: 401, message: "Invalid credentials" }
         };
 
+        // case handling after login attempt
         if (error) {
             return rejectWithValue(error);
         }
@@ -67,7 +61,7 @@ const loginFormSlice = createSlice({
             .addCase(loginAsync.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.jwt_token = action.payload;
-                console.log(action);
+                console.log(action.payload);
             })
             .addCase(loginAsync.rejected, (state, action) => {
                 state.isLoading = false;
