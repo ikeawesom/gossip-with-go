@@ -14,6 +14,7 @@ import {
 import Notice from "../utils/Notice";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import AuthForm from "./AuthForm";
 
 export default function RegisterForm() {
   const {
@@ -48,7 +49,7 @@ export default function RegisterForm() {
   }, [error, jwt_token]);
 
   return (
-    <form className="w-full max-w-[600px] flex flex-col gap-2 items-start justify-center border-t border-gray-dark/20 pt-5">
+    <AuthForm>
       <input
         value={email}
         onChange={(e) => dispatch(setEmail(e.target.value))}
@@ -99,7 +100,7 @@ export default function RegisterForm() {
           to="/auth/login"
           className="text-sm text-primary hover:opacity-70 duration-150"
         >
-          Log In?
+          Sign In
         </Link>
       </p>
       {password_mismatch && (
@@ -134,6 +135,6 @@ export default function RegisterForm() {
           "Get Started"
         )}
       </PrimaryButton>
-    </form>
+    </AuthForm>
   );
 }

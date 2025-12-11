@@ -9,6 +9,7 @@ import {
 } from "../../state/auth/loginFormSlice";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import AuthForm from "./AuthForm";
 
 export default function LoginForm() {
   const { isLoading, password, username, error, jwt_token } = useSelector(
@@ -32,7 +33,7 @@ export default function LoginForm() {
   }, [error, jwt_token]);
 
   return (
-    <form className="w-full max-w-[600px] flex flex-col gap-2 items-start justify-center border-t border-gray-dark/20 pt-5">
+    <AuthForm>
       <input
         onChange={(e) => dispatch(setUsername(e.target.value))}
         type="text"
@@ -82,6 +83,6 @@ export default function LoginForm() {
           "Login"
         )}
       </PrimaryButton>
-    </form>
+    </AuthForm>
   );
 }
