@@ -1,3 +1,4 @@
+import type { errorType } from "../state/auth/constants";
 import type { QueryPeek } from "../types/query";
 
 export const APP_NAME = "GossipWithGo";
@@ -99,3 +100,8 @@ export const TEMP_QUERY_RESULTS: QueryPeek[] = [
         likes: 531
     }
 ];
+
+export const defaultError: errorType = {
+    code: 0,
+    message: "An unknown error has occurred. Please try again later."
+}
