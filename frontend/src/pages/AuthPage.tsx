@@ -3,10 +3,11 @@ import Card from "../components/utils/Card";
 import LoginForm from "../components/auth/LoginForm";
 import RegisterForm from "../components/auth/RegisterForm";
 import Logo from "../components/utils/Logo";
+import FgPassForm from "../components/auth/FgPassForm";
 
 type AuthPageParams = { auth_option: string };
 const authTitles = {
-  login: "Login",
+  login: "Sign In",
   register: "Sign Up",
   "forgot-password": "Forgot Password",
 } as { [key: string]: string };
@@ -35,7 +36,7 @@ export default function AuthPage() {
         ) : auth_option === "register" ? (
           <RegisterForm />
         ) : (
-          <p>Forgot Password Form Placeholder</p>
+          <FgPassForm />
         )}
       </Card>
     </section>
