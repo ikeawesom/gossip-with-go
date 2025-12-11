@@ -32,7 +32,7 @@ export default function LoginForm() {
   }, [error, jwt_token]);
 
   return (
-    <form className="w-full max-w-[600px] flex flex-col gap-2 items-start justify-center border-t border-gray-dark/20 pt-6 ">
+    <form className="w-full max-w-[600px] flex flex-col gap-2 items-start justify-center border-t border-gray-dark/20 pt-5">
       <input
         onChange={(e) => dispatch(setUsername(e.target.value))}
         type="text"
