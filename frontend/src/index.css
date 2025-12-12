@@ -32,13 +32,24 @@ h3 {
 h4 {
   @apply text-lg font-bold;
 }
+p {
+  @apply text-sm;
+}
 
 p:not(.fine-print) {
-  @apply text-sm text-gray-dark;
+  @apply text-gray-dark;
 }
 
 p.fine-print {
-  @apply text-sm text-fine-print;
+  @apply text-fine-print;
+}
+
+p.error {
+  @apply text-red;
+}
+
+p.success {
+  @apply text-green;
 }
 
 input {
