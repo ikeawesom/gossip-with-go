@@ -37,15 +37,21 @@ export const authApi = {
         await apiClient.post('/auth/refresh');
     },
 
-    // verify email
+    // verify email after registration
     verifyEmail: async (data: VerifyEmailRequest): Promise<{ message: string }> => {
         const response = await apiClient.post<{ message: string }>('/auth/verify-email', data);
         return response.data;
     },
 
+    // send verification email
+    sendVerification: async (email: string): Promise<{ message: string }> => {
+        const response = await apiClient.post<{ message: string }>('/auth/send-verification', { email });
+        return response.data;
+    },
+
     // forgot password (send reset email)
-    forgotPassword: async (data: ForgotPasswordRequest): Promise<{ message: string }> => {
-        const response = await apiClient.post<{ message: string }>('/auth/forgot-password', data);
+    forgotPassword: async (data: ForgotPasswordRequest): Promise<AuthResponse> => {
+        const response = await apiClient.post<AuthResponse>('/auth/forgot-password', data);
         return response.data;
     },
 
