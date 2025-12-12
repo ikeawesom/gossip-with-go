@@ -1,48 +1,48 @@
 import { Link, useNavigate } from "react-router-dom";
 import PrimaryButton from "../utils/PrimaryButton";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../../state/store";
-import {
-  setPassword,
-  setUsername,
-  loginAsync,
-} from "../../state/auth/loginFormSlice";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../state/store";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import {  useState } from "react";
 import AuthForm from "./AuthForm";
+import { clearError, loginUser } from "../../state/auth/authSlice";
+import useAuth from "../../hooks/useAuth";
 
 export default function LoginForm() {
-  const { isLoading, password, username, error, jwt_token } = useSelector(
-    (state: RootState) => state.loginForm
-  );
-  const dispatch = useDispatch<AppDispatch>();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { error, isLoading, prev_page } = useAuth();
 
   const disable = isLoading || password.length === 0 || username.length === 0;
 
-  useEffect(() => {
-    if (error) {
-      toast.error(`ERROR: ${error.message}`);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    dispatch(clearError());
+    
+    const result = await dispatch(loginUser({ username, password }));
+    
+    if (loginUser.fulfilled.match(result)) {
+      navigate(prev_page, { replace: true });
+    } else {
+      toast.error(error);
     }
-
-    if (jwt_token) {
-      const { name } = jwt_token;
-      toast.success(`Welcome home, ${name}!`);
-      navigate("/");
-    }
-  }, [error, jwt_token]);
+  };
 
   return (
-    <AuthForm>
+    <AuthForm onSubmit={handleSubmit} >
       <input
-        onChange={(e) => dispatch(setUsername(e.target.value))}
+      value={username}
+        onChange={(e) => setUsername(e.target.value)}
         type="text"
         placeholder="Enter your username"
         required
       />
       <div className="w-full flex flex-col gap-3 items-start justify-start">
         <input
-          onChange={(e) => dispatch(setPassword(e.target.value))}
+        value={password}
+          onChange={(e) => setPassword(e.target.value)}
           type="password"
           placeholder="Enter your password"
           required
@@ -65,9 +65,9 @@ export default function LoginForm() {
       </p>
 
       <PrimaryButton
+      type="submit"
         className="w-full mt-3"
         disabled={disable}
-        onClick={() => dispatch(loginAsync({ username, password }))}
       >
         {isLoading ? (
           <div className="grid place-items-center">

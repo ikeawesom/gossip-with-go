@@ -2,37 +2,49 @@ import AuthForm from "./AuthForm";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../state/store";
 import { Link } from "react-router-dom";
-import { fgPassAsync, setUsername } from "../../state/auth/fgPassSlice";
 import PrimaryButton from "../utils/PrimaryButton";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { maskEmail } from "../../lib/helpers";
 import { twMerge } from "tailwind-merge";
+import { clearError, sendPasswordResetEmail } from "../../state/auth/authSlice";
 
 export default function FgPassForm() {
-  const { isLoading, username, error, email } = useSelector(
-    (state: RootState) => state.fgPassForm
+  const [username, setUsername] = useState("");
+  const { isLoading, error, user } = useSelector(
+    (state: RootState) => state.auth
   );
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     if (error) {
-      toast.error(`ERROR: ${error.message}`);
+      toast.error(`ERROR: ${error}`);
     }
   }, [error]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    dispatch(clearError());
+
+    const result = await dispatch(sendPasswordResetEmail({ username }));
+
+    if (!sendPasswordResetEmail.fulfilled.match(result)) {
+      toast.error(error);
+    }
+  };
+
   return (
-    <AuthForm>
-      {email ? (
+    <AuthForm onSubmit={handleSubmit}>
+      {user ? (
         <>
           <h1 className="text-center">
             Reset password link sent to{" "}
-            <span className="text-primary">{maskEmail(email)}</span>
+            <span className="text-primary">{maskEmail(user.email)}</span>
           </h1>
           <p className="text-center w-full">
             Didn't get your email?{" "}
             <span
-              onClick={() => dispatch(fgPassAsync({ username }))}
+              onClick={handleSubmit}
               className={twMerge(
                 "text-sm text-primary duration-150",
                 isLoading
@@ -48,7 +60,7 @@ export default function FgPassForm() {
         <>
           <div className="w-full flex flex-col gap-3 items-start justify-start">
             <input
-              onChange={(e) => dispatch(setUsername(e.target.value))}
+              onChange={(e) => setUsername(e.target.value)}
               type="text"
               placeholder="Enter your username"
               required
@@ -65,10 +77,9 @@ export default function FgPassForm() {
           </div>
 
           <PrimaryButton
-            type="button"
+            type="submit"
             className="w-full mt-3"
             disabled={username === "" || isLoading}
-            onClick={() => dispatch(fgPassAsync({ username }))}
           >
             {isLoading ? (
               <div className="grid place-items-center">
