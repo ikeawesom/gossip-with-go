@@ -12,4 +12,5 @@ export interface queryState {
     query: string;
     results: QueryPeek[];
     isLoading: boolean;
+    isShowResults: boolean;
 }

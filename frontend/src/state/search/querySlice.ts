@@ -6,7 +6,8 @@ import { TEMP_QUERY_RESULTS } from "../../lib/constants";
 const initialState: queryState = {
     query: "",
     results: [],
-    isLoading: false
+    isLoading: false,
+    isShowResults: false,
 }
 
 export const queryAsync = createAsyncThunk(
@@ -26,7 +27,17 @@ const querySlice = createSlice({
     reducers: {
         setQuery: (state, action: PayloadAction<string>) => {
             state.query = action.payload;
-
+            if (action.payload !== "") {
+                state.isShowResults = true;
+            } else {
+                state.isShowResults = false;
+            }
+        },
+        hideResults: (state) => {
+            state.isShowResults = false;
+        },
+        showResults: (state) => {
+            state.isShowResults = true;
         }
     },
     extraReducers: (builder) => {
@@ -40,6 +51,6 @@ const querySlice = createSlice({
     }
 })
 
-export const { setQuery } = querySlice.actions;
+export const { setQuery, hideResults, showResults } = querySlice.actions;
 
 export default querySlice.reducer;

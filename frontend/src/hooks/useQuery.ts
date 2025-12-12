@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { searchQueryPeeks } from "../lib/helpers";
-import { setQuery, queryAsync } from "../state/search/querySlice";
+import { setQuery, queryAsync, hideResults, showResults } from "../state/search/querySlice";
 import type { RootState, AppDispatch } from "../state/store";
 import type { QueryPeek } from "../types/query";
 
 export function useQuery() {
-    const { query, results, isLoading } = useSelector(
+    const { query, results, isLoading, isShowResults } = useSelector(
         (state: RootState) => state.query
     );
     const dispatch = useDispatch<AppDispatch>();
@@ -28,5 +28,9 @@ export function useQuery() {
         console.log("here");
     };
 
-    return { query, isLoading, filteredResults, handleQuery, handleRedirect };
+
+    return {
+        query, isLoading, filteredResults, handleQuery, handleRedirect, isShowResults,
+        hideResults: () => dispatch(hideResults()), showResults: () => dispatch(showResults())
+    };
 }
