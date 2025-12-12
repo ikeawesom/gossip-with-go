@@ -28,7 +28,7 @@ export default function AuthPage() {
     <section className="w-full grid place-items-center p-12 h-screen from-primary/30 to-primary/5 bg-linear-145">
       <Card className="flex flex-col items-center justify-center gap-4">
         <div className="flex flex-col items-center justify-center gap-1">
-          <Logo color />
+          <Logo color link />
           <h2>{authTitles[auth_option ?? ""]}</h2>
         </div>
         {auth_option === "login" ? (
