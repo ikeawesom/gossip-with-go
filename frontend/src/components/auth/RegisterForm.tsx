@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import PrimaryButton from "../utils/PrimaryButton";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../state/store";
-import Notice from "../utils/Notice";
 import { useState } from "react";
 import { toast } from "sonner";
 import AuthForm from "./AuthForm";
@@ -25,9 +24,8 @@ export default function RegisterForm() {
   const [success, setSuccess] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { error, isLoading, user } = useAuth();
+  const { error, isLoading } = useAuth();
 
   const empty_password = password === "" && confirm_password === "";
   const password_mismatch = password !== confirm_password;
@@ -64,11 +62,11 @@ export default function RegisterForm() {
     <AuthForm onSubmit={handleSubmit}>
       {success ? (
         <>
-          <h1 className="text-center">
-            Email verification link sent to{" "}
-            <span className="text-primary">{email}</span>
-          </h1>
           <div className="w-full">
+            <h1 className="text-center mb-2">
+              Email verification link sent to{" "}
+              <span className="text-primary">{email}</span>
+            </h1>
             <p className="text-center">
               Please verify your email before creating an account.
             </p>
