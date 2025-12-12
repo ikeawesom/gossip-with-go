@@ -1,7 +1,7 @@
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Links, Link } from "react-router-dom";
-import { authApi } from "../api/auth.api";
+import { useParams, useNavigate, Link } from "react-router-dom";
+// import { authApi } from "../api/auth.api";
 import type { ApiError } from "../types/auth";
 
 export default function VerifyEmailPage() {
@@ -35,12 +35,15 @@ export default function VerifyEmailPage() {
       }
 
       try {
-        const response = await authApi.verifyEmail({ token });
+        // await authApi.verifyEmail({ token });
         setStatus("success");
 
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          navigate("/login");
+          navigate("/auth/login");
+          // toast.success(
+          //   "You may now sign in using your username and password."
+          // );
         }, 3000);
       } catch (error) {
         setStatus("error");
