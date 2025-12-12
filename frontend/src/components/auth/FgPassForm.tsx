@@ -11,10 +11,9 @@ import { clearError, sendPasswordResetEmail } from "../../state/auth/authSlice";
 
 export default function FgPassForm() {
   const [username, setUsername] = useState("");
-  const { isLoading, error, user } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { isLoading, error } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     if (error) {
@@ -25,21 +24,17 @@ export default function FgPassForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(clearError());
-
-    const result = await dispatch(sendPasswordResetEmail({ username }));
-
-    if (!sendPasswordResetEmail.fulfilled.match(result)) {
-      toast.error(error);
-    }
+    const { payload } = await dispatch(sendPasswordResetEmail({ username }));
+    setEmail(payload as string);
   };
 
   return (
     <AuthForm onSubmit={handleSubmit}>
-      {user ? (
+      {email !== "" ? (
         <>
           <h1 className="text-center">
             Reset password link sent to{" "}
-            <span className="text-primary">{maskEmail(user.email)}</span>
+            <span className="text-primary">{maskEmail(email)}</span>
           </h1>
           <p className="text-center w-full">
             Didn't get your email?{" "}

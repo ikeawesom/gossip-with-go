@@ -27,7 +27,6 @@ export interface SignupCredentials {
 
 export interface ForgotPasswordRequest {
     username: string;
-    email?: string;
 }
 
 export interface ResetPasswordRequest {

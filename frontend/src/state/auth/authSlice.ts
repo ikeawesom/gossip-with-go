@@ -10,6 +10,7 @@ import type {
 } from '../../types/auth';
 import { AxiosError } from 'axios';
 import { defaultError } from '../../lib/constants';
+// import { authApi } from '../../api/auth.api';
 
 const initialState: AuthState = {
     user: null,
@@ -23,7 +24,7 @@ const TEMP_USER = {
     username: "ike",
     email: "ike@gossip.com",
     created_at: "12-12-2025",
-    email_verified: true,
+    email_verified: false,
 }
 
 // Async thunks
@@ -52,12 +53,15 @@ export const signupUser = createAsyncThunk(
     'auth/signup',
     async (credentials: SignupCredentials, { rejectWithValue }) => {
         try {
+            // 1. create user
             // const response = await authApi.signup(credentials);
-            // return response;
+
+            // 2. send email verification link
+            // const response_email = await authApi.sendVerification(credentials.email)
+
 
             // simulate
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            console.log("here")
             return { user: TEMP_USER, message: TEMP_USER.email } as AuthResponse;
 
         } catch (error) {
@@ -111,18 +115,18 @@ export const sendPasswordResetEmail = createAsyncThunk(
     'auth/sendPassReset',
     async (credentials: ForgotPasswordRequest, { rejectWithValue }) => {
         try {
-            // const response = await authApi.forgotPassword({ email });
+            // const response = await authApi.forgotPassword({ username: credentials.username });
             // return response;
 
             // simulate
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            return { user: TEMP_USER, message: TEMP_USER.email } as AuthResponse;
+            return TEMP_USER.email;
 
         } catch (error) {
             const axiosError = error as AxiosError<ApiError>;
-            return rejectWithValue(
-                axiosError.response?.data?.message || defaultError.message
-            );
+            const msg = axiosError.response?.data?.message ?? defaultError.message;
+
+            return rejectWithValue(msg)
         }
     }
 );
@@ -210,14 +214,18 @@ const authSlice = createSlice({
                 state.isAuthenticated = false;
             });
 
+        // send reset password email
         builder
             .addCase(sendPasswordResetEmail.pending, (state) => {
                 state.isLoading = true;
                 state.error = null
             })
-            .addCase(sendPasswordResetEmail.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+            .addCase(sendPasswordResetEmail.fulfilled, (state) => {
                 state.isLoading = false;
-                state.user = action.payload.user;
+            })
+            .addCase(sendPasswordResetEmail.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
             })
     },
 });
