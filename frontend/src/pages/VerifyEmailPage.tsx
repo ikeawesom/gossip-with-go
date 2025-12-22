@@ -1,8 +1,8 @@
 import type { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-// import { authApi } from "../api/auth.api";
 import type { ApiError } from "../types/auth";
+import { authApi } from "../api/auth.api";
 
 export default function VerifyEmailPage() {
   const { token } = useParams<{ token: string }>();
@@ -35,9 +35,8 @@ export default function VerifyEmailPage() {
       }
 
       try {
-        // await authApi.verifyEmail({ token });
+        await authApi.verifyEmail({ token });
         setStatus("success");
-
         // Redirect to login after 3 seconds
         setTimeout(() => {
           navigate("/auth/login");
@@ -48,6 +47,7 @@ export default function VerifyEmailPage() {
       } catch (error) {
         setStatus("error");
         const axiosError = error as AxiosError<ApiError>;
+        console.error("Full error:", axiosError.response?.data);
         setErrorMsg(
           axiosError.response?.data?.message ||
             "An unexpected error occurred when verifiying your email. Please register again or try again later."
