@@ -13,14 +13,11 @@ import { twMerge } from "tailwind-merge";
 export default function RegisterForm() {
   const [registerDetails, setRegisterDetails] = useState<SignupCredentials>({
     email: "",
-    first_name: "",
-    last_name: "",
     username: "",
     password: "",
     confirm_password: "",
   });
-  const { confirm_password, email, first_name, last_name, password, username } =
-    registerDetails;
+  const { confirm_password, email, password, username } = registerDetails;
   const [success, setSuccess] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -42,8 +39,6 @@ export default function RegisterForm() {
       signupUser({
         confirm_password,
         email,
-        first_name,
-        last_name,
         password,
         username,
       })
@@ -97,68 +92,42 @@ export default function RegisterForm() {
             placeholder="Enter your email"
             required
           />
-          <div className="flex w-full items-center justify-center gap-2 pb-2">
-            <input
-              value={first_name}
-              onChange={(e) =>
-                setRegisterDetails({
-                  ...registerDetails,
-                  first_name: e.target.value,
-                })
-              }
-              type="text"
-              placeholder="First name"
-            />
-            <input
-              value={last_name}
-              onChange={(e) =>
-                setRegisterDetails({
-                  ...registerDetails,
-                  last_name: e.target.value,
-                })
-              }
-              type="text"
-              placeholder="Last name"
-            />
-          </div>
-          <div className="border-t border-gray-dark/20 w-full flex flex-col gap-2 items-start justify-center pt-4">
-            <input
-              value={username}
-              onChange={(e) =>
-                setRegisterDetails({
-                  ...registerDetails,
-                  username: e.target.value,
-                })
-              }
-              type="text"
-              placeholder="Enter a username"
-              required
-            />
-            <input
-              value={password}
-              onChange={(e) =>
-                setRegisterDetails({
-                  ...registerDetails,
-                  password: e.target.value,
-                })
-              }
-              type="password"
-              placeholder="Enter a password"
-              required
-            />
-            <input
-              value={confirm_password}
-              onChange={(e) =>
-                setRegisterDetails({
-                  ...registerDetails,
-                  confirm_password: e.target.value,
-                })
-              }
-              type="password"
-              placeholder="Confirm password"
-              required
-            />
-          </div>
+          <input
+            value={username}
+            onChange={(e) =>
+              setRegisterDetails({
+                ...registerDetails,
+                username: e.target.value,
+              })
+            }
+            type="text"
+            placeholder="Enter a username"
+            required
+          />
+          <input
+            value={password}
+            onChange={(e) =>
+              setRegisterDetails({
+                ...registerDetails,
+                password: e.target.value,
+              })
+            }
+            type="password"
+            placeholder="Enter a password"
+            required
+          />
+          <input
+            value={confirm_password}
+            onChange={(e) =>
+              setRegisterDetails({
+                ...registerDetails,
+                confirm_password: e.target.value,
+              })
+            }
+            type="password"
+            placeholder="Confirm password"
+            required
+          />
           {password_mismatch && (
             <p className="ml-1 error">ERROR: Passwords do not match.</p>
           )}

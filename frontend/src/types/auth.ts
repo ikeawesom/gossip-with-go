@@ -7,7 +7,7 @@ export interface User {
 }
 
 export interface AuthResponse {
-    user: User;
+    data: { user: User };
     message?: string;
 }
 
@@ -19,8 +19,6 @@ export interface LoginCredentials {
 export interface SignupCredentials {
     username: string;
     email: string;
-    first_name: string;
-    last_name: string;
     password: string;
     confirm_password: string;
 }
