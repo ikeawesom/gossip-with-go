@@ -40,6 +40,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler) {
 			auth.POST("/verify-email", authHandler.VerifyEmail)
 			auth.POST("/resend-verification", authHandler.ResendVerification)
 			auth.POST("/forgot-password", authHandler.ForgotPassword)
+			auth.POST("/check-reset-token", authHandler.CheckResetToken)
 			auth.POST("/reset-password", authHandler.ResetPassword)
 			auth.POST("/refresh", authHandler.RefreshToken)
 

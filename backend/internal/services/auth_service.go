@@ -151,11 +151,13 @@ func (s *AuthService) ResendVerification(email string) error {
 	return nil
 }
 
-func (s *AuthService) ForgotPassword(email string) error {
+func (s *AuthService) ForgotPassword(username string) error {
 	var user models.User
-	if err := s.DB.Where("email = ?", email).First(&user).Error; err != nil {
-		// dont reveal if user exists
-		return nil
+	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return err
 	}
 
 	// generate reset token
@@ -181,8 +183,20 @@ func (s *AuthService) ForgotPassword(email string) error {
 	return nil
 }
 
+func (s *AuthService) CheckResetToken(token string) error {
+	var user models.User
+	if err := s.DB.Where("reset_token = ?", token).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("invalid or expired reset token")
+		}
+		return err
+	}
+	return nil
+}
+
 func (s *AuthService) ResetPassword(token, newPassword string) error {
 	var user models.User
+	log.Println("Resetting...")
 	if err := s.DB.Where("reset_token = ?", token).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("invalid or expired reset token")
@@ -194,6 +208,8 @@ func (s *AuthService) ResetPassword(token, newPassword string) error {
 	if user.ResetExpiry != nil && time.Now().After(*user.ResetExpiry) {
 		return errors.New("reset token has expired")
 	}
+	
+	log.Printf("valid token")
 
 	// hash new password
 	hashedPassword, err := utils.HashPassword(newPassword)

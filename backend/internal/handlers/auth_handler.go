@@ -22,9 +22,9 @@ func NewAuthHandler(authService *services.AuthService) *AuthHandler {
 }
 
 type SignupRequest struct {
-	Username        string `json:"username" binding:"required,min=3,max=50"`
+	Username        string `json:"username" binding:"required"`
 	Email           string `json:"email" binding:"required,email"`
-	Password        string `json:"password" binding:"required,min=8"`
+	Password        string `json:"password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" binding:"required"`
 }
 
@@ -42,12 +42,12 @@ type ResendVerificationRequest struct {
 }
 
 type ForgotPasswordRequest struct {
-	Email string `json:"email" binding:"required,email"`
+	Username string `json:"username" binding:"required"`
 }
 
 type ResetPasswordRequest struct {
 	Token           string `json:"token" binding:"required"`
-	NewPassword     string `json:"new_password" binding:"required,min=8"`
+	NewPassword     string `json:"new_password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" binding:"required"`
 }
 
@@ -213,6 +213,18 @@ func (h *AuthHandler) ResendVerification(c *gin.Context) {
 
 	utils.SuccessResponse(c, http.StatusOK, "Verification email sent!", nil)
 }
+func (h *AuthHandler) CheckResetToken(c *gin.Context) {
+	var req VerifyEmailRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ValidationErrorResponse(c, err.Error())
+		return
+	}
+	if err := h.AuthService.CheckResetToken(req.Token); err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	utils.SuccessResponse(c, http.StatusOK, "Reset token is valid", nil)
+}
 
 func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	var req ForgotPasswordRequest
@@ -221,8 +233,8 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	if err := h.AuthService.ForgotPassword(req.Email); err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to send reset email", nil)
+	if err := h.AuthService.ForgotPassword(req.Username); err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "s", nil)
 		return
 	}
 
