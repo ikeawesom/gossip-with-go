@@ -3,38 +3,37 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../state/store";
 import { Link } from "react-router-dom";
 import PrimaryButton from "../utils/PrimaryButton";
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { maskEmail } from "../../lib/helpers";
+import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { clearError, sendPasswordResetEmail } from "../../state/auth/authSlice";
+import type { ResponseType } from "../../types/res";
+import { toast } from "sonner";
 
 export default function FgPassForm() {
   const [username, setUsername] = useState("");
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
+  const { isLoading } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
-  const [email, setEmail] = useState("");
-
-  useEffect(() => {
-    if (error) {
-      toast.error(`ERROR: ${error}`);
-    }
-  }, [error]);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(clearError());
     const { payload } = await dispatch(sendPasswordResetEmail({ username }));
-    setEmail(payload as string);
+    const res = payload as ResponseType;
+    if (!res.error) {
+      setSuccess(true);
+    } else {
+      toast.error(res.error);
+    }
   };
 
   return (
     <AuthForm onSubmit={handleSubmit}>
-      {email !== "" ? (
+      {success ? (
         <>
           <h1 className="text-center">
-            Reset password link sent to{" "}
-            <span className="text-primary">{maskEmail(email)}</span>
+            If <span className="text-primary">{username}</span> exists, an email
+            has been sent.
           </h1>
           <p className="text-center w-full">
             Didn't get your email?{" "}
