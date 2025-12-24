@@ -77,3 +77,33 @@ func (s *EmailService) SendVerificationEmail(to, username, token, verifyURL stri
 
 	return s.SendEmail(to, subject, body)
 }
+
+func (s *EmailService) SendPasswordResetEmail(to, username, token, resetURL string) error {
+	resetLink := fmt.Sprintf("%s/%s", resetURL, token)
+	
+	subject := "Reset Your Password - Gossip With Go"
+	body := fmt.Sprintf(`
+		<html>
+		<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+			<div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+				<h2 style="color: #4F46E5;">Password Reset Request</h2>
+				<p>Hi %s,</p>
+				<p>We received a request to reset your password. Click the button below to reset it:</p>
+				<div style="text-align: center; margin: 30px 0;">
+					<a href="%s" 
+					   style="background-color: #4F46E5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+						Reset Password
+					</a>
+				</div>
+				<p>Or copy and paste this link into your browser:</p>
+				<p style="word-break: break-all; color: #4F46E5;">%s</p>
+				<p style="margin-top: 30px; font-size: 12px; color: #666;">
+					This link will expire in 1 hour. If you didn't request a password reset, please ignore this email.
+				</p>
+			</div>
+		</body>
+		</html>
+	`, username, resetLink, resetLink)
+
+	return s.SendEmail(to, subject, body)
+}
