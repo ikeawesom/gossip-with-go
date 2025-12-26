@@ -71,7 +71,7 @@ export default function SearchBar() {
                           <div className="flex items-center justify-center gap-3">
                             <p className="fine-print">{result.likes} ❤︎</p>
                             <p className="fine-print">
-                              {formatDate(result.date)}
+                              {formatDate(result.date).time}
                             </p>
                           </div>
                         </div>
