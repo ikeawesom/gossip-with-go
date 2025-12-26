@@ -9,14 +9,18 @@ export default function AuthInitializer({
   children: React.ReactNode;
 }) {
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   useEffect(() => {
-    // only check auth if we think user is authenticated (from persisted state)
-    if (isAuthenticated) {
+    if (!isAuthenticated) {
+      console.log("checking auth: ");
       dispatch(checkAuth());
+    } else {
+      console.log("authenticated as:", user?.username);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   return <>{children} </>;
 }
