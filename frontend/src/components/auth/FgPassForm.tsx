@@ -8,6 +8,7 @@ import { twMerge } from "tailwind-merge";
 import { clearError, sendPasswordResetEmail } from "../../state/auth/authSlice";
 import type { ResponseType } from "../../types/res";
 import { toast } from "sonner";
+import SpinnerSecondary from "../spinner/SpinnerSecondary";
 
 export default function FgPassForm() {
   const [username, setUsername] = useState("");
@@ -75,19 +76,7 @@ export default function FgPassForm() {
             className="w-full mt-3"
             disabled={username === "" || isLoading}
           >
-            {isLoading ? (
-              <div className="grid place-items-center">
-                <img
-                  className="animate-spin"
-                  src="/utils/spinner_white.png"
-                  alt="Loading"
-                  height={24}
-                  width={24}
-                />
-              </div>
-            ) : (
-              "Reset Password"
-            )}
+            {isLoading ? <SpinnerSecondary /> : "Reset Password"}
           </PrimaryButton>
         </>
       )}

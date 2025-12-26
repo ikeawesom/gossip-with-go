@@ -3,10 +3,11 @@ import PrimaryButton from "../utils/PrimaryButton";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../state/store";
 import { toast } from "sonner";
-import {  useState } from "react";
+import { useState } from "react";
 import AuthForm from "./AuthForm";
 import { clearError, loginUser } from "../../state/auth/authSlice";
 import useAuth from "../../hooks/useAuth";
+import SpinnerSecondary from "../spinner/SpinnerSecondary";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
@@ -20,9 +21,9 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(clearError());
-    
+
     const result = await dispatch(loginUser({ username, password }));
-    
+
     if (loginUser.fulfilled.match(result)) {
       navigate(prev_page, { replace: true });
     } else {
@@ -31,9 +32,9 @@ export default function LoginForm() {
   };
 
   return (
-    <AuthForm onSubmit={handleSubmit} >
+    <AuthForm onSubmit={handleSubmit}>
       <input
-      value={username}
+        value={username}
         onChange={(e) => setUsername(e.target.value)}
         type="text"
         placeholder="Enter your username"
@@ -41,7 +42,7 @@ export default function LoginForm() {
       />
       <div className="w-full flex flex-col gap-3 items-start justify-start">
         <input
-        value={password}
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           type="password"
           placeholder="Enter your password"
@@ -64,24 +65,8 @@ export default function LoginForm() {
         </Link>
       </p>
 
-      <PrimaryButton
-      type="submit"
-        className="w-full mt-3"
-        disabled={disable}
-      >
-        {isLoading ? (
-          <div className="grid place-items-center">
-            <img
-              className="animate-spin"
-              src="/utils/spinner_white.png"
-              alt="Loading"
-              height={24}
-              width={24}
-            />
-          </div>
-        ) : (
-          "Login"
-        )}
+      <PrimaryButton type="submit" className="w-full mt-3" disabled={disable}>
+        {isLoading ? <SpinnerSecondary /> : "Login"}
       </PrimaryButton>
     </AuthForm>
   );

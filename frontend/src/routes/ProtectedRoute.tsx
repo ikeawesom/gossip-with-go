@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 import type { DefaultCustomProps } from "../lib/constants";
 import type { RootState } from "../state/store";
+import SpinnerPrimary from "../components/spinner/SpinnerPrimary";
 
 export default function ProtectedRoute({ children }: DefaultCustomProps) {
   const { isAuthenticated, isLoading } = useSelector(
@@ -10,17 +11,7 @@ export default function ProtectedRoute({ children }: DefaultCustomProps) {
   const location = useLocation();
 
   if (isLoading) {
-    return (
-      <div className="grid place-items-center">
-        <img
-          className="animate-spin"
-          src="/utils/spinner_white.png"
-          alt="Loading"
-          height={24}
-          width={24}
-        />
-      </div>
-    );
+    return <SpinnerPrimary />;
   }
 
   // redirect to login if not authenticated

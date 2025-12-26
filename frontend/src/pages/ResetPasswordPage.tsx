@@ -4,6 +4,7 @@ import { authApi } from "../api/auth.api";
 import { toast } from "sonner";
 import AuthForm from "../components/auth/AuthForm";
 import PrimaryButton from "../components/utils/PrimaryButton";
+import SpinnerSecondary from "../components/spinner/SpinnerSecondary";
 
 export default function ResetPasswordPage() {
   const { token } = useParams<{ token: string }>();
@@ -69,19 +70,7 @@ export default function ResetPasswordPage() {
         required
       />
       <PrimaryButton type="submit" className="w-full mt-3" disabled={disable}>
-        {loading ? (
-          <div className="grid place-items-center">
-            <img
-              className="animate-spin"
-              src="/utils/spinner_white.png"
-              alt="Loading"
-              height={24}
-              width={24}
-            />
-          </div>
-        ) : (
-          "Reset Password"
-        )}
+        {loading ? <SpinnerSecondary /> : "Reset Password"}
       </PrimaryButton>
     </AuthForm>
   );

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PrimaryButton from "../utils/PrimaryButton";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../state/store";
@@ -9,6 +9,7 @@ import type { SignupCredentials } from "../../types/auth";
 import { clearError, signupUser } from "../../state/auth/authSlice";
 import useAuth from "../../hooks/useAuth";
 import { twMerge } from "tailwind-merge";
+import SpinnerSecondary from "../spinner/SpinnerSecondary";
 
 export default function RegisterForm() {
   const [registerDetails, setRegisterDetails] = useState<SignupCredentials>({
@@ -146,19 +147,7 @@ export default function RegisterForm() {
             disabled={disabled}
             className="w-full mt-3"
           >
-            {isLoading ? (
-              <div className="grid place-items-center">
-                <img
-                  className="animate-spin"
-                  src="/utils/spinner_white.png"
-                  alt="Loading"
-                  height={24}
-                  width={24}
-                />
-              </div>
-            ) : (
-              "Get Started"
-            )}
+            {isLoading ? <SpinnerSecondary /> : "Get Started"}
           </PrimaryButton>
         </>
       )}
