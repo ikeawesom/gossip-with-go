@@ -33,11 +33,16 @@ func main() {
 
 	db := database.GetDB()
 	authService := services.NewAuthService(db, emailService)
+	userService := services.NewUserService(db)
+
+	postServce := services.NewPostService(db)
 	
 	authHandler := handlers.NewAuthHandler(authService)
+	userHandler := handlers.NewUserHandler(userService)
+	postHandler := handlers.NewPostHandler(postServce)
 
 	r := gin.Default()
-	routes.SetupRoutes(r, authHandler)
+	routes.SetupRoutes(r, authHandler, userHandler, postHandler)
 
 	// start server
 	serverAddr := ":" + cfg.Port
