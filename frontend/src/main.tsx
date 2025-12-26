@@ -9,7 +9,8 @@ import { Toaster } from "sonner";
 import "./index.css";
 import { persistor, store } from "./state/store.ts";
 import AuthInitializer from "./components/auth/AuthInit.tsx";
-import ProtectedRoute from "./routes/ProtectedRoute.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
+// import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -20,17 +21,10 @@ createRoot(document.getElementById("root")!).render(
           <AuthInitializer>
             <Routes>
               <Route path="/" element={<App />} />
-              <Route path="/:user_id" element={<App />} />
               <Route path="/auth/:auth_option" element={<AuthPage />} />
               <Route path="/auth/:auth_option/:token" element={<AuthPage />} />
-              <Route
-                path="/:user_id/posts/:post_id"
-                element={
-                  <ProtectedRoute>
-                    <PostPage />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/:user_id/posts/:post_id" element={<PostPage />} />
+              <Route path="/:user_id" element={<ProfilePage />} />
             </Routes>
           </AuthInitializer>
         </BrowserRouter>
