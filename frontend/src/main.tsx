@@ -10,6 +10,8 @@ import "./index.css";
 import { persistor, store } from "./state/store.ts";
 import AuthInitializer from "./components/auth/AuthInit.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
+import NavSection from "./components/nav/NavSection.tsx";
+import NotFound from "./pages/NotFound.tsx";
 // import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 
 createRoot(document.getElementById("root")!).render(
@@ -25,6 +27,14 @@ createRoot(document.getElementById("root")!).render(
               <Route path="/auth/:auth_option/:token" element={<AuthPage />} />
               <Route path="/:user_id/posts/:post_id" element={<PostPage />} />
               <Route path="/:user_id" element={<ProfilePage />} />
+              <Route
+                path="*"
+                element={
+                  <NavSection>
+                    <NotFound />
+                  </NavSection>
+                }
+              />
             </Routes>
           </AuthInitializer>
         </BrowserRouter>
