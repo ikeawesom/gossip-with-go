@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"gossip-with-go/internal/models"
 	"log"
 
@@ -27,12 +28,18 @@ func NewPostService(db *gorm.DB) *PostService {
 func (s *PostService) GetPostByUsername(username string) ([]models.Post, error) {
 	var user models.User
 	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
 		return nil, err
 	}
 	log.Printf("found user ID %d for username %s", user.ID, username)
 
 	var posts []models.Post
 	if err := s.DB.Where("user_id = ?", user.ID).Order("created_at DESC").Find(&posts).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("posts not found")
+		}
 		return nil, err
 	}
 	return posts, nil
@@ -41,9 +48,32 @@ func (s *PostService) GetPostByUsername(username string) ([]models.Post, error) 
 func (s *PostService) GetPostByTopic(topic string) ([]models.Post, error) {
 	var posts []models.Post
 	if err := s.DB.Where("topic = ?", topic).Find(&posts).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("posts not found")
+		}
 		return nil, err
 	}
 	return posts, nil
+}
+
+func (s *PostService) GetUserPostByID(username string, postID uint) (*models.Post, error) {
+	var user models.User
+	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+
+	var post models.Post
+	if err := s.DB.Where("id = ? AND user_id = ?", postID, user.ID).First(&post).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("post not found")
+		}
+		return nil, err
+	}
+
+	return &post, nil
 }
 
 func (s *PostService) CreatePost(username, topic, title, content string) error {

@@ -68,6 +68,28 @@ func (h *PostHandler) GetPostByTopic(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"posts": posts})
 }
 
+func (h *PostHandler) GetUserPostByID(c *gin.Context) {
+	username := c.Param("username")
+	postIDParam := c.Param("postID")
+	log.Printf("searching for post ID %s by user %s", postIDParam, username)
+
+	postID, err := utils.ParseUintParam(postIDParam)
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid post ID", nil)	
+		return
+	}
+	
+	post, err := h.PostService.GetUserPostByID(username, postID)
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
+		log.Println(err)
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Post retrieved successfully", gin.H{"post": post})
+}
+
+
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	var req CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
