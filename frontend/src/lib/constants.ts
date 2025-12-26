@@ -105,3 +105,16 @@ export const defaultError: errorType = {
     code: 0,
     message: "An unknown error has occurred. Please try again later."
 }
+
+export const DEFAULT_TOPICS = [
+    { title: "GENERAL DISCUSSION", color: "bg-blue-100" },
+    { title: "INTRODUCTIONS", color: "bg-green-100" },
+    { title: "TECHNOLOGY", color: "bg-purple-100" },
+    { title: "ENTERTAINMENT", color: "bg-pink-100" },
+    { title: "SPORTS & FITNESS", color: "bg-red-100" },
+    { title: "FOOD & COOKING", color: "bg-orange-100" },
+    { title: "TRAVEL & ADVENTURE", color: "bg-teal-100" },
+    { title: "HOBBIES & CRAFTS", color: "bg-indigo-100" },
+    { title: "CAREER & EDUCATION", color: "bg-yellow-100" },
+    { title: "OTHERS", color: "bg-gray-100" }
+];
