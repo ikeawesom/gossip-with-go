@@ -5,12 +5,12 @@ import type {
     LoginCredentials,
     SignupCredentials,
     ApiError,
-    AuthResponse,
-    ForgotPasswordRequest
+    ForgotPasswordRequest,
+    User
 } from '../../types/auth';
 import { AxiosError } from 'axios';
 import { defaultError } from '../../lib/constants';
-// import { authApi } from '../../api/auth.api';
+import { authApi } from '../../api/auth.api';
 
 const initialState: AuthState = {
     user: null,
@@ -19,29 +19,17 @@ const initialState: AuthState = {
     error: null,
 };
 
-const TEMP_USER = {
-    id: 1,
-    username: "ike",
-    email: "ike@gossip.com",
-    created_at: "12-12-2025",
-    email_verified: false,
-}
-
 // Async thunks
 export const loginUser = createAsyncThunk(
     'auth/login',
     async (credentials: LoginCredentials, { rejectWithValue }) => {
         try {
-            // const response = await authApi.login(credentials);
-            // return response;
-
-            // simulate
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            return { user: TEMP_USER, message: "success" } as AuthResponse;
+            const response = await authApi.login(credentials);
+            return response;
 
         } catch (error) {
-            console.log(error);
             const axiosError = error as AxiosError<ApiError>;
+            console.log("Full error:", axiosError.response?.data)
             return rejectWithValue(
                 axiosError.response?.data?.message || defaultError.message
             );
@@ -53,19 +41,12 @@ export const signupUser = createAsyncThunk(
     'auth/signup',
     async (credentials: SignupCredentials, { rejectWithValue }) => {
         try {
-            // 1. create user
-            // const response = await authApi.signup(credentials);
-
-            // 2. send email verification link
-            // const response_email = await authApi.sendVerification(credentials.email)
-
-
-            // simulate
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            return { user: TEMP_USER, message: TEMP_USER.email } as AuthResponse;
+            const response = await authApi.signup(credentials);
+            return response;
 
         } catch (error) {
             const axiosError = error as AxiosError<ApiError>;
+            console.error('Full error:', axiosError.response?.data);
             return rejectWithValue(
                 axiosError.response?.data?.message || defaultError.message
             );
@@ -77,13 +58,11 @@ export const logoutUser = createAsyncThunk(
     'auth/logout',
     async (_, { rejectWithValue }) => {
         try {
-            // await authApi.logout();
-
-            // simulate
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await authApi.logout();
 
         } catch (error) {
             const axiosError = error as AxiosError<ApiError>;
+            console.error('Full error:', axiosError.response?.data);
             return rejectWithValue(
                 axiosError.response?.data?.message || defaultError.message
             );
@@ -95,15 +74,12 @@ export const checkAuth = createAsyncThunk(
     'auth/checkAuth',
     async (_, { rejectWithValue }) => {
         try {
-            // const response = await authApi.getCurrentUser();
-            // return response;
-
-            // simulate
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            return { user: TEMP_USER, message: "success" } as AuthResponse;
+            const response = await authApi.getCurrentUser();
+            return response;
 
         } catch (error) {
             const axiosError = error as AxiosError<ApiError>;
+            console.error('Full error:', axiosError.response?.data);
             return rejectWithValue(
                 axiosError.response?.data?.message || defaultError.message
             );
@@ -115,18 +91,13 @@ export const sendPasswordResetEmail = createAsyncThunk(
     'auth/sendPassReset',
     async (credentials: ForgotPasswordRequest, { rejectWithValue }) => {
         try {
-            // const response = await authApi.forgotPassword({ username: credentials.username });
-            // return response;
-
-            // simulate
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            return TEMP_USER.email;
+            const response = await authApi.forgotPassword({ username: credentials.username });
+            return response;
 
         } catch (error) {
             const axiosError = error as AxiosError<ApiError>;
-            const msg = axiosError.response?.data?.message ?? defaultError.message;
-
-            return rejectWithValue(msg)
+            console.error('Full error:', axiosError.response?.data);
+            return rejectWithValue(axiosError.response?.data?.message || defaultError.message)
         }
     }
 );
@@ -152,7 +123,7 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.user = action.payload.user;
+                state.user = action.payload.data.user;
                 state.isAuthenticated = true;
                 state.error = null;
             })
@@ -202,9 +173,9 @@ const authSlice = createSlice({
             .addCase(checkAuth.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(checkAuth.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+            .addCase(checkAuth.fulfilled, (state, action: PayloadAction<User>) => {
                 state.isLoading = false;
-                state.user = action.payload.user;
+                state.user = action.payload;
                 state.isAuthenticated = true;
                 state.error = null;
             })
