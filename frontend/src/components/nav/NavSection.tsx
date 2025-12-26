@@ -15,7 +15,7 @@ export default function NavSection({
     <section>
       <NavBar showAccount={showAccount} />
       <section className="pt-18 w-full flex items-start justify-center">
-        <div className={twMerge("w-full max-w-[1200px] p-6", className)}>
+        <div className={twMerge("w-full max-w-[800px] p-6", className)}>
           {children}
         </div>
       </section>
