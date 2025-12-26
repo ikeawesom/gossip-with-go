@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler) {
+func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler) {
 	// CORS configuration
 	cfg := config.AppConfig
 	r.Use(cors.New(cors.Config{
@@ -32,6 +32,8 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler) {
 		})
 
 		// public API routes
+
+		// auth routes
 		auth := api.Group("/auth")
 		{
 			auth.POST("/signup", authHandler.Signup)
@@ -46,6 +48,21 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler) {
 
 			// protected auth routes - for testing (can remove later)
 			auth.GET("/me", middleware.AuthRequired(), authHandler.GetCurrentUser)
+		}
+
+		// user routes
+		users := api.Group("/users")
+		{
+			users.GET("/:username", userHandler.GetUserByUsername)
+		}
+
+		// post routes
+		posts := api.Group("/posts")
+		{
+			// likes and comments will be included here
+			posts.GET("/users/:username", postHandler.GetPostByUsername)
+			posts.GET("/topic/:topic", postHandler.GetPostByTopic)
+			posts.POST("/create", middleware.AuthRequired(), postHandler.CreatePost)
 		}
 		
 		// private API routes example
