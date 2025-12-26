@@ -16,7 +16,7 @@ export default function useAuth() {
     const location = useLocation();
 
     // get the previous page user was trying to access
-    const prev_page = (location.state as any)?.prev_page?.pathname || '/';
+    const prev_page = (location.state as any)?.prev_page || '/';
 
     useEffect(() => {
         dispatch(clearError());
@@ -31,6 +31,6 @@ export default function useAuth() {
 
     return {
         isLoading,
-        error, prev_page, user
+        error, prev_page, user, isAuthenticated
     };
 }
