@@ -1,10 +1,11 @@
 import type { JSX } from "react/jsx-dev-runtime";
 import type { QueryPeek } from "../types/query";
+import { DEFAULT_TOPICS } from "./constants";
 
 export type HTMLProps<T extends keyof JSX.IntrinsicElements> =
   React.ComponentPropsWithoutRef<T>;
 
-export function formatDate(timestamp: number): string {
+export function formatDate(timestamp: number, includeTime?: boolean): { date: boolean; time: string } {
   const months = [
     "Jan",
     "Feb",
@@ -25,7 +26,25 @@ export function formatDate(timestamp: number): string {
   const month = months[date.getMonth()];
   const year = date.getFullYear();
 
-  return `${day} ${month} ${year}`;
+  if (includeTime) {
+    const tempDate = new Date();
+    tempDate.setHours(tempDate.getHours() + 8); // adjust to SGT
+    const now = tempDate.getTime();
+    const diffMs = now - timestamp;
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+
+    if (diffSecs < 60) {
+      return { date: false, time: `${diffSecs} SEC${diffSecs !== 1 ? 'S' : ''} AGO` };
+    } else if (diffMins < 60) {
+      return { date: false, time: `${diffMins} MIN${diffMins !== 1 ? 'S' : ''} AGO` };
+    } else if (diffHours < 24) {
+      return { date: false, time: `${diffHours} HOUR${diffHours !== 1 ? 'S' : ''} AGO` };
+    }
+  }
+
+  return { date: true, time: `${day} ${month} ${year}` };
 }
 
 export function searchQueryPeeks(
@@ -91,4 +110,8 @@ export function maskEmail(email: string): string {
   const maskedDomain = maskedDomainParts.join('.');
 
   return `${maskedLocal}@${maskedDomain}`;
+}
+
+export function getTopicColor(topic: string) {
+  return DEFAULT_TOPICS.find((t) => t.title === topic)?.color || "";
 }
