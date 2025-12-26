@@ -5,6 +5,7 @@ import RegisterForm from "../components/auth/RegisterForm";
 import Logo from "../components/utils/Logo";
 import FgPassForm from "../components/auth/FgPassForm";
 import VerifyEmailPage from "./VerifyEmailPage";
+import ResetPasswordPage from "./ResetPasswordPage";
 
 type AuthPageParams = { auth_option: string; token?: string };
 const authTitles = {
@@ -40,6 +41,8 @@ export default function AuthPage() {
           ) : (
             <RegisterForm />
           )
+        ) : token ? (
+          <ResetPasswordPage />
         ) : (
           <FgPassForm />
         )}
