@@ -17,9 +17,17 @@ export const postApi = {
         return response.data;
     },
 
+    // create new post
     createPost: async (postData: CreatePostRequest): Promise<ResponseType> => {
         const response = await apiClient.post(`/posts/create`, postData);
         console.log(response)
+        return response.data;
+    },
+
+    // get post by username and postID
+    getUserPostByID: async (username: string, postID: string): Promise<ResponseType> => {
+        const response = await apiClient.get(`/posts/${username}/${postID}`);
+        console.log("API RESPONSE:", response.data);
         return response.data;
     }
 
