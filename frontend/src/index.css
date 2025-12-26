@@ -17,22 +17,22 @@
   --color-green-light: #adffb3;
 }
 
-h1 {
+h1:not(.custom) {
   @apply text-3xl font-bold;
 }
 
-h2 {
+h2:not(.custom) {
   @apply text-2xl font-bold;
 }
 
-h3 {
+h3:not(.custom) {
   @apply text-xl font-bold;
 }
 
-h4 {
+h4:not(.custom) {
   @apply text-lg font-bold;
 }
-p,
+p:not(.custom),
 label {
   @apply text-sm;
 }
