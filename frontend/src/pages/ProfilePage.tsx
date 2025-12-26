@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../state/store";
 import type { User } from "../types/auth";
 import NavSection from "../components/nav/NavSection";
-import { formatDate, getTopicColor } from "../lib/helpers";
+import { formatDate } from "../lib/helpers";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import PrimaryButton from "../components/utils/PrimaryButton";
 import { toast } from "sonner";
@@ -14,13 +14,13 @@ import { checkAuth } from "../state/auth/authSlice";
 import { postApi } from "../api/posts.api";
 import type { PostType } from "../types/post";
 import CreatePostForm from "../components/posts/CreatePostForm";
-import { twMerge } from "tailwind-merge";
+import TopicTag from "../components/utils/TopicTag";
 
 export default function ProfilePage() {
   // const { user } = useSelector((state: RootState) => state.auth);
+  // const navigate = useNavigate();
   const { user_id } = useParams<{ user_id: string }>();
   const { user } = useSelector((state: RootState) => state.auth);
-  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
   const [userState, setUserState] = useState<"loading" | "success" | "invalid">(
@@ -128,9 +128,7 @@ export default function ProfilePage() {
                 >
                   <div className="flex items-center justify-start gap-2">
                     <h4>{title}</h4>
-                    <p className={twMerge("topic-tag", getTopicColor(topic))}>
-                      {topic}
-                    </p>
+                    <TopicTag topic={topic} />
                   </div>
                   <p>{content}</p>
                   <p className="fine-print mt-2">
