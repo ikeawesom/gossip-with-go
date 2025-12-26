@@ -63,6 +63,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			posts.GET("/users/:username", postHandler.GetPostByUsername)
 			posts.GET("/topic/:topic", postHandler.GetPostByTopic)
 			posts.POST("/create", middleware.AuthRequired(), postHandler.CreatePost)
+			posts.GET("/:username/:postID", postHandler.GetUserPostByID)
 		}
 		
 		// private API routes example
