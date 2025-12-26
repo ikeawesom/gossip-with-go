@@ -32,7 +32,8 @@ h3 {
 h4 {
   @apply text-lg font-bold;
 }
-p {
+p,
+label {
   @apply text-sm;
 }
 
@@ -40,7 +41,8 @@ p:not(.fine-print) {
   @apply text-gray-dark;
 }
 
-p.fine-print {
+p.fine-print,
+label {
   @apply text-fine-print;
 }
 
@@ -52,8 +54,20 @@ p.success {
   @apply text-green;
 }
 
-input {
+p.topic-tag {
+  @apply text-xs px-2 py-1 rounded-full;
+}
+
+input,
+select,
+textarea {
   @apply bg-white placeholder-fine-print rounded-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-gray-dark w-full;
+}
+
+input.not-rounded,
+select,
+textarea {
+  @apply rounded-lg;
 }
 
 button:disabled {
