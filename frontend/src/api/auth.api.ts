@@ -6,6 +6,7 @@ import type {
     ForgotPasswordRequest,
     ResetPasswordRequest,
     VerifyEmailRequest,
+    User,
 } from '../types/auth';
 
 export const authApi = {
@@ -17,7 +18,9 @@ export const authApi = {
 
     // signup
     signup: async (credentials: SignupCredentials): Promise<{ message: string }> => {
+        console.log("here");
         const response = await apiClient.post<{ message: string }>('/auth/signup', credentials);
+        console.log(response);
         return response.data;
     },
 
@@ -27,9 +30,10 @@ export const authApi = {
     },
 
     // get current user (from cookie)
-    getCurrentUser: async (): Promise<AuthResponse> => {
+    getCurrentUser: async (): Promise<User> => {
         const response = await apiClient.get<AuthResponse>('/auth/me');
-        return response.data;
+        const user = response.data.data.user;
+        return user;
     },
 
     // refresh access token
@@ -60,4 +64,10 @@ export const authApi = {
         const response = await apiClient.post<{ message: string }>('/auth/reset-password', data);
         return response.data;
     },
+
+    // check reset token validity
+    checkResetToken: async (token: string): Promise<{ success: boolean }> => {
+        const response = await apiClient.post<{ success: boolean }>('/auth/check-reset-token', { token });
+        return response.data;
+    }
 };
