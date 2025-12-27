@@ -1,15 +1,11 @@
-import NavBar from "./components/nav/NavBar";
+import NavSection from "./components/nav/NavSection";
+import TopicsSection from "./components/topics/TopicsSection";
 
 function App() {
   return (
-    <section>
-      <NavBar />
-      <section className="pt-18 w-full flex items-start justify-center">
-        <div className="w-full max-w-[1200px] p-6 border border-red-500 min-h-screen">
-          {/* website body goes here */}
-        </div>
-      </section>
-    </section>
+    <NavSection className="border border-red-500">
+      <TopicsSection />
+    </NavSection>
   );
 }
 
