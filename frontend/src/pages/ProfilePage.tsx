@@ -3,7 +3,7 @@ import type { AppDispatch, RootState } from "../state/store";
 import type { User } from "../types/auth";
 import NavSection from "../components/nav/NavSection";
 import { formatDate } from "../lib/helpers";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import PrimaryButton from "../components/utils/PrimaryButton";
 import { toast } from "sonner";
 import { authApi } from "../api/auth.api";
@@ -14,7 +14,7 @@ import { checkAuth } from "../state/auth/authSlice";
 import { postApi } from "../api/posts.api";
 import type { PostType } from "../types/post";
 import CreatePostForm from "../components/posts/CreatePostForm";
-import TopicTag from "../components/utils/TopicTag";
+import PostCard from "../components/posts/PostCard";
 
 export default function ProfilePage() {
   // const { user } = useSelector((state: RootState) => state.auth);
@@ -116,26 +116,14 @@ export default function ProfilePage() {
           <p>{username} has no posts yet.</p>
         ) : (
           <div className="w-full flex flex-col gap-4 items-center justify-center">
-            {userPosts.map((post: PostType) => {
-              const { content, created_at, id, title, topic } = post;
-              const newDate = formatDate(new Date(created_at).getTime(), true);
-
+            {userPosts.map((post: PostType, index: number) => {
               return (
-                <Link
-                  to={`/${username}/posts/${id}`}
-                  className="hover:brightness-95 duration-150 bg-white w-full border flex flex-col items-start gap-2 justify-start border-gray-light shadow-xs p-5 rounded-md"
-                  key={id}
-                >
-                  <div className="flex items-center justify-start gap-2">
-                    <h4>{title}</h4>
-                    <TopicTag topic={topic} />
-                  </div>
-                  <p>{content}</p>
-                  <p className="fine-print mt-2">
-                    Posted {newDate.date ? "on" : ""}{" "}
-                    {newDate.time.toLowerCase()}
-                  </p>
-                </Link>
+                <PostCard
+                  username={username}
+                  post={post}
+                  key={index}
+                  showTopic
+                />
               );
             })}
           </div>
