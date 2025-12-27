@@ -112,6 +112,6 @@ export function maskEmail(email: string): string {
   return `${maskedLocal}@${maskedDomain}`;
 }
 
-export function getTopicColor(topic: string) {
-  return DEFAULT_TOPICS.find((t) => t.title === topic)?.color || "";
+export function getTopicColor(topic_id: string) {
+  return DEFAULT_TOPICS[topic_id]?.color || "";
 }
