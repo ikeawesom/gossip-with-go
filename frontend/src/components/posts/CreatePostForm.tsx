@@ -15,7 +15,7 @@ export default function CreatePostForm({
   const [postDetails, setPostDetails] = useState<CreatePostRequest>({
     title: "",
     content: "",
-    topic: DEFAULT_TOPICS[0].title,
+    topic: Object.keys(DEFAULT_TOPICS)[0],
     username,
   });
 
@@ -67,11 +67,11 @@ export default function CreatePostForm({
             setPostDetails({ ...postDetails, topic: e.target.value })
           }
         >
-          {DEFAULT_TOPICS.map(
-            (topic: { title: string; color: string }, id: number) => (
-              <option key={id}>{topic.title}</option>
-            )
-          )}
+          {Object.keys(DEFAULT_TOPICS).map((id: string) => (
+            <option value={id} key={id}>
+              {DEFAULT_TOPICS[id].title}
+            </option>
+          ))}
         </select>
       </div>
       <PrimaryButton className="self-end" type="submit">
