@@ -19,6 +19,11 @@ type NewPost struct {
 	Content  string
 }
 
+type PostWithUsername struct {
+	models.Post
+	Username string `json:"username"`
+}
+
 func NewPostService(db *gorm.DB) *PostService {
 	return &PostService{
 		DB: db,
@@ -42,17 +47,23 @@ func (s *PostService) GetPostByUsername(username string) ([]models.Post, error) 
 		}
 		return nil, err
 	}
+	
 	return posts, nil
 }
 
-func (s *PostService) GetPostByTopic(topic string) ([]models.Post, error) {
-	var posts []models.Post
-	if err := s.DB.Where("topic = ?", topic).Find(&posts).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("posts not found")
-		}
-		return nil, err
-	}
+func (s *PostService) GetPostByTopic(topic string) ([]PostWithUsername, error) {
+	var posts []PostWithUsername
+	if err := s.DB.
+				Table("posts").
+				Select("posts.id, posts.user_id, users.username, posts.topic, posts.title, posts.content, posts.created_at, posts.updated_at").
+				Joins("JOIN users ON user_id = posts.user_id").
+				Where("topic = ?", topic).Find(&posts).Error; err != nil {
+					if errors.Is(err, gorm.ErrRecordNotFound) {
+						return nil, errors.New("posts not found")
+					}
+					return nil, err
+				}
+
 	return posts, nil
 }
 
