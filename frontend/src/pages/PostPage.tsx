@@ -6,7 +6,8 @@ import SpinnerPrimary from "../components/spinner/SpinnerPrimary";
 import { postApi } from "../api/posts.api";
 import { formatDate } from "../lib/helpers";
 import type { PostType } from "../types/post";
-import TopicTag from "../components/utils/TopicTag";
+import TopicTag from "../components/topics/TopicTag";
+import Card from "../components/utils/Card";
 
 type PostPageParams = {
   user_id: string;
@@ -23,7 +24,6 @@ export default function PostPage() {
   const fetchPost = async (username: string, post_id: string) => {
     try {
       const res = await postApi.getUserPostByID(username, post_id);
-      console.log("Fetched post:", res.data?.post);
       setPostData(res.data.post);
       setStatus("success");
     } catch (err: any) {
@@ -47,7 +47,7 @@ export default function PostPage() {
       ) : (
         postData && (
           <div className="flex w-full items-center justify-start gap-4">
-            <div className="flex flex-col items-start justify-center gap-2 w-full border border-gray-light rounded-lg p-4">
+            <Card className="flex flex-col items-start justify-center gap-2">
               <h1 className="text-3xl font-semibold">{postData.title}</h1>
               <p className="text-gray-dark">
                 <Link className="text-primary" to={`/${user_id}`}>
@@ -62,11 +62,16 @@ export default function PostPage() {
                   true
                 ).time.toLowerCase()}
               </p>
-              <TopicTag topic={postData.topic} />
+              <Link
+                to={`/topics/${postData.topic}`}
+                className="hover:brightness-125 duration-150"
+              >
+                <TopicTag topic_id={postData.topic} />
+              </Link>
               <div className="mt-2 w-full border-t border-gray-dark/20 pt-2">
-                <p>{postData.content}</p>
+                <p className="smart-wrap">{postData.content}</p>
               </div>
-            </div>
+            </Card>
             {/* for comments */}
           </div>
         )

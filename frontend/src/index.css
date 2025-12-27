@@ -55,7 +55,12 @@ p.success {
 }
 
 p.topic-tag {
-  @apply text-xs px-2 py-1 rounded-full;
+  @apply text-xs px-2 py-1 rounded-full text-white;
+}
+
+.smart-wrap {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 input,
