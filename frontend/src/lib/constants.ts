@@ -106,15 +106,15 @@ export const defaultError: errorType = {
     message: "An unknown error has occurred. Please try again later."
 }
 
-export const DEFAULT_TOPICS = [
-    { title: "GENERAL DISCUSSION", color: "bg-blue-100" },
-    { title: "INTRODUCTIONS", color: "bg-green-100" },
-    { title: "TECHNOLOGY", color: "bg-purple-100" },
-    { title: "ENTERTAINMENT", color: "bg-pink-100" },
-    { title: "SPORTS & FITNESS", color: "bg-red-100" },
-    { title: "FOOD & COOKING", color: "bg-orange-100" },
-    { title: "TRAVEL & ADVENTURE", color: "bg-teal-100" },
-    { title: "HOBBIES & CRAFTS", color: "bg-indigo-100" },
-    { title: "CAREER & EDUCATION", color: "bg-yellow-100" },
-    { title: "OTHERS", color: "bg-gray-100" }
-];
+export const DEFAULT_TOPICS = {
+    "general-discussion": { title: "GENERAL DISCUSSION", color: "bg-blue-400", hover: "hover:bg-blue-400" },
+    "introductions": { title: "INTRODUCTIONS", color: "bg-green-400", hover: "hover:bg-green-400" },
+    "technology": { title: "TECHNOLOGY", color: "bg-purple-400", hover: "hover:bg-purple-400" },
+    "entertainment": { title: "ENTERTAINMENT", color: "bg-pink-400", hover: "hover:bg-pink-400" },
+    "sports-fitness": { title: "SPORTS & FITNESS", color: "bg-red-400", hover: "hover:bg-red-400" },
+    "food-cooking": { title: "FOOD & COOKING", color: "bg-orange-400", hover: "hover:bg-orange-400" },
+    "travel-adventure": { title: "TRAVEL & ADVENTURE", color: "bg-teal-400", hover: "hover:bg-teal-400" },
+    "hobbies-crafts": { title: "HOBBIES & CRAFTS", color: "bg-indigo-400", hover: "hover:bg-indigo-400" },
+    "career-education": { title: "CAREER & EDUCATION", color: "bg-yellow-400", hover: "hover:bg-yellow-400" },
+    "others": { title: "OTHERS", color: "bg-gray-400", hover: "hover:bg-gray-400" }
+} as { [id: string]: { title: string, color: string, hover: string } }
