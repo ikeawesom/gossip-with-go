@@ -35,7 +35,7 @@ export default function PostCard({
         <div className="w-full flex flex-col items-start justify-start gap-3">
           <div className="flex items-center justify-start gap-2">
             {showTopic && <TopicTag topic_id={topic} />}
-            <h4 className="custom">{title}</h4> • <p>{user}</p>
+            <h4 className="custom font-bold">{title}</h4> • <p>{user}</p>
           </div>
           <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
           <p className="fine-print">
