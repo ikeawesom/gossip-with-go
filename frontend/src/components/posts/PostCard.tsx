@@ -1,4 +1,4 @@
-import { formatDate, truncateContent } from "../../lib/helpers";
+import { formatDate } from "../../lib/helpers";
 import ArrowRight from "../utils/ArrowRight";
 import Card from "../utils/Card";
 import type { PostType } from "../../types/post";
@@ -37,7 +37,7 @@ export default function PostCard({
             {showTopic && <TopicTag topic_id={topic} />}
             <h4 className="custom">{title}</h4> • <p>{user}</p>
           </div>
-          <p className="whitespace-pre-wrap">{truncateContent(content)}</p>
+          <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
           <p className="fine-print">
             Posted {newDateStr.date ? "on" : ""} {newDateStr.time.toLowerCase()}
           </p>

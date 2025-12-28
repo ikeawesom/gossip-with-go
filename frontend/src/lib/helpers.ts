@@ -115,10 +115,3 @@ export function maskEmail(email: string): string {
 export function getTopicColor(topic_id: string) {
   return DEFAULT_TOPICS[topic_id]?.color || "";
 }
-
-export function truncateContent(s: string) {
-  if (s.length > 330) {
-    return s.substring(0, 228) + "..."
-  }
-  return s;
-}
