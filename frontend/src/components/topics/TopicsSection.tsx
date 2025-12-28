@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { DEFAULT_TOPICS } from "../../lib/constants";
 import { twMerge } from "tailwind-merge";
 import { Link } from "react-router-dom";
-import Card from "../utils/Card";
 import ArrowRight from "../utils/ArrowRight";
 
 export default function TopicsSection() {

@@ -6,9 +6,6 @@ import { useEffect, useState } from "react";
 import type { PostType } from "../types/post";
 import { postApi } from "../api/posts.api";
 import SpinnerPrimary from "../components/spinner/SpinnerPrimary";
-import Card from "../components/utils/Card";
-import { formatDate, truncateContent } from "../lib/helpers";
-import ArrowRight from "../components/utils/ArrowRight";
 import PostCard from "../components/posts/PostCard";
 
 export default function TopicPage() {

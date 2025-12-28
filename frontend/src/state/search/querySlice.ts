@@ -15,6 +15,7 @@ export const queryAsync = createAsyncThunk(
     async (query: string) => {
         // fetch from backend if needed
         // const data = await fetch(`api/...${query}`);
+        console.log(query);
         await new Promise((resolve) => setTimeout(resolve, 500));
         const data = TEMP_QUERY_RESULTS;
         return data
