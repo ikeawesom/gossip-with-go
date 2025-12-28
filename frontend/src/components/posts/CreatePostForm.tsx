@@ -17,14 +17,12 @@ export default function CreatePostForm({
   curPost?: PostType;
   close: () => void;
 }) {
-  const [postDetails, setPostDetails] = useState<CreatePostRequest>(
-    curPost || {
-      title: "",
-      content: "",
-      topic: Object.keys(DEFAULT_TOPICS)[0],
-      username,
-    }
-  );
+  const [postDetails, setPostDetails] = useState<CreatePostRequest>({
+    title: curPost?.title ?? "",
+    content: curPost?.content ?? "",
+    topic: curPost?.topic ?? Object.keys(DEFAULT_TOPICS)[0],
+    username,
+  });
 
   const handlePosts = async (e: React.FormEvent) => {
     e.preventDefault();
