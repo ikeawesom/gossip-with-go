@@ -59,13 +59,14 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		// post routes
 		posts := api.Group("/posts")
 		{
-			// likes and comments will be included here
-			posts.GET("/users/:username", postHandler.GetPostByUsername)
+			posts.GET("/trending", postHandler.GetTrendingPosts)
 			posts.GET("/topic/:topic", postHandler.GetPostByTopic)
+			posts.GET("/users/:username", postHandler.GetPostByUsername)
+			posts.GET("/:username/:postID", postHandler.GetUserPostByID)
 			posts.POST("/create", middleware.AuthRequired(), postHandler.CreatePost)
 			posts.POST("/edit/:postID", middleware.AuthRequired(), postHandler.EditPost)
 			posts.POST("/delete/:postID", middleware.AuthRequired(), postHandler.DeletePost)
-			posts.GET("/:username/:postID", postHandler.GetUserPostByID)
+			// likes and comments will be included here
 		}
 		
 		// private API routes example
