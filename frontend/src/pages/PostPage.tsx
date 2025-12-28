@@ -8,6 +8,13 @@ import { formatDate } from "../lib/helpers";
 import type { PostType } from "../types/post";
 import TopicTag from "../components/topics/TopicTag";
 import Card from "../components/utils/Card";
+import { useSelector } from "react-redux";
+import type { RootState } from "../state/store";
+import SecondaryButton from "../components/utils/SecondaryButton";
+import PrimaryButton from "../components/utils/PrimaryButton";
+import Modal from "../components/utils/Modal";
+import CreatePostForm from "../components/posts/CreatePostForm";
+import DeletePostForm from "../components/posts/DeletePostForm";
 
 type PostPageParams = {
   user_id: string;
@@ -20,6 +27,11 @@ export default function PostPage() {
     "loading"
   );
   const [postData, setPostData] = useState<PostType>();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
+
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isCurrentUser = user?.username === user_id;
 
   const fetchPost = async (username: string, post_id: string) => {
     try {
@@ -47,34 +59,100 @@ export default function PostPage() {
       ) : (
         postData && (
           <div className="flex w-full items-center justify-start gap-4">
-            <Card className="flex flex-col items-start justify-center gap-2">
-              <h1 className="text-3xl font-semibold">{postData.title}</h1>
-              <p className="text-gray-dark">
-                <Link className="text-primary" to={`/${user_id}`}>
-                  {user_id}
-                </Link>{" "}
-                •<span className="font-medium">{postData.username}</span>{" "}
-                {formatDate(new Date(postData.updated_at).getTime(), true).date
-                  ? "on"
-                  : ""}{" "}
-                {formatDate(
-                  new Date(postData.updated_at).getTime(),
-                  true
-                ).time.toLowerCase()}
-              </p>
-              <Link
-                to={`/topics/${postData.topic}`}
-                className="hover:brightness-125 duration-150"
-              >
-                <TopicTag topic_id={postData.topic} />
-              </Link>
-              <div className="mt-2 w-full border-t border-gray-dark/20 pt-2">
-                <p className="smart-wrap">{postData.content}</p>
+            <Card>
+              <div className="flex items-start justify-between">
+                <div className="flex flex-col items-start justify-center gap-2">
+                  <h1 className="text-3xl font-semibold">{postData.title}</h1>
+                  <p className="text-gray-dark">
+                    <Link className="text-primary" to={`/${user_id}`}>
+                      {user_id}
+                    </Link>{" "}
+                    •<span className="font-medium">{postData.username}</span>
+                    {" Posted "}
+                    {formatDate(new Date(postData.created_at).getTime(), true)
+                      .date
+                      ? "on"
+                      : ""}{" "}
+                    {formatDate(
+                      new Date(postData.created_at).getTime(),
+                      true
+                    ).time.toLowerCase()}
+                  </p>
+                  <Link
+                    to={`/topics/${postData.topic}`}
+                    className="hover:brightness-125 duration-150"
+                  >
+                    <TopicTag topic_id={postData.topic} />
+                  </Link>
+                </div>
+                {isCurrentUser && (
+                  <div className="flex items-start justify-end gap-2">
+                    <SecondaryButton
+                      onClick={() => setIsEditing(true)}
+                      className="rounded-md text-xs flex items-center justify-center gap-2 border-none px-3"
+                    >
+                      Edit
+                      <img
+                        alt="Edit"
+                        src="/icons/icon_pencil.svg"
+                        height={15}
+                        width={15}
+                      />
+                    </SecondaryButton>
+                    <PrimaryButton
+                      onClick={() => setIsDelete(true)}
+                      className="text-xs bg-red rounded-md flex items-center justify-center gap-2 border-none px-3"
+                    >
+                      Delete
+                      <img
+                        alt="Edit"
+                        src="/icons/icon_trash.svg"
+                        height={15}
+                        width={15}
+                      />
+                    </PrimaryButton>
+                  </div>
+                )}
+              </div>
+              <div className="mt-3 w-full border-t border-gray-dark/20 pt-2">
+                <p className="smart-wrap whitespace-pre-wrap">
+                  {postData.content}
+                </p>
+                <p className="fine-print text-xs italic custom mt-3">
+                  {" Edited "}
+                  {formatDate(new Date(postData.updated_at).getTime(), true)
+                    .date
+                    ? "on"
+                    : ""}{" "}
+                  {formatDate(
+                    new Date(postData.updated_at).getTime(),
+                    true
+                  ).time.toLowerCase()}
+                </p>
               </div>
             </Card>
             {/* for comments */}
           </div>
         )
+      )}
+      {isEditing && (
+        <Modal close={() => setIsEditing(false)}>
+          <CreatePostForm
+            close={() => setIsEditing(false)}
+            username={user_id ?? ""}
+            reload={() => fetchPost(user_id ?? "", post_id ?? "")}
+            curPost={postData}
+          />
+        </Modal>
+      )}
+      {isDelete && (
+        <Modal close={() => setIsDelete(false)}>
+          <DeletePostForm
+            close={() => setIsDelete(false)}
+            postID={postData?.id ?? 0}
+            username={user_id ?? ""}
+          />
+        </Modal>
       )}
     </NavSection>
   );
