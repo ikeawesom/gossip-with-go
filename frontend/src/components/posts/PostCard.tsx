@@ -20,18 +20,12 @@ export default function PostCard({
     content,
     created_at,
     title,
-    updated_at,
     username: fetched_username,
     id,
     topic,
   } = post;
 
-  const newDate =
-    new Date(updated_at) > new Date(created_at)
-      ? new Date(updated_at)
-      : new Date(created_at);
-
-  const newDateStr = formatDate(newDate.getTime(), true);
+  const newDateStr = formatDate(new Date(created_at).getTime(), true);
 
   const user = fetched_username ?? username;
 
@@ -43,7 +37,7 @@ export default function PostCard({
             {showTopic && <TopicTag topic_id={topic} />}
             <h4 className="custom">{title}</h4> • <p>{user}</p>
           </div>
-          <p>{truncateContent(content)}</p>
+          <p className="whitespace-pre-wrap">{truncateContent(content)}</p>
           <p className="fine-print">
             Posted {newDateStr.date ? "on" : ""} {newDateStr.time.toLowerCase()}
           </p>
