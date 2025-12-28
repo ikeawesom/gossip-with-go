@@ -57,7 +57,9 @@ func (s *PostService) GetPostByTopic(topic string) ([]PostWithUsername, error) {
 				Table("posts").
 				Select("posts.id, posts.user_id, users.username, posts.topic, posts.title, posts.content, posts.created_at, posts.updated_at").
 				Joins("JOIN users ON users.id = posts.user_id").
-				Where("topic = ?", topic).Find(&posts).Error; err != nil {
+				Where("topic = ?", topic).
+				Order("created_at DESC").
+				Find(&posts).Error; err != nil {
 					if errors.Is(err, gorm.ErrRecordNotFound) {
 						return nil, errors.New("posts not found")
 					}
@@ -77,7 +79,7 @@ func (s *PostService) GetUserPostByID(username string, postID uint) (*models.Pos
 	}
 
 	var post models.Post
-	if err := s.DB.Where("id = ? AND user_id = ?", postID, user.ID).First(&post).Error; err != nil {
+	if err := s.DB.Where("id = ? AND user_id = ?", postID, user.ID).Order("created_at DESC").First(&post).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("post not found")
 		}
