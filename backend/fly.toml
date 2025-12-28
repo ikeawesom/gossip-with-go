@@ -1,3 +1,8 @@
+# fly.toml app configuration file generated for gossip-with-go on 2025-12-28T18:18:06+08:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = 'gossip-with-go'
 primary_region = 'sin'
 
@@ -13,6 +18,5 @@ primary_region = 'sin'
 
 [[vm]]
   memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
+  cpus = 2
   memory_mb = 1024
