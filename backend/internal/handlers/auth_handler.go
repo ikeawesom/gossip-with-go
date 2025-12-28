@@ -264,7 +264,8 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 func setTokenCookies(c *gin.Context, accessToken, refreshToken string) {
 	cfg := config.AppConfig
 
-	// 15 minutes access token cookie
+	// access token cookie
+	c.SetSameSite(http.SameSiteNoneMode) 
 	c.SetCookie(
 		"access_token",
 		accessToken,
@@ -272,10 +273,11 @@ func setTokenCookies(c *gin.Context, accessToken, refreshToken string) {
 		"/",
 		cfg.CookieDomain,
 		cfg.CookieSecure,
-		true,
+		true, 
 	)
 
-	// 30 days refresh token cookie
+	// refresh token cookie
+	c.SetSameSite(http.SameSiteNoneMode)
 	c.SetCookie(
 		"refresh_token",
 		refreshToken,
@@ -283,7 +285,7 @@ func setTokenCookies(c *gin.Context, accessToken, refreshToken string) {
 		"/",
 		cfg.CookieDomain,
 		cfg.CookieSecure,
-		true,
+		true, 
 	)
 }
 
