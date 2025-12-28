@@ -5,6 +5,7 @@ import (
 	"gossip-with-go/internal/utils"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,6 +35,18 @@ type CreatePostRequest struct {
 	Topic    string `json:"topic" binding:"required"`
 }
 
+
+type EditPostRequest struct {
+    Title   string `json:"title" binding:"required"`
+    Content string `json:"content" binding:"required"`
+    Topic   string `json:"topic" binding:"required"`
+}
+
+type DeletePostRequest struct {
+	PostID uint `json:"post_id" binding:"required"`
+	UserID uint `json:"user_id" binding:"required"`
+}
+
 func (h *PostHandler) GetPostByUsername(c *gin.Context) {
 	req := GetPostByUsernameRequest{
 		Username: c.Param("username"),
@@ -48,7 +61,6 @@ func (h *PostHandler) GetPostByUsername(c *gin.Context) {
 		return
 	}
 
-	log.Println("posts:",posts)
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"posts": posts})
 }
 
@@ -91,6 +103,15 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 
 
 func (h *PostHandler) CreatePost(c *gin.Context) {
+	username, exists := c.Get("username")
+    if !exists {
+        utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
+		log.Print("User not authenticated")
+        return
+    }
+
+	log.Printf("creating post for user %s", username.(string))
+
 	var req CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ValidationErrorResponse(c, err.Error())
@@ -106,4 +127,81 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, http.StatusCreated, "Post created successfully", nil)
+}
+
+func (h *PostHandler) EditPost(c *gin.Context) {
+    postIDStr := c.Param("postID")
+    postID, err := strconv.ParseUint(postIDStr, 10, 32)
+    if err != nil {
+        utils.ErrorResponse(c, http.StatusBadRequest, "Invalid post ID", nil)
+        return
+    }
+
+    var req EditPostRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        utils.ValidationErrorResponse(c, err.Error())
+        return
+    }
+
+    username, exists := c.Get("username")
+    if !exists {
+        utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
+		log.Print("User not authenticated")
+        return
+    }
+
+    log.Printf("editing post %d for user %s", postID, username.(string))
+
+    err = h.PostService.EditPost(uint(postID), username.(string), req.Topic, req.Title, req.Content)
+    if err != nil {
+        log.Println(err)
+        if err.Error() == "post not found" {
+            utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)
+            return
+        }
+        if err.Error() == "unauthorized to edit this post" {
+            utils.ErrorResponse(c, http.StatusForbidden, err.Error(), nil)
+            return
+        }
+        utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
+        return
+    }
+
+    utils.SuccessResponse(c, http.StatusOK, "Post updated successfully", nil)
+}
+
+func (h *PostHandler) DeletePost(c *gin.Context) {
+	postIDStr := c.Param("postID")
+    postID, err := strconv.ParseUint(postIDStr, 10, 32)
+    if err != nil {
+        utils.ErrorResponse(c, http.StatusBadRequest, "Invalid post ID", nil)
+        return
+    }
+
+    username, exists := c.Get("username")
+    if !exists {
+        utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
+		log.Print("User not authenticated")
+        return
+    }
+
+    log.Printf("deleting post %d for user %s", postID, username.(string))
+
+	err = h.PostService.DeletePost(uint(postID), username.(string))
+    if err != nil {
+        log.Println(err)
+        if err.Error() == "post not found" {
+            utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)
+            return
+        }
+        if err.Error() == "unauthorized to delete this post" {
+            utils.ErrorResponse(c, http.StatusForbidden, err.Error(), nil)
+            return
+        }
+        utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
+        return
+    }
+
+    utils.SuccessResponse(c, http.StatusOK, "Post deleted successfully", nil)
+
 }
