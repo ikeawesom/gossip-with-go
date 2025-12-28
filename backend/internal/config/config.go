@@ -78,6 +78,9 @@ func LoadConfig() *Config {
 		FrontendResetPasswordURL: getEnv("FRONTEND_RESET_PASSWORD_URL", ""),
 	}
 
+	log.Printf("Cookie Domain set to: %s", getEnv("COOKIE_DOMAIN", "localhost"))
+	log.Printf("FrontendURL set to %s", getEnv("FRONTEND_URL", "http://localhost:5173"))
+
 	if AppConfig.DatabaseURL == "" {
 		log.Fatal("DATABASE_URL is required")
 	}
