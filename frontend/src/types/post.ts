@@ -20,3 +20,14 @@ export interface CreatePostRequest {
     content: string;
     topic: string;
 }
+
+export interface TrendingPostsResponse {
+    posts: PostType[];
+    next_cursor: number | null;
+    has_more: boolean;
+}
+
+export interface TrendingPostsParams {
+    limit?: number;
+    cursor?: number;
+}
