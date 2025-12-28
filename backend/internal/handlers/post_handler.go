@@ -101,6 +101,39 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Post retrieved successfully", gin.H{"post": post})
 }
 
+func (h *PostHandler) GetTrendingPosts(c *gin.Context) {
+	limitStr := c.DefaultQuery("limit", "10")  // default to 10
+	cursorStr := c.Query("cursor")              // empty string if not provided
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit <= 0 {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid limit parameter", nil)
+		return
+	}
+
+	var cursor uint
+	if cursorStr != "" {
+		cursorUint64, err := strconv.ParseUint(cursorStr, 10, 32)
+		if err != nil {
+			utils.ErrorResponse(c, http.StatusBadRequest, "Invalid cursor parameter", nil)
+			return
+		}
+		cursor = uint(cursorUint64)
+	}
+
+	params := services.PaginationParams{
+		Limit:  limit,
+		Cursor: cursor,
+	}
+
+	result, err := h.PostService.GetTrendingPosts(params)
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to fetch posts", err.Error())
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", result)
+}
 
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	username, exists := c.Get("username")

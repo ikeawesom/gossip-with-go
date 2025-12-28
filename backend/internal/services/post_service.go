@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gossip-with-go/internal/models"
 	"log"
+	"sort"
 
 	"gorm.io/gorm"
 )
@@ -17,6 +18,17 @@ type NewPost struct {
 	Topic    string
 	Title    string
 	Content  string
+}
+
+type PaginationParams struct {
+	Limit  int  
+	Cursor uint
+}
+
+type PaginatedPostsResponse struct {
+	Posts      []PostWithUsername `json:"posts"`
+	NextCursor *uint         `json:"next_cursor"`
+	HasMore    bool          `json:"has_more"`
 }
 
 type PostWithUsername struct {
@@ -175,4 +187,59 @@ func (s *PostService) DeletePost(postID uint, username string) error {
 
     log.Printf("successfully updated post %d", postID)
     return nil
+}
+
+func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPostsResponse, error) {
+	// validate parameters
+	if params.Limit <= 0 {
+		params.Limit = 10 // default to 10 posts per page
+	}
+	if params.Limit > 50 {
+		params.Limit = 50 // maximum 50 posts per page
+	}
+
+	query := s.DB.
+		Table("posts").
+		Select("posts.id, posts.user_id, users.username, posts.topic, posts.title, posts.content, posts.like_count, posts.comment_count, posts.view_count, posts.repost_count, posts.created_at, posts.updated_at").
+		Joins("JOIN users ON users.id = posts.user_id")
+
+	if params.Cursor > 0 {
+		query = query.Where("posts.id < ?", params.Cursor)
+	}
+
+	var posts []PostWithUsername
+	if err := query.
+		Order("posts.created_at DESC").
+		Limit(params.Limit + 1). // fetch +1 to check if there are more posts
+		Find(&posts).Error; err != nil {
+		return nil, err
+	}
+
+	posts = CalculatePostScores(posts)
+	sortPostsByScore(posts)
+
+	// check if there are more posts (because of +1 earlier)
+	hasMore := len(posts) > params.Limit
+	if hasMore {
+		posts = posts[:params.Limit] // trim to limit
+	}
+
+	// determine next cursor
+	var nextCursor *uint
+	if hasMore && len(posts) > 0 {
+		lastPostID := posts[len(posts) - 1].ID // next cursor is the ID of the last post in this batch
+		nextCursor = &lastPostID
+	}
+
+	return &PaginatedPostsResponse{
+		Posts:      posts,
+		NextCursor: nextCursor,
+		HasMore:    hasMore,
+	}, nil
+}
+
+func sortPostsByScore(posts []PostWithUsername) {
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].Score > posts[j].Score
+	})
 }
