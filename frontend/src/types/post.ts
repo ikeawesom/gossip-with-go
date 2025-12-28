@@ -1,12 +1,17 @@
 export interface PostType {
     id: number;
-    user: number;
-    username: string;
+    user_id: number;
+    topic: string;
     title: string;
     content: string;
-    topic: string;
+    like_count: number;
+    comment_count: number;
+    view_count: number;
+    repost_count: number;
+    score: number;
     created_at: string;
     updated_at: string;
+    username?: string;
 }
 
 export interface CreatePostRequest {
