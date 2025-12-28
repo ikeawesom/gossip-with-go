@@ -15,6 +15,7 @@ import { postApi } from "../api/posts.api";
 import type { PostType } from "../types/post";
 import CreatePostForm from "../components/posts/CreatePostForm";
 import PostCard from "../components/posts/PostCard";
+import Modal from "../components/utils/Modal";
 
 export default function ProfilePage() {
   // const { user } = useSelector((state: RootState) => state.auth);
@@ -22,6 +23,8 @@ export default function ProfilePage() {
   const { user_id } = useParams<{ user_id: string }>();
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
+
+  const [showForm, setShowForm] = useState(false);
 
   const [userState, setUserState] = useState<"loading" | "success" | "invalid">(
     "loading"
@@ -51,7 +54,6 @@ export default function ProfilePage() {
   const getUserPosts = async (username: string) => {
     try {
       const res = await postApi.getPostByUsername(username);
-      console.log(res.data.posts);
       setUserPosts(res.data.posts);
       setPostState("success");
     } catch (err: any) {
@@ -78,10 +80,10 @@ export default function ProfilePage() {
 
   if (userState === "loading")
     return (
-      <>
+      <NavSection>
         <p className="text-center mb-1">Loading user</p>
         <SpinnerPrimary />
-      </>
+      </NavSection>
     );
 
   const { created_at, username } = visitingUser as User;
@@ -107,9 +109,20 @@ export default function ProfilePage() {
         </div>
       )}
       <div className="flex items-center justify-center w-full flex-col gap-4 py-4">
-        {isCurrentUser && (
-          <CreatePostForm reload={getUserPosts} username={username} />
-        )}
+        {isCurrentUser &&
+          (showForm ? (
+            <Modal close={() => setShowForm(false)}>
+              <CreatePostForm
+                close={() => setShowForm(false)}
+                reload={getUserPosts}
+                username={username}
+              />
+            </Modal>
+          ) : (
+            <PrimaryButton onClick={() => setShowForm(true)}>
+              Make a Post
+            </PrimaryButton>
+          ))}
         {postState === "loading" ? (
           <SpinnerPrimary />
         ) : postState === "invalid" ? (
