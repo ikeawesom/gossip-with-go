@@ -1,5 +1,4 @@
 import axios from 'axios';
-import type { AxiosError } from "axios";
 
 declare module 'axios' {
     export interface InternalAxiosRequestConfig {
@@ -34,24 +33,7 @@ apiClient.interceptors.response.use(
     (response) => {
         return response;
     },
-    async (error: AxiosError) => {
-        const originalRequest = error.config;
-
-        // if access token expired (401) for the first time
-        if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
-            originalRequest._retry = true;
-
-            try {
-                await apiClient.post('/auth/refresh');
-
-                // retry the original request
-                return apiClient(originalRequest);
-            } catch (refreshError) {
-                // refresh failed - user needs to log in again
-                return Promise.reject(refreshError);
-            }
-        }
-
+    (error) => {
         return Promise.reject(error);
     }
 );
