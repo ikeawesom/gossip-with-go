@@ -1,4 +1,4 @@
-import type { CreatePostRequest } from "../types/post";
+import type { CreatePostRequest, TrendingPostsParams } from "../types/post";
 import type { ResponseType } from "../types/res";
 import apiClient from "./axios.config";
 
@@ -39,7 +39,25 @@ export const postApi = {
         const response = await apiClient.post(`/posts/delete/${postID}`);
         console.log("API RESPONSE:", response.data)
         return response.data
-    }
+    },
+
+    getTrendingPosts: async (params?: TrendingPostsParams): Promise<ResponseType> => {
+        const queryParams = new URLSearchParams();
+
+        if (params?.limit) {
+            queryParams.append('limit', params.limit.toString());
+        }
+
+        if (params?.cursor) {
+            queryParams.append('cursor', params.cursor.toString());
+        }
+
+        const url = `trending${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+        const response = await apiClient.get(`/posts/${url}`);
+
+        console.log("API RESPONSE:", response.data)
+        return response.data;
+    },
 
 
 }
