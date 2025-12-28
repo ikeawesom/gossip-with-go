@@ -6,29 +6,40 @@ export const postApi = {
     // get posts by username
     getPostByUsername: async (username: string): Promise<ResponseType> => {
         const response = await apiClient.get(`/posts/users/${username}`);
-        console.log("API RESPONSE:", response.data);
         return response.data;
     },
 
     // get posts by topic
     getPostsByTopic: async (topic: string): Promise<ResponseType> => {
         const response = await apiClient.get(`/posts/topic/${topic}`);
-        console.log("API RESPONSE:", response.data);
         return response.data;
     },
 
     // create new post
     createPost: async (postData: CreatePostRequest): Promise<ResponseType> => {
         const response = await apiClient.post(`/posts/create`, postData);
-        console.log(response)
         return response.data;
     },
 
     // get post by username and postID
     getUserPostByID: async (username: string, postID: string): Promise<ResponseType> => {
         const response = await apiClient.get(`/posts/${username}/${postID}`);
-        console.log("API RESPONSE:", response.data);
         return response.data;
+    },
+
+    // edit post by postID
+    editPostByID: async (postData: CreatePostRequest, postID: number): Promise<ResponseType> => {
+        const response = await apiClient.post(`/posts/edit/${postID}`, postData);
+        console.log("API RESPONSE:", response.data)
+        return response.data
+    },
+
+    // delete post by postID
+    deletePostByID: async (postID: number): Promise<ResponseType> => {
+        const response = await apiClient.post(`/posts/delete/${postID}`);
+        console.log("API RESPONSE:", response.data)
+        return response.data
     }
+
 
 }
