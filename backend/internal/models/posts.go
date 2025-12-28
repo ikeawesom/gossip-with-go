@@ -12,6 +12,14 @@ type Post struct {
 	Topic     string   `gorm:"not null;index" json:"topic"`
 	Title	  string `gorm:"type:text;not null" json:"title"`
 	Content   string `gorm:"type:text;not null" json:"content"`
+
+	// engagement metrics for scoring
+	LikeCount    int            `gorm:"default:0;not null" json:"like_count"`
+	CommentCount int            `gorm:"default:0;not null" json:"comment_count"`
+	ViewCount    int            `gorm:"default:0;not null" json:"view_count"`
+	RepostCount  int            `gorm:"default:0;not null" json:"repost_count"`
+	Score        float64        `gorm:"-" json:"score,omitempty"` // don't need to store in DB (calculated value)
+
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
