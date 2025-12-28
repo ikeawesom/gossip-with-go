@@ -106,15 +106,17 @@ export const defaultError: errorType = {
     message: "An unknown error has occurred. Please try again later."
 }
 
+interface topicsType { [id: string]: { title: string, color: string, hover: string, src: string } };
+
 export const DEFAULT_TOPICS = {
-    "general-discussion": { title: "GENERAL DISCUSSION", color: "bg-blue-400", hover: "hover:bg-blue-400" },
-    "introductions": { title: "INTRODUCTIONS", color: "bg-green-400", hover: "hover:bg-green-400" },
-    "technology": { title: "TECHNOLOGY", color: "bg-purple-400", hover: "hover:bg-purple-400" },
-    "entertainment": { title: "ENTERTAINMENT", color: "bg-pink-400", hover: "hover:bg-pink-400" },
-    "sports-fitness": { title: "SPORTS & FITNESS", color: "bg-red-400", hover: "hover:bg-red-400" },
-    "food-cooking": { title: "FOOD & COOKING", color: "bg-orange-400", hover: "hover:bg-orange-400" },
-    "travel-adventure": { title: "TRAVEL & ADVENTURE", color: "bg-teal-400", hover: "hover:bg-teal-400" },
-    "hobbies-crafts": { title: "HOBBIES & CRAFTS", color: "bg-indigo-400", hover: "hover:bg-indigo-400" },
-    "career-education": { title: "CAREER & EDUCATION", color: "bg-yellow-400", hover: "hover:bg-yellow-400" },
-    "others": { title: "OTHERS", color: "bg-gray-400", hover: "hover:bg-gray-400" }
-} as { [id: string]: { title: string, color: string, hover: string } }
+    "general-discussion": { title: "GENERAL DISCUSSION", color: "bg-blue-400", hover: "hover:bg-blue-400", src: "icon_chat.svg" },
+    "introductions": { title: "INTRODUCTIONS", color: "bg-green-400", hover: "hover:bg-green-400", src: "icon_book.svg" },
+    "technology": { title: "TECHNOLOGY", color: "bg-purple-400", hover: "hover:bg-purple-400", src: "icon_tech.svg" },
+    "entertainment": { title: "ENTERTAINMENT", color: "bg-pink-400", hover: "hover:bg-pink-400", src: "icon_game.svg" },
+    "sports-fitness": { title: "SPORTS & FITNESS", color: "bg-red-400", hover: "hover:bg-red-400", src: "icon_basketball.svg" },
+    "food-cooking": { title: "FOOD & COOKING", color: "bg-orange-400", hover: "hover:bg-orange-400", src: "icon_chef.svg" },
+    "travel-adventure": { title: "TRAVEL & ADVENTURE", color: "bg-teal-400", hover: "hover:bg-teal-400", src: "icon_plane.svg" },
+    "hobbies-crafts": { title: "HOBBIES & CRAFTS", color: "bg-indigo-400", hover: "hover:bg-indigo-400", src: "icon_paint.svg" },
+    "career-education": { title: "CAREER & EDUCATION", color: "bg-yellow-400", hover: "hover:bg-yellow-400", src: "icon_graduate.svg" },
+    "others": { title: "OTHERS", color: "bg-gray-400", hover: "hover:bg-gray-400", src: "icon_question.svg" }
+} as topicsType;
