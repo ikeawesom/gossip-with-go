@@ -1,3 +1,8 @@
+# fly.toml app configuration file generated for gossip-with-go on 2025-12-28T09:54:34Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 # fly.toml app configuration file generated for gossip-with-go on 2025-12-28T18:18:06+08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
