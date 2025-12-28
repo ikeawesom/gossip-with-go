@@ -1,41 +1,69 @@
 import { useState } from "react";
-import type { CreatePostRequest } from "../../types/post";
+import type { CreatePostRequest, PostType } from "../../types/post";
 import { DEFAULT_TOPICS } from "../../lib/constants";
 import PrimaryButton from "../utils/PrimaryButton";
 import { postApi } from "../../api/posts.api";
 import { toast } from "sonner";
+import { twMerge } from "tailwind-merge";
 
 export default function CreatePostForm({
   username,
   reload,
+  curPost,
+  close,
 }: {
   username: string;
   reload: (username: string) => Promise<void>;
+  curPost?: PostType;
+  close: () => void;
 }) {
-  const [postDetails, setPostDetails] = useState<CreatePostRequest>({
-    title: "",
-    content: "",
-    topic: Object.keys(DEFAULT_TOPICS)[0],
-    username,
-  });
+  const [postDetails, setPostDetails] = useState<CreatePostRequest>(
+    curPost || {
+      title: "",
+      content: "",
+      topic: Object.keys(DEFAULT_TOPICS)[0],
+      username,
+    }
+  );
 
-  const handleCreatePost = async (e: React.FormEvent) => {
+  const handlePosts = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (curPost) {
+      await handleSaveChanges(curPost);
+    } else {
+      await handleCreatePost();
+    }
+  };
+  const handleCreatePost = async () => {
     try {
       await postApi.createPost(postDetails);
       await reload(username);
       toast.success("Posted!");
+      close();
     } catch (err: any) {
       console.error(err);
     }
   };
+
+  const handleSaveChanges = async (curPost: PostType) => {
+    try {
+      if (!curPost) throw new Error("Invalid post");
+      await postApi.editPostByID(postDetails, curPost.id);
+      await reload(username);
+      toast.success("Changes have been saved");
+      close();
+    } catch (err: any) {
+      console.log(err);
+    }
+  };
+
   return (
     <form
-      onSubmit={handleCreatePost}
-      className="w-full flex flex-col items-start justify-start gap-3 bg-primary/10 rounded-lg p-5 border border-primary/20"
+      onSubmit={handlePosts}
+      className="w-full flex flex-col items-start justify-start gap-3"
     >
       <h3 className="text-2xl font-semibold border-b border-gray-dark/20 w-full pb-2">
-        Share your thoughts
+        {curPost ? "Edit Post" : "Share your thoughts"}
       </h3>
       <input
         value={postDetails.title}
@@ -54,10 +82,16 @@ export default function CreatePostForm({
         }
         required
         placeholder="Share your thoughts here..."
-        className="resize-none h-[100px]"
+        className="resize-none h-[200px] text-sm"
       />
       <div className="w-full">
-        <label htmlFor="topics" className="ml-[0.5px]">
+        <label
+          htmlFor="topics"
+          className={twMerge(
+            "ml-[0.5px]",
+            curPost ? "custom text-gray-dark" : ""
+          )}
+        >
           What is this for?
         </label>
         <select
@@ -74,9 +108,15 @@ export default function CreatePostForm({
           ))}
         </select>
       </div>
-      <PrimaryButton className="self-end" type="submit">
-        Create Post
-      </PrimaryButton>
+      {curPost ? (
+        <PrimaryButton className="self-end" type="submit">
+          Save Changes
+        </PrimaryButton>
+      ) : (
+        <PrimaryButton className="self-end" type="submit">
+          Create Post
+        </PrimaryButton>
+      )}
     </form>
   );
 }
