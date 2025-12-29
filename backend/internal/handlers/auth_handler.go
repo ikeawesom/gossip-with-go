@@ -264,8 +264,14 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 func setTokenCookies(c *gin.Context, accessToken, refreshToken string) {
 	cfg := config.AppConfig
 
+	// determine SameSite mode based on environment
+	sameSiteMode := http.SameSiteLaxMode // default for development
+	if cfg.CookieDomain != "localhost" {
+		sameSiteMode = http.SameSiteNoneMode
+	}
+
 	// access token cookie
-	c.SetSameSite(http.SameSiteNoneMode) 
+	c.SetSameSite(sameSiteMode) 
 	c.SetCookie(
 		"access_token",
 		accessToken,
@@ -277,7 +283,7 @@ func setTokenCookies(c *gin.Context, accessToken, refreshToken string) {
 	)
 
 	// refresh token cookie
-	c.SetSameSite(http.SameSiteNoneMode)
+	c.SetSameSite(sameSiteMode)
 	c.SetCookie(
 		"refresh_token",
 		refreshToken,
