@@ -1,27 +1,30 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Like struct {
-	ID         uint      `gorm:"primaryKey" json:"id"`
-	UserID     uint      `gorm:"not null;index" json:"user_id"`
-	LikeType   uint      `gorm:"not null" json:"like_type"`       // 1 for post, 2 for comment
-	TargetID   uint      `gorm:"not null;index" json:"target_id"` // can be comments or posts
-	LikeToggle uint      `gorm:"not null" json:"like_toggle"`     // 1 for like, 2 for dislike
-	CreatedAt  time.Time `json:"created_at"`
+	ID           uint      `gorm:"primaryKey" json:"id"`
+	UserID       uint      `gorm:"not null;index:idx_user_target" json:"user_id"`
+	
+	LikeableType string    `gorm:"type:varchar(20);not null;index:idx_user_target" json:"likeable_type"` // "post" or "comment"
+	LikeableID   uint      `gorm:"not null;index:idx_user_target" json:"likeable_id"`
+
+	CreatedAt    time.Time `json:"created_at"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (Like) TableName() string {
 	return "likes"
 }
 
-func (l *Like) ToResponse() Like {
-	return Like{
-		ID:         l.ID,
-		UserID:     l.UserID,
-		LikeType:   l.LikeType,
-		TargetID:   l.TargetID,
-		LikeToggle: l.LikeToggle,
-		CreatedAt:  l.CreatedAt,
+func (l *Like) BeforeCreate(tx *gorm.DB) error {
+	if l.LikeableType != "post" && l.LikeableType != "comment" {
+		return errors.New("likeable_type must be either 'post' or 'comment'")
 	}
+	return nil
 }
