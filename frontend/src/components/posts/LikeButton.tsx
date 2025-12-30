@@ -22,6 +22,8 @@ export default function LikeButton({
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialCount);
   const [loading, setLoading] = useState(false);
+  const [animate, setAnimate] = useState(false);
+
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
@@ -35,6 +37,8 @@ export default function LikeButton({
     if (loading) return;
 
     setLoading(true);
+    setAnimate(true);
+    setTimeout(() => setAnimate(false), 150);
 
     // optimistic update
     const newLiked = !liked;
@@ -78,8 +82,12 @@ export default function LikeButton({
           liked ? "icons/posts/icon_liked.svg" : "icons/posts/icon_unliked.svg"
         }
         alt="Liked"
-        height={15}
-        width={15}
+        height={18}
+        width={18}
+        className={twMerge(
+          "transition-transform duration-150 ease-out",
+          animate && "scale-125"
+        )}
       />
     </button>
   );
