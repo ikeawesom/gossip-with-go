@@ -34,15 +34,20 @@ func main() {
 	db := database.GetDB()
 	authService := services.NewAuthService(db, emailService)
 	userService := services.NewUserService(db)
-
-	postServce := services.NewPostService(db)
+	postService := services.NewPostService(db)
+	likeService := services.NewLikeService(db)
+	repostService := services.NewRepostService(db)
+	commentService := services.NewCommentService(db)
 	
 	authHandler := handlers.NewAuthHandler(authService)
 	userHandler := handlers.NewUserHandler(userService)
-	postHandler := handlers.NewPostHandler(postServce)
+	postHandler := handlers.NewPostHandler(postService)
+	likeHandler := handlers.NewLikeHandler(likeService)
+	repostHandler := handlers.NewRepostHandler(repostService)
+	commentHandler := handlers.NewCommentHandler(commentService)
 
 	r := gin.Default()
-	routes.SetupRoutes(r, authHandler, userHandler, postHandler)
+	routes.SetupRoutes(r, authHandler, userHandler, postHandler, likeHandler, repostHandler, commentHandler)
 
 	// start server
 	serverAddr := ":" + cfg.Port
