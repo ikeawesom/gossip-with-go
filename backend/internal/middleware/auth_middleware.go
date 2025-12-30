@@ -43,3 +43,26 @@ func AuthRequired() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func AuthOptional() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		accessToken, err := c.Cookie("access_token")
+		if err != nil {
+			c.Next() // do not crash if not authorised
+			return
+		}
+
+		cfg := config.AppConfig
+		claims, err := utils.ValidateToken(accessToken, cfg.JWTSecret)
+		if err != nil || claims.Type != utils.AccessToken {
+			c.Next()
+			return
+		}
+
+		c.Set("userID", claims.UserID)
+		c.Set("email", claims.Email)
+		c.Set("username", claims.Username)
+
+		c.Next()
+	}
+}
