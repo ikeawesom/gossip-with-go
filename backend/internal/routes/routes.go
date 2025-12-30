@@ -59,12 +59,10 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		// post routes
 		posts := api.Group("/posts")
 		{
-			posts.GET("/topic/:topic", postHandler.GetPostsByTopic)
-			posts.GET("/users/:username", postHandler.GetPostsByUsername)
-			posts.GET("/users/:username/:postID", postHandler.GetUserPostByID)
 			posts.GET("/:postID/comments", commentHandler.GetRootComments)
-			
-			// authenticated endpoints for posts
+			posts.GET("/topic/:topic", middleware.AuthOptional(), postHandler.GetPostsByTopic)
+			posts.GET("/users/:username", middleware.AuthOptional(), postHandler.GetPostsByUsername)
+			posts.GET("/users/:username/:postID", middleware.AuthOptional(), postHandler.GetUserPostByID)
 			posts.GET("/trending", middleware.AuthOptional(), postHandler.GetTrendingPosts)
 			posts.POST("/create", middleware.AuthRequired(), postHandler.CreatePost)
 			posts.POST("/edit/:postID", middleware.AuthRequired(), postHandler.EditPost)
