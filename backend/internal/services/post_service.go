@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"gossip-with-go/internal/models"
+	"gossip-with-go/internal/utils"
 	"log"
 	"sort"
 
@@ -48,32 +49,42 @@ func NewPostService(db *gorm.DB) *PostService {
 	}
 }
 
-func (s *PostService) GetPostByUsername(username string) ([]models.Post, error) {
-	var user models.User
-	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
+func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint) ([]PostWithUsername, error) {
+	var author models.User
+	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
 		}
 		return nil, err
 	}
-	log.Printf("found user ID %d for username %s", user.ID, username)
+	log.Printf("found author ID: %d for username: %s", author.ID, author)
 
-	var posts []models.Post
-	if err := s.DB.Where("user_id = ?", user.ID).Order("created_at DESC").Find(&posts).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("posts not found")
-		}
+	var posts []PostWithUsername
+	if err := s.DB.
+				Table("posts").
+				Select("posts.*, users.username").
+				Joins("JOIN users ON users.id = posts.user_id").
+				Where("user_id = ?", author.ID).
+				Order("created_at DESC").
+				Find(&posts).Error; err != nil {
+					if errors.Is(err, gorm.ErrRecordNotFound) {
+						return nil, errors.New("posts not found")
+					}
+					return nil, err
+				}
+
+	if err := s.encrichWithInteractionData(posts, currentUser); err != nil {
 		return nil, err
-	}
+	}	
 	
 	return posts, nil
 }
 
-func (s *PostService) GetPostByTopic(topic string) ([]PostWithUsername, error) {
+func (s *PostService) GetPostByTopic(topic string, currentUser uint) ([]PostWithUsername, error) {
 	var posts []PostWithUsername
 	if err := s.DB.
 				Table("posts").
-				Select("posts.id, posts.user_id, users.username, posts.topic, posts.title, posts.content, posts.created_at, posts.updated_at").
+				Select("posts.*, users.username").
 				Joins("JOIN users ON users.id = posts.user_id").
 				Where("topic = ?", topic).
 				Order("created_at DESC").
@@ -84,27 +95,39 @@ func (s *PostService) GetPostByTopic(topic string) ([]PostWithUsername, error) {
 					return nil, err
 				}
 
+	if err := s.encrichWithInteractionData(posts, currentUser); err != nil {
+		return nil, err
+	}
+
 	return posts, nil
 }
 
-func (s *PostService) GetUserPostByID(username string, postID uint) (*models.Post, error) {
-	var user models.User
-	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
+func (s *PostService) GetUserPostByID(authorUsername string, postID uint, currentUser uint) (*PostWithUsername, error) {
+	var author models.User
+	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("user not found")
+			return nil, errors.New("author not found")
 		}
 		return nil, err
 	}
 
-	var post models.Post
-	if err := s.DB.Where("id = ? AND user_id = ?", postID, user.ID).Order("created_at DESC").First(&post).Error; err != nil {
+	var post PostWithUsername
+	if err := s.DB.Where("id = ? AND user_id = ?", postID, author.ID).Order("created_at DESC").First(&post).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("post not found")
 		}
 		return nil, err
 	}
+	post.Username = authorUsername
 
-	return &post, nil
+	var post_array = []PostWithUsername{post}
+
+	if err := s.encrichWithInteractionData(post_array, currentUser); err != nil {
+		return nil, err
+	}
+
+	// utils.DebugLog("post:", post_array)
+	return &(post_array[0]), nil
 }
 
 func (s *PostService) CreatePost(username, topic, title, content string) error {
@@ -208,7 +231,7 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 
 	query := s.DB.
 		Table("posts").
-		Select("posts.id, posts.user_id, users.username, posts.topic, posts.title, posts.content, posts.like_count, posts.comment_count, posts.view_count, posts.repost_count, posts.created_at, posts.updated_at").
+		Select("posts.*, users.username").
 		Joins("JOIN users ON users.id = posts.user_id")
 
 	if params.Cursor > 0 {
@@ -234,7 +257,6 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		posts = posts[:params.Limit] // trim to limit
 	}
 
-	log.Printf("[SERVICE] user ID: %s", params.UserID)
 	// only enrich if user is authenticated - HERE
 	if (params.UserID > 0) {
 		log.Println("Enriching likes data...")
@@ -262,7 +284,6 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 		return nil
 	}
 
-	// Extract post IDs
 	postIDs := make([]uint, len(posts))
 	for i, post := range posts {
 		postIDs[i] = post.ID
@@ -275,7 +296,6 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 			currentUserID, "post", postIDs).
 			Find(&userLikes)
 	}
-	log.Printf("user %s likes: %d",currentUserID, userLikes)
 
 	// get current user's reposts
 	var userReposts []models.Repost
@@ -284,9 +304,8 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 			currentUserID, postIDs).
 			Find(&userReposts)
 	}
-	log.Printf("user %s reposts: %d",currentUserID, userReposts)
 
-	// Create a map for fast lookup
+	// use map for fast lookup
 	userLikesMap := make(map[uint]bool)
 	for _, like := range userLikes {
 		userLikesMap[like.LikeableID] = true
@@ -297,7 +316,7 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 		userRepostsMap[repost.PostID] = true
 	}
 
-	// STEP 2: Get top likers for all posts in ONE query
+	// get top likers for all posts
 	type InteractionResult struct {
 		PostID   uint   `json:"post_id"`
 		Username string `json:"username"`
@@ -311,7 +330,7 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 		Order("likes.created_at DESC").
 		Find(&likeResults)
 
-	// Group likers by post ID
+	// group likers by post ID
 	likersMap := make(map[uint][]string)
 	for _, result := range likeResults {
 		likersMap[result.PostID] = append(likersMap[result.PostID], result.Username)
@@ -325,13 +344,13 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 		Order("reposts.created_at DESC").
 		Find(&repostResults)
 
-	// Group reposters by post ID
+	// group reposters by post ID
 	repostersMap := make(map[uint][]string)
 	for _, result := range repostResults {
 		repostersMap[result.PostID] = append(repostersMap[result.PostID], result.Username)
 	}
 
-	// STEP 3: Populate post fields
+	// ppulate post fields
 	for i := range posts {
 		postID := posts[i].ID
 		
@@ -360,6 +379,8 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 			posts[i].Reposters = []string{}
 		}
 	}
+
+	utils.DebugLog("final posts:", posts)
 
 	return nil
 }

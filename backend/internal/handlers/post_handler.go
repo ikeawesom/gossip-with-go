@@ -48,13 +48,19 @@ type DeletePostRequest struct {
 }
 
 func (h *PostHandler) GetPostsByUsername(c *gin.Context) {
+	var userID uint = 0
+
+	if v, exists := c.Get("userID"); exists {
+		userID = v.(uint)
+	}
+
 	req := GetPostByUsernameRequest{
 		Username: c.Param("username"),
 	}
 
 	log.Printf("searching for posts by %s", req.Username)
 
-	posts, err := h.PostService.GetPostByUsername(req.Username)
+	posts, err := h.PostService.GetPostByUsername(req.Username, userID)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
 		log.Println(err)
@@ -65,13 +71,19 @@ func (h *PostHandler) GetPostsByUsername(c *gin.Context) {
 }
 
 func (h *PostHandler) GetPostsByTopic(c *gin.Context) {
+	var userID uint = 0
+
+	if v, exists := c.Get("userID"); exists {
+		userID = v.(uint)
+	}
+
 	req := GetPostByTopicRequest{
 		Topic: c.Param("topic"),
 	}
 
 	log.Printf("searching for posts from %s", req.Topic)
 
-	posts, err := h.PostService.GetPostByTopic(req.Topic)
+	posts, err := h.PostService.GetPostByTopic(req.Topic, userID)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
 		log.Println(err)
@@ -81,6 +93,12 @@ func (h *PostHandler) GetPostsByTopic(c *gin.Context) {
 }
 
 func (h *PostHandler) GetUserPostByID(c *gin.Context) {
+	var userID uint = 0
+
+	if v, exists := c.Get("userID"); exists {
+		userID = v.(uint)
+	}
+
 	username := c.Param("username")
 	postIDParam := c.Param("postID")
 	log.Printf("searching for post ID %s by user %s", postIDParam, username)
@@ -91,7 +109,7 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 		return
 	}
 	
-	post, err := h.PostService.GetUserPostByID(username, postID)
+	post, err := h.PostService.GetUserPostByID(username, postID, userID)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
 		log.Println(err)
