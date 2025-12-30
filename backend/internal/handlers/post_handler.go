@@ -47,7 +47,7 @@ type DeletePostRequest struct {
 	UserID uint `json:"user_id" binding:"required"`
 }
 
-func (h *PostHandler) GetPostByUsername(c *gin.Context) {
+func (h *PostHandler) GetPostsByUsername(c *gin.Context) {
 	req := GetPostByUsernameRequest{
 		Username: c.Param("username"),
 	}
@@ -64,7 +64,7 @@ func (h *PostHandler) GetPostByUsername(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"posts": posts})
 }
 
-func (h *PostHandler) GetPostByTopic(c *gin.Context) {
+func (h *PostHandler) GetPostsByTopic(c *gin.Context) {
 	req := GetPostByTopicRequest{
 		Topic: c.Param("topic"),
 	}
@@ -102,7 +102,13 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 }
 
 func (h *PostHandler) GetTrendingPosts(c *gin.Context) {
-	limitStr := c.DefaultQuery("limit", "10")  // default to 10
+	var userID uint = 0
+
+	if v, exists := c.Get("userID"); exists {
+		userID = v.(uint)
+	}
+
+	limitStr := c.DefaultQuery("limit", utils.GetLimitStr()) 
 	cursorStr := c.Query("cursor")              // empty string if not provided
 
 	limit, err := strconv.Atoi(limitStr)
@@ -124,8 +130,10 @@ func (h *PostHandler) GetTrendingPosts(c *gin.Context) {
 	params := services.PaginationParams{
 		Limit:  limit,
 		Cursor: cursor,
+		UserID: userID,
 	}
 
+	log.Println("[HANLDER] Attempting to fetch trending posts...")
 	result, err := h.PostService.GetTrendingPosts(params)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to fetch posts", err.Error())
