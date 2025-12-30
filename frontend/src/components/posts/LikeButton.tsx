@@ -65,7 +65,10 @@ export default function LikeButton({
 
   return (
     <button
-      className="flex items-center justify-center gap-1 cursor-pointer px-2 py-1 rounded-md hover:bg-gray-dark/20 duration-150"
+      className={twMerge(
+        "flex items-center justify-center gap-1 cursor-pointer px-2 py-1 rounded-md",
+        !loading && "hover:bg-gray-dark/20 duration-150"
+      )}
       onClick={handleToggleLike}
       disabled={loading}
     >
