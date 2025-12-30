@@ -4,14 +4,21 @@ export interface PostType {
     topic: string;
     title: string;
     content: string;
-    like_count: number;
-    comment_count: number;
-    view_count: number;
-    repost_count: number;
-    score: number;
+    username?: string;
+
     created_at: string;
     updated_at: string;
-    username?: string;
+
+    like_count: number;
+    comment_count: number;
+    repost_count: number;
+    view_count: number;
+    score: number;
+
+    user_has_liked: boolean;
+    user_has_reposted: boolean;
+    reposters: string[];
+    likers: string[];
 }
 
 export interface CreatePostRequest {
@@ -30,4 +37,5 @@ export interface TrendingPostsResponse {
 export interface TrendingPostsParams {
     limit?: number;
     cursor?: number;
+    userID?: number;
 }
