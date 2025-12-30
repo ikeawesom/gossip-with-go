@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"encoding/json"
 	"errors"
+	"log"
 	"strconv"
 )
 
@@ -13,4 +15,13 @@ func ParseUintParam(param string) (uint, error) {
 	}
 
 	return uint(id), nil
+}
+
+func DebugLog(prefix string, v interface{}) {
+    jsonBytes, err := json.MarshalIndent(v, "", "  ")
+    if err != nil {
+        log.Printf("Error marshaling: %v", err)
+        return
+    }
+    log.Println(prefix, string(jsonBytes))
 }
