@@ -4,9 +4,7 @@ import Card from "../utils/Card";
 import type { PostType } from "../../types/post";
 import { Link } from "react-router-dom";
 import TopicTag from "../topics/TopicTag";
-import LikeButton from "./LikeButton";
-import RepostButton from "./RepostButton";
-import CommentButton from "./CommentButton";
+import PostInteractionSection from "./PostInteractionSection";
 
 export default function PostCard({
   post,
@@ -26,11 +24,6 @@ export default function PostCard({
     username: fetched_username,
     id,
     topic,
-    like_count,
-    comment_count,
-    repost_count,
-    user_has_reposted,
-    user_has_liked,
   } = post;
 
   const newDateStr = formatDate(new Date(created_at).getTime(), true);
@@ -62,20 +55,7 @@ export default function PostCard({
           )}
         </Card>
       </Link>
-      <div className="flex items-center justify-start gap-4 mt-2">
-        <LikeButton
-          initialLiked={user_has_liked}
-          targetType="post"
-          targetId={id}
-          initialCount={like_count}
-        />
-        <RepostButton
-          postID={id}
-          initialCount={repost_count}
-          initialReposted={user_has_reposted}
-        />
-        <CommentButton postID={id} initialCount={comment_count} url={url} />
-      </div>
+      <PostInteractionSection post={post} url={url} />
     </div>
   );
 }
