@@ -8,8 +8,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../state/store";
 
 export default function TrendingFeed() {
-  const { posts, loading, error, hasMore, loadMore } = usePagination(10);
   const { user } = useSelector((state: RootState) => state.auth);
+  const { posts, loading, error, hasMore, loadMore } = usePagination(10);
 
   // ref for the "load more" trigger element
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -17,7 +17,7 @@ export default function TrendingFeed() {
   const handleObserver = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const entry = entries[0];
-      if (entry.isIntersecting && hasMore && !loading) {
+      if (entry.isIntersecting && hasMore && !loading && !error) {
         console.log("Loading more posts...");
         loadMore();
       }
@@ -59,20 +59,20 @@ export default function TrendingFeed() {
       {posts.map((post) => (
         <PostCard key={post.id} post={post} showTopic />
       ))}
-
-      {loading && (
+      {!error && loading && (
         <div className="w-full grid place-items-center p-6">
           <SpinnerPrimary size={24} />
         </div>
       )}
+      {}
 
-      {!loading && hasMore && (
+      {!error && !loading && hasMore && (
         <div ref={loadMoreRef} className="w-full grid place-items-center p-6">
           <SpinnerPrimary size={24} />
         </div>
       )}
 
-      {!loading && !hasMore && posts.length > 0 && (
+      {!error && !loading && !hasMore && posts.length > 0 && (
         <p className="text-center py-8 custom text-gray-dark">
           You've reached the end.{" "}
           <span>
