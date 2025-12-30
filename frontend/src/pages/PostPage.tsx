@@ -15,6 +15,8 @@ import PrimaryButton from "../components/utils/PrimaryButton";
 import Modal from "../components/utils/Modal";
 import CreatePostForm from "../components/posts/CreatePostForm";
 import DeletePostForm from "../components/posts/DeletePostForm";
+import LongContent from "../components/posts/LongContent";
+import PostInteractionSection from "../components/posts/PostInteractionSection";
 
 type PostPageParams = {
   user_id: string;
@@ -57,83 +59,86 @@ export default function PostPage() {
       ) : status === "invalid" ? (
         <NotFound />
       ) : (
-        postData && (
-          <div className="flex w-full items-center justify-start gap-4">
-            <Card>
-              <div className="flex items-start justify-between">
-                <div className="flex flex-col items-start justify-center gap-2">
-                  <h1 className="text-3xl font-semibold">{postData.title}</h1>
-                  <p className="text-gray-dark">
-                    <Link className="text-primary" to={`/${user_id}`}>
-                      {user_id}
-                    </Link>{" "}
-                    •<span className="font-medium">{postData.username}</span>
-                    {" Posted "}
-                    {formatDate(new Date(postData.created_at).getTime(), true)
-                      .date
-                      ? "on"
-                      : ""}{" "}
-                    {formatDate(
-                      new Date(postData.created_at).getTime(),
-                      true
-                    ).time.toLowerCase()}
-                  </p>
-                  <Link
-                    to={`/topics/${postData.topic}`}
-                    className="hover:brightness-125 duration-150"
-                  >
-                    <TopicTag topic_id={postData.topic} />
-                  </Link>
-                </div>
-                {isCurrentUser && (
-                  <div className="flex items-start justify-end gap-2">
-                    <SecondaryButton
-                      onClick={() => setIsEditing(true)}
-                      className="rounded-md text-xs flex items-center justify-center gap-2 border-none px-3"
+        postData &&
+        (() => {
+          const { created_at, title, username, topic, content, updated_at } =
+            postData;
+          const isDate = formatDate(new Date(created_at).getTime(), true).date;
+          const newDate = formatDate(
+            new Date(created_at).getTime(),
+            true
+          ).time.toLowerCase();
+
+          const isEdited =
+            new Date(updated_at).getTime() > new Date(created_at).getTime();
+          const isEdit = formatDate(new Date(updated_at).getTime(), true).date;
+          const editDate = formatDate(
+            new Date(updated_at).getTime(),
+            true
+          ).time.toLowerCase();
+          return (
+            <div className="flex w-full items-start justify-start gap-1 flex-col">
+              <Card>
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col items-start justify-center gap-2">
+                    <h1 className="text-3xl font-semibold">{title}</h1>
+                    <p className="text-gray-dark">
+                      <Link className="text-primary" to={`/${username}`}>
+                        {username}
+                      </Link>{" "}
+                      •{" Posted "}
+                      {isDate ? "on" : ""} {newDate}
+                    </p>
+                    <Link
+                      to={`/topics/${topic}`}
+                      className="hover:brightness-125 duration-150"
                     >
-                      Edit
-                      <img
-                        alt="Edit"
-                        src="/icons/icon_pencil.svg"
-                        height={15}
-                        width={15}
-                      />
-                    </SecondaryButton>
-                    <PrimaryButton
-                      onClick={() => setIsDelete(true)}
-                      className="text-xs bg-red rounded-md flex items-center justify-center gap-2 border-none px-3"
-                    >
-                      Delete
-                      <img
-                        alt="Edit"
-                        src="/icons/icon_trash.svg"
-                        height={15}
-                        width={15}
-                      />
-                    </PrimaryButton>
+                      <TopicTag topic_id={topic} />
+                    </Link>
                   </div>
-                )}
-              </div>
-              <div className="mt-3 w-full border-t border-gray-dark/20 pt-2">
-                <p className="smart-wrap whitespace-pre-wrap">
-                  {postData.content}
-                </p>
-                <p className="fine-print text-xs italic custom mt-3">
-                  {" Edited "}
-                  {formatDate(new Date(postData.updated_at).getTime(), true)
-                    .date
-                    ? "on"
-                    : ""}{" "}
-                  {formatDate(
-                    new Date(postData.updated_at).getTime(),
-                    true
-                  ).time.toLowerCase()}
-                </p>
-              </div>
-            </Card>
-            {/* for comments */}
-          </div>
-        )
+                  {isCurrentUser && (
+                    <div className="flex items-start justify-end gap-2">
+                      <SecondaryButton
+                        onClick={() => setIsEditing(true)}
+                        className="rounded-md text-xs flex items-center justify-center gap-2 border-none px-3"
+                      >
+                        Edit
+                        <img
+                          alt="Edit"
+                          src="/icons/icon_pencil.svg"
+                          height={15}
+                          width={15}
+                        />
+                      </SecondaryButton>
+                      <PrimaryButton
+                        onClick={() => setIsDelete(true)}
+                        className="text-xs bg-red rounded-md flex items-center justify-center gap-2 border-none px-3"
+                      >
+                        Delete
+                        <img
+                          alt="Edit"
+                          src="/icons/icon_trash.svg"
+                          height={15}
+                          width={15}
+                        />
+                      </PrimaryButton>
+                    </div>
+                  )}
+                </div>
+                <LongContent content={content}>
+                  {isEdited && (
+                    <p className="fine-print text-xs italic custom mt-3">
+                      {" Edited "}
+                      {isEdit ? "on" : ""} {editDate}
+                    </p>
+                  )}
+                </LongContent>
+              </Card>
+              <PostInteractionSection post={postData} className="self-end" />
+              {/* for comments */}
+            </div>
+          );
+        })()
       )}
       {isEditing && (
         <Modal close={() => setIsEditing(false)}>
