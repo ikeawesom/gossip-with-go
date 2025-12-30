@@ -28,11 +28,24 @@ func CalculatePostScore(post *PostWithUsername) float64 {
 
 	ageInHours := time.Since(post.CreatedAt).Hours()
 
-	// calculate time decay
-	timeDecay := math.Pow(ageInHours + 2, GRAVITY) // to prevent issues with very new posts (division by 0)
+	if ageInHours < 0 {
+		ageInHours = 0
+	}
+	
+	// to prevent issues with very new posts (division by 0)
+	decayBase := ageInHours + 2
+	if decayBase <= 0 {
+		decayBase = 2
+	}
 
-	// calculate final score
+	// calculate time decay
+	timeDecay := math.Pow(decayBase, GRAVITY)
+
+	// calculate final score with safety
 	score := engagementScore / timeDecay
+	if math.IsNaN(score) || math.IsInf(score, 0) {
+		score = 0
+	}
 
 	return score
 }
