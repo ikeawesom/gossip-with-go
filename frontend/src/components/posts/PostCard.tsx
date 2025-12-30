@@ -4,6 +4,9 @@ import Card from "../utils/Card";
 import type { PostType } from "../../types/post";
 import { Link } from "react-router-dom";
 import TopicTag from "../topics/TopicTag";
+import LikeButton from "./LikeButton";
+import RepostButton from "./RepostButton";
+import CommentButton from "./CommentButton";
 
 export default function PostCard({
   post,
@@ -23,32 +26,57 @@ export default function PostCard({
     username: fetched_username,
     id,
     topic,
+    like_count,
+    comment_count,
+    repost_count,
+    likers,
+    user_has_reposted,
+    user_has_liked,
   } = post;
 
   const newDateStr = formatDate(new Date(created_at).getTime(), true);
 
   const user = fetched_username ?? username;
 
+  const url = `/${user}/posts/${id}`;
+
   return (
-    <Link to={`/${user}/posts/${id}`} className="w-full">
-      <Card className="flex items-center justify-between gap-6 group hover:brightness-110 duration-150 smart-wrap">
-        <div className="w-full flex flex-col items-start justify-start gap-3">
-          <div className="flex items-center justify-start gap-2">
-            {showTopic && <TopicTag topic_id={topic} />}
-            <h4 className="custom font-bold">{title}</h4> • <p>{user}</p>
+    <div className="w-full">
+      <Link to={url} className="w-full">
+        <Card className="flex items-center justify-between gap-6 group hover:brightness-110 duration-150 smart-wrap">
+          <div className="w-full flex flex-col items-start justify-start gap-3">
+            <div className="flex items-center justify-start gap-2">
+              {showTopic && <TopicTag topic_id={topic} />}
+              <h4 className="custom font-bold">{title}</h4> • <p>{user}</p>
+            </div>
+            <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
+            <p className="fine-print">
+              Posted {newDateStr.date ? "on" : ""}{" "}
+              {newDateStr.time.toLowerCase()}
+            </p>
           </div>
-          <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
-          <p className="fine-print">
-            Posted {newDateStr.date ? "on" : ""} {newDateStr.time.toLowerCase()}
-          </p>
-        </div>
-        {!hideArrow && (
-          <ArrowRight
-            className="group-hover:translate-x-1 duration-150"
-            size={30}
-          />
-        )}
-      </Card>
-    </Link>
+          {!hideArrow && (
+            <ArrowRight
+              className="group-hover:translate-x-1 duration-150"
+              size={30}
+            />
+          )}
+        </Card>
+      </Link>
+      <div className="flex items-center justify-start gap-4 mt-2">
+        <LikeButton
+          initialLiked={user_has_liked}
+          targetType="post"
+          targetId={id}
+          initialCount={like_count}
+        />
+        <RepostButton
+          postID={id}
+          initialCount={repost_count}
+          initialReposted={user_has_reposted}
+        />
+        <CommentButton postID={id} initialCount={comment_count} url={url} />
+      </div>
+    </div>
   );
 }
