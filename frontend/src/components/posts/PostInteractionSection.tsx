@@ -2,14 +2,18 @@ import type { PostType } from "../../types/post";
 import LikeButton from "./LikeButton";
 import RepostButton from "./RepostButton";
 import CommentButton from "./CommentButton";
+import type { DefaultCustomProps } from "../../lib/constants";
+import { twMerge } from "tailwind-merge";
 
+interface PostInteractionType extends DefaultCustomProps {
+  post: PostType;
+  url?: string;
+}
 export default function PostInteractionSection({
   post,
   url,
-}: {
-  post: PostType;
-  url: string;
-}) {
+  className,
+}: PostInteractionType) {
   const {
     comment_count,
     user_has_liked,
@@ -18,8 +22,14 @@ export default function PostInteractionSection({
     repost_count,
     user_has_reposted,
   } = post;
+
   return (
-    <div className="flex items-center justify-start gap-4 mt-2">
+    <div
+      className={twMerge(
+        "flex items-center justify-start gap-4 mt-2",
+        className
+      )}
+    >
       <LikeButton
         initialLiked={user_has_liked}
         targetType="post"
@@ -31,7 +41,9 @@ export default function PostInteractionSection({
         initialCount={repost_count}
         initialReposted={user_has_reposted}
       />
-      <CommentButton postID={id} initialCount={comment_count} url={url} />
+      {url && (
+        <CommentButton postID={id} initialCount={comment_count} url={url} />
+      )}
     </div>
   );
 }
