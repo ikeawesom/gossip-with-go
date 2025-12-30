@@ -3,6 +3,9 @@ import type { QueryPeek } from "../types/query";
 
 export const APP_NAME = "GossipWithGo";
 
+export const REQUEST_CURSOR_LIMIT = 10;
+export const REQUEST_OFFSET = 0;
+
 export interface DefaultCustomProps {
     className?: string;
     children?: React.ReactNode;
