@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler) {
+func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler) {
 	// CORS configuration
 	cfg := config.AppConfig
 	r.Use(cors.New(cors.Config{
@@ -46,7 +46,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			auth.POST("/reset-password", authHandler.ResetPassword)
 			auth.POST("/refresh", authHandler.RefreshToken)
 
-			// protected auth routes - for testing (can remove later)
+			// authenticated endpoints for auth - for testing
 			auth.GET("/me", middleware.AuthRequired(), authHandler.GetCurrentUser)
 		}
 
@@ -59,14 +59,49 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		// post routes
 		posts := api.Group("/posts")
 		{
-			posts.GET("/trending", postHandler.GetTrendingPosts)
-			posts.GET("/topic/:topic", postHandler.GetPostByTopic)
-			posts.GET("/users/:username", postHandler.GetPostByUsername)
-			posts.GET("/:username/:postID", postHandler.GetUserPostByID)
+			posts.GET("/topic/:topic", postHandler.GetPostsByTopic)
+			posts.GET("/users/:username", postHandler.GetPostsByUsername)
+			posts.GET("/users/:username/:postID", postHandler.GetUserPostByID)
+			posts.GET("/:postID/comments", commentHandler.GetRootComments)
+			
+			// authenticated endpoints for posts
+			posts.GET("/trending", middleware.AuthOptional(), postHandler.GetTrendingPosts)
 			posts.POST("/create", middleware.AuthRequired(), postHandler.CreatePost)
 			posts.POST("/edit/:postID", middleware.AuthRequired(), postHandler.EditPost)
 			posts.POST("/delete/:postID", middleware.AuthRequired(), postHandler.DeletePost)
-			// likes and comments will be included here
+		}
+
+		// likes routes
+		likes := api.Group("/likes")
+		{
+			likes.GET("/likers", likeHandler.GetLikers)
+
+			// authenticated endpoints for likes
+			likes.GET("/status", middleware.AuthRequired(), likeHandler.GetLikeStatus)
+			likes.POST("/toggle", middleware.AuthRequired(), likeHandler.ToggleLike)
+		}
+
+		reposts := api.Group("/reposts")
+		{
+			reposts.GET("/reposters", repostHandler.GetReposters)
+			reposts.GET("/user/:username", repostHandler.GetUserReposts)
+			
+			// authenticted endpoints for reposts
+			reposts.POST("/toggle", middleware.AuthOptional(),repostHandler.ToggleRepost)
+			reposts.GET("/status",middleware.AuthRequired(), repostHandler.GetRepostStatus)
+			reposts.POST("/update-visibility",middleware.AuthRequired(), repostHandler.UpdateRepostVisibility)
+			
+		}
+
+		comments := api.Group("/comments")
+		{
+			comments.GET("/:id/replies", commentHandler.GetReplies)
+			
+			// authenticted endpoints for comments
+			comments.POST("/root",middleware.AuthRequired(), commentHandler.CreateRootComment)      
+			comments.POST("/reply",middleware.AuthRequired(), commentHandler.CreateReply)           
+			comments.POST("/:id",middleware.AuthRequired(), commentHandler.UpdateComment)           
+			comments.DELETE("/:id",middleware.AuthRequired(), commentHandler.DeleteComment)         
 		}
 		
 		// private API routes example
