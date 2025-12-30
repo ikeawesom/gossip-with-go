@@ -29,7 +29,6 @@ export default function PostCard({
     like_count,
     comment_count,
     repost_count,
-    likers,
     user_has_reposted,
     user_has_liked,
   } = post;
