@@ -74,8 +74,8 @@ export default function RepostButton({
       <img
         src={
           reposted
-            ? "icons/posts/icon_reposted.svg"
-            : "icons/posts/icon_unreposted.svg"
+            ? "/icons/posts/icon_reposted.svg"
+            : "/icons/posts/icon_unreposted.svg"
         }
         className={twMerge(
           reposted ? "rotate-180 duration-300" : "-rotate-180 duration-300"

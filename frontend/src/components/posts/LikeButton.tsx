@@ -79,7 +79,9 @@ export default function LikeButton({
       </p>
       <img
         src={
-          liked ? "icons/posts/icon_liked.svg" : "icons/posts/icon_unliked.svg"
+          liked
+            ? "/icons/posts/icon_liked.svg"
+            : "/icons/posts/icon_unliked.svg"
         }
         alt="Liked"
         height={18}

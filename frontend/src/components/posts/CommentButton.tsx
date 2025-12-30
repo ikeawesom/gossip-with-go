@@ -18,7 +18,7 @@ export default function CommentButton({
     >
       <p className="custom text-gray-dark">{initialCount ?? 0}</p>
       <img
-        src="icons/posts/icon_comment.svg"
+        src="/icons/posts/icon_comment.svg"
         alt="Comments"
         width={20}
         height={20}
