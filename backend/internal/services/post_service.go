@@ -23,6 +23,7 @@ type NewPost struct {
 type PaginationParams struct {
 	Limit  int  
 	Cursor uint
+	UserID uint
 }
 
 type PaginatedPostsResponse struct {
@@ -34,6 +35,11 @@ type PaginatedPostsResponse struct {
 type PostWithUsername struct {
 	models.Post
 	Username string `json:"username"`
+
+	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
+	UserHasReposted bool  `gorm:"-" json:"user_has_reposted"` 
+	Likers       []string `gorm:"-" json:"likers"`
+	Reposters    []string `gorm:"-" json:"reposters"`
 }
 
 func NewPostService(db *gorm.DB) *PostService {
@@ -190,6 +196,8 @@ func (s *PostService) DeletePost(postID uint, username string) error {
 }
 
 func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPostsResponse, error) {
+	log.Println("[SERVICE] User ID:", params.UserID)
+
 	// validate parameters
 	if params.Limit <= 0 {
 		params.Limit = 10 // default to 10 posts per page
@@ -215,6 +223,8 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		return nil, err
 	}
 
+	log.Println("[SERVICE] Fetched posts...")
+
 	posts = CalculatePostScores(posts)
 	sortPostsByScore(posts)
 
@@ -224,10 +234,19 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		posts = posts[:params.Limit] // trim to limit
 	}
 
-	// determine next cursor
+	log.Printf("[SERVICE] user ID: %s", params.UserID)
+	// only enrich if user is authenticated - HERE
+	if (params.UserID > 0) {
+		log.Println("Enriching likes data...")
+		if err := s.encrichWithInteractionData(posts, params.UserID); err != nil {
+			return nil, err
+		}
+	}
+
+	// Determine next cursor
 	var nextCursor *uint
 	if hasMore && len(posts) > 0 {
-		lastPostID := posts[len(posts) - 1].ID // next cursor is the ID of the last post in this batch
+		lastPostID := posts[len(posts)-1].ID
 		nextCursor = &lastPostID
 	}
 
@@ -236,6 +255,113 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		NextCursor: nextCursor,
 		HasMore:    hasMore,
 	}, nil
+}
+
+func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, currentUserID uint) error {
+	if len(posts) == 0 {
+		return nil
+	}
+
+	// Extract post IDs
+	postIDs := make([]uint, len(posts))
+	for i, post := range posts {
+		postIDs[i] = post.ID
+	}
+
+	// get current user's likes in ONE query
+	var userLikes []models.Like
+	if currentUserID > 0 {
+		s.DB.Where("user_id = ? AND likeable_type = ? AND likeable_id IN ?", 
+			currentUserID, "post", postIDs).
+			Find(&userLikes)
+	}
+	log.Printf("user %s likes: %d",currentUserID, userLikes)
+
+	// get current user's reposts
+	var userReposts []models.Repost
+	if currentUserID > 0 {
+		s.DB.Where("user_id = ? AND post_id IN ?", 
+			currentUserID, postIDs).
+			Find(&userReposts)
+	}
+	log.Printf("user %s reposts: %d",currentUserID, userReposts)
+
+	// Create a map for fast lookup
+	userLikesMap := make(map[uint]bool)
+	for _, like := range userLikes {
+		userLikesMap[like.LikeableID] = true
+	}
+
+	userRepostsMap := make(map[uint]bool)
+	for _, repost := range userReposts {
+		userRepostsMap[repost.PostID] = true
+	}
+
+	// STEP 2: Get top likers for all posts in ONE query
+	type InteractionResult struct {
+		PostID   uint   `json:"post_id"`
+		Username string `json:"username"`
+	}
+	
+	var likeResults []InteractionResult
+	s.DB.Table("likes").
+		Select("likes.likeable_id as post_id, users.username").
+		Joins("JOIN users ON users.id = likes.user_id").
+		Where("likes.likeable_type = ? AND likes.likeable_id IN ?", "post", postIDs).
+		Order("likes.created_at DESC").
+		Find(&likeResults)
+
+	// Group likers by post ID
+	likersMap := make(map[uint][]string)
+	for _, result := range likeResults {
+		likersMap[result.PostID] = append(likersMap[result.PostID], result.Username)
+	}
+
+	var repostResults []InteractionResult
+	s.DB.Table("reposts").
+		Select("reposts.post_id, users.username").
+		Joins("JOIN users ON users.id = reposts.user_id").
+		Where("reposts.post_id IN ?", postIDs).
+		Order("reposts.created_at DESC").
+		Find(&repostResults)
+
+	// Group reposters by post ID
+	repostersMap := make(map[uint][]string)
+	for _, result := range repostResults {
+		repostersMap[result.PostID] = append(repostersMap[result.PostID], result.Username)
+	}
+
+	// STEP 3: Populate post fields
+	for i := range posts {
+		postID := posts[i].ID
+		
+		posts[i].UserHasLiked = userLikesMap[postID] // set to user liked
+		posts[i].UserHasReposted = userRepostsMap[postID] // set to user reposted
+		
+		// set top likers (limit to first 3 for preview)
+		if likers, ok := likersMap[postID]; ok {
+			if len(likers) > 3 {
+				posts[i].Likers = likers[:3]
+			} else {
+				posts[i].Likers = likers
+			}
+		} else {
+			posts[i].Likers = []string{}
+		}
+
+		// set top reposters (limit to first 3 for preview)
+		if reposters, ok := repostersMap[postID]; ok {
+			if len(reposters) > 3 {
+				posts[i].Reposters = reposters[:3]
+			} else {
+				posts[i].Reposters = reposters
+			}
+		} else {
+			posts[i].Reposters = []string{}
+		}
+	}
+
+	return nil
 }
 
 func sortPostsByScore(posts []PostWithUsername) {
