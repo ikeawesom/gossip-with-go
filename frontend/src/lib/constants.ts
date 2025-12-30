@@ -3,6 +3,8 @@ import type { QueryPeek } from "../types/query";
 
 export const APP_NAME = "GossipWithGo";
 
+export const DEV_MODE = import.meta.env.MODE === "development"
+
 export const REQUEST_CURSOR_LIMIT = 10;
 export const REQUEST_OFFSET = 0;
 
