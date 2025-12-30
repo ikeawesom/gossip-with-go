@@ -23,7 +23,7 @@ export const postApi = {
 
     // get post by username and postID
     getUserPostByID: async (username: string, postID: string): Promise<ResponseType> => {
-        const response = await apiClient.get(`/posts/${username}/${postID}`);
+        const response = await apiClient.get(`/posts/users/${username}/${postID}`);
         return response.data;
     },
 
@@ -55,7 +55,6 @@ export const postApi = {
         const url = `trending${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
         const response = await apiClient.get(`/posts/${url}`);
 
-        console.log("API RESPONSE:", response.data)
         return response.data;
     },
 
