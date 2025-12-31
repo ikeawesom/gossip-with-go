@@ -43,8 +43,7 @@ export default function PostCard({
             </div>
             <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
             <p className="fine-print">
-              Posted {newDateStr.date ? "on" : ""}{" "}
-              {newDateStr.time.toLowerCase()}
+              Posted {newDateStr.date ? "on" : ""} {newDateStr.time}
             </p>
           </div>
           {!hideArrow && (
