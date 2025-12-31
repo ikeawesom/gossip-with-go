@@ -10,7 +10,10 @@ export default function NotFound() {
       </p>
       <p className="custom">
         Back to{" "}
-        <Link to="/" className="text-primary mt-4">
+        <Link
+          to="/"
+          className="text-sm text-primary hover:opacity-70 duration-150 mt-4"
+        >
           Home
         </Link>
         .

@@ -58,7 +58,10 @@ export default function TopicPage() {
               <h4 className="custom text-gray-dark">•</h4>
               <h4 className="custom text-gray-dark">
                 Browse other topics{" "}
-                <Link className="text-primary font-bold" to="/topics">
+                <Link
+                  className="font-bold text-primary hover:opacity-70 duration-150"
+                  to="/topics"
+                >
                   here
                 </Link>
                 .
