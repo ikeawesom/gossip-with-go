@@ -17,6 +17,7 @@ import CreatePostForm from "../components/posts/CreatePostForm";
 import DeletePostForm from "../components/posts/DeletePostForm";
 import LongContent from "../components/posts/LongContent";
 import PostInteractionSection from "../components/posts/PostInteractionSection";
+import CommentSection from "../components/posts/CommentSection";
 
 type PostPageParams = {
   user_id: string;
@@ -64,10 +65,7 @@ export default function PostPage() {
           const { created_at, title, username, topic, content, updated_at } =
             postData;
           const isDate = formatDate(new Date(created_at).getTime(), true).date;
-          const newDate = formatDate(
-            new Date(created_at).getTime(),
-            true
-          ).time.toLowerCase();
+          const newDate = formatDate(new Date(created_at).getTime(), true).time;
 
           const isEdited =
             new Date(updated_at).getTime() > new Date(created_at).getTime();
@@ -75,7 +73,7 @@ export default function PostPage() {
           const editDate = formatDate(
             new Date(updated_at).getTime(),
             true
-          ).time.toLowerCase();
+          ).time;
           return (
             <div className="flex w-full items-start justify-start gap-1 flex-col">
               <Card>
@@ -83,7 +81,10 @@ export default function PostPage() {
                   <div className="flex flex-col items-start justify-center gap-2">
                     <h1 className="text-3xl font-semibold">{title}</h1>
                     <p className="text-gray-dark">
-                      <Link className="text-primary" to={`/${username}`}>
+                      <Link
+                        className="text-sm text-primary hover:opacity-70 duration-150"
+                        to={`/${username}`}
+                      >
                         {username}
                       </Link>{" "}
                       •{" Posted "}
@@ -125,7 +126,10 @@ export default function PostPage() {
                     </div>
                   )}
                 </div>
-                <LongContent content={content}>
+                <LongContent
+                  className="mt-3 border-t border-gray-dark/20 pt-2"
+                  content={content}
+                >
                   {isEdited && (
                     <p className="fine-print text-xs italic custom mt-3">
                       {" Edited "}
@@ -135,7 +139,7 @@ export default function PostPage() {
                 </LongContent>
               </Card>
               <PostInteractionSection post={postData} className="self-end" />
-              {/* for comments */}
+              <CommentSection postID={postData.id} />
             </div>
           );
         })()
