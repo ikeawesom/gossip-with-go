@@ -4,8 +4,16 @@ import { twMerge } from "tailwind-merge";
 
 interface LongContentType extends DefaultCustomProps {
   content: string;
+  left?: boolean;
+  largeClamp?: boolean;
 }
-export default function LongContent({ content, children }: LongContentType) {
+export default function LongContent({
+  content,
+  children,
+  className,
+  left,
+  largeClamp,
+}: LongContentType) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
   const contentRef = useRef<HTMLParagraphElement>(null);
@@ -18,23 +26,31 @@ export default function LongContent({ content, children }: LongContentType) {
   }, [content]);
 
   return (
-    <div className="mt-3 w-full border-t border-gray-dark/20 pt-2 flex flex-col items-start justify-start">
+    <div
+      className={twMerge(
+        "w-full flex flex-col items-start justify-start",
+        className
+      )}
+    >
       <p
         ref={contentRef}
         className={twMerge(
           "smart-wrap whitespace-pre-wrap",
-          !isExpanded && "line-clamp-6"
+          !isExpanded && (largeClamp ? "line-clamp-3" : "line-clamp-6")
         )}
       >
         {content}
       </p>
       {showReadMore && (
-        <h4
+        <p
           onClick={() => setIsExpanded(!isExpanded)}
-          className="mt-2 self-end mr-2 custom text-primary text-sm cursor-pointer hover:opacity-70 duration-150"
+          className={twMerge(
+            "font-bold cursor-pointer hover:opacity-70 duration-150",
+            left ? "" : "self-end mr-2"
+          )}
         >
           {isExpanded ? "Read less" : "Read more"}
-        </h4>
+        </p>
       )}
       {children}
     </div>

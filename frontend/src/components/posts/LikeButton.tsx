@@ -11,9 +11,11 @@ interface LikeButtonProps {
   targetType: "post" | "comment";
   initialLiked: boolean;
   initialCount: number;
+  fitWidth?: boolean;
 }
 
 export default function LikeButton({
+  fitWidth,
   initialCount,
   initialLiked,
   targetId,
@@ -74,8 +76,9 @@ export default function LikeButton({
     >
       <p
         className={twMerge(
-          "custom text-green tabular-nums min-w-[2ch] text-right",
-          liked ? "text-red" : "text-gray-dark"
+          "custom text-green",
+          liked ? "text-red" : "text-gray-dark",
+          fitWidth ? "" : "tabular-nums min-w-[2ch] text-right"
         )}
       >
         {likeCount}
