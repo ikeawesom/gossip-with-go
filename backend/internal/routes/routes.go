@@ -59,7 +59,6 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		// post routes
 		posts := api.Group("/posts")
 		{
-			posts.GET("/:postID/comments", commentHandler.GetRootComments)
 			posts.GET("/topic/:topic", middleware.AuthOptional(), postHandler.GetPostsByTopic)
 			posts.GET("/users/:username", middleware.AuthOptional(), postHandler.GetPostsByUsername)
 			posts.GET("/users/:username/:postID", middleware.AuthOptional(), postHandler.GetUserPostByID)
@@ -73,12 +72,12 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		likes := api.Group("/likes")
 		{
 			likes.GET("/likers", likeHandler.GetLikers)
-
+			
 			// authenticated endpoints for likes
 			likes.GET("/status", middleware.AuthRequired(), likeHandler.GetLikeStatus)
 			likes.POST("/toggle", middleware.AuthRequired(), likeHandler.ToggleLike)
 		}
-
+		
 		reposts := api.Group("/reposts")
 		{
 			reposts.GET("/reposters", repostHandler.GetReposters)
@@ -90,10 +89,12 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			reposts.POST("/update-visibility",middleware.AuthRequired(), repostHandler.UpdateRepostVisibility)
 			
 		}
-
+		
 		comments := api.Group("/comments")
 		{
-			comments.GET("/:id/replies", commentHandler.GetReplies)
+			comments.GET("/post/:postID", middleware.AuthOptional(), commentHandler.GetRootComments)
+			
+			comments.GET("/:id/replies",middleware.AuthOptional(), commentHandler.GetReplies)
 			
 			// authenticted endpoints for comments
 			comments.POST("/root",middleware.AuthRequired(), commentHandler.CreateRootComment)      
