@@ -3,14 +3,11 @@ import { useNavigate } from "react-router-dom";
 export default function CommentButton({
   url,
   initialCount,
-  postID,
 }: {
   url: string;
-  postID: number;
   initialCount: number;
 }) {
   const navigate = useNavigate();
-  console.log(`[COMMENT BUTTON]: ${postID}`);
   return (
     <button
       className="flex items-center justify-center gap-1 cursor-pointer px-2 py-1 rounded-md hover:bg-gray-dark/20 duration-150"
