@@ -78,27 +78,31 @@ export default function IndividualComment({
               trigger={trigger}
               triggerBool={triggerBool}
             />
-            <p>•</p>
-            <p
-              onClick={
-                allLoaded
-                  ? showReplies
-                    ? handleHideAllReplies
-                    : loadMore
-                  : loadMore
-              }
-              className={twMerge(
-                "custom text-gray-dark text-sm flex items-center justify-center gap-1 cursor-pointer hover:opacity-70 duration-150"
-              )}
-            >
-              View {comment.reply_count} replies
-              <img
-                src="/icons/posts/icon_comment.svg"
-                alt="Comments"
-                width={20}
-                height={20}
-              />
-            </p>
+            {comment.reply_count !== undefined && comment.reply_count > 0 && (
+              <>
+                <p>•</p>
+                <p
+                  onClick={
+                    allLoaded
+                      ? showReplies
+                        ? handleHideAllReplies
+                        : loadMore
+                      : loadMore
+                  }
+                  className={twMerge(
+                    "custom text-gray-dark text-sm flex items-center justify-center gap-1 cursor-pointer hover:opacity-70 duration-150"
+                  )}
+                >
+                  View {comment.reply_count} replies
+                  <img
+                    src="/icons/posts/icon_comment.svg"
+                    alt="Comments"
+                    width={20}
+                    height={20}
+                  />
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
