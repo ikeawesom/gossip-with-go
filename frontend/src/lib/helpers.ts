@@ -36,11 +36,11 @@ export function formatDate(timestamp: number, includeTime?: boolean): { date: bo
     const diffHours = Math.floor(diffMins / 60);
 
     if (diffSecs < 60) {
-      return { date: false, time: `${diffSecs} SEC${diffSecs !== 1 ? 'S' : ''} AGO` };
+      return { date: false, time: `${diffSecs} sec${diffSecs !== 1 ? 's' : ''} ago` };
     } else if (diffMins < 60) {
-      return { date: false, time: `${diffMins} MIN${diffMins !== 1 ? 'S' : ''} AGO` };
+      return { date: false, time: `${diffMins} min${diffMins !== 1 ? 's' : ''} ago` };
     } else if (diffHours < 24) {
-      return { date: false, time: `${diffHours} HOUR${diffHours !== 1 ? 'S' : ''} AGO` };
+      return { date: false, time: `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago` };
     }
   }
 
