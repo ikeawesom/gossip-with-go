@@ -41,9 +41,7 @@ export default function PostInteractionSection({
         initialCount={repost_count}
         initialReposted={user_has_reposted}
       />
-      {url && (
-        <CommentButton postID={id} initialCount={comment_count} url={url} />
-      )}
+      {url && <CommentButton initialCount={comment_count} url={url} />}
     </div>
   );
 }
