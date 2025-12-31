@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../state/store";
+import type { PostType } from "../../types/post";
 
 export default function TrendingFeed() {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -56,8 +57,8 @@ export default function TrendingFeed() {
 
   return (
     <div className="flex items-center justify-center gap-5 flex-col mt-4 border-t border-t-gray-dark/20 pt-6">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} showTopic />
+      {posts.map((post: PostType, index: number) => (
+        <PostCard key={index} post={post} showTopic />
       ))}
       {!error && loading && (
         <div className="w-full grid place-items-center p-6">

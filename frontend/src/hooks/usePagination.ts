@@ -1,57 +1,67 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { postApi } from '../api/posts.api';
-import type { PostType, TrendingPostsResponse } from '../types/post';
+import type { PostType, TrendingPostsResponse } from "../types/post"
+import type { ApiError } from '../types/auth';
+import { AxiosError } from 'axios';
 import { REQUEST_CURSOR_LIMIT } from '../lib/constants';
+
 
 export function usePagination(limit: number = REQUEST_CURSOR_LIMIT) {
     const [posts, setPosts] = useState<PostType[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [hasMore, setHasMore] = useState(true);
-    const [cursor, setCursor] = useState<number | null>(null);
 
     const isLoadingRef = useRef(false);
+    const cursorRef = useRef<number | null>(null);
+    const initialLoadRef = useRef(false);
 
-    const fetchPosts = useCallback(async (isRefresh: boolean = false) => {
+    const fetchPosts = useCallback(async () => {
         if (isLoadingRef.current) return;
-
-        if (!isRefresh && !hasMore) return;
+        if (!hasMore) return;
 
         isLoadingRef.current = true;
         setLoading(true);
         setError(null);
 
         try {
-            const params = { limit, ...(isRefresh ? {} : cursor ? { cursor } : {}) };
+            const params = {
+                limit,
+                ...(cursorRef.current ? { cursor: cursorRef.current } : {}),
+            };
+
             const response = await postApi.getTrendingPosts(params);
             const data = response.data as TrendingPostsResponse;
 
-            if (isRefresh) {
-                setPosts(data.posts);
-            } else {
-                setPosts(prev => [...prev, ...data.posts]);
-            }
+            setPosts(prev => {
+                const existingIds = new Set(prev.map(p => p.id));
+                const newPosts = data.posts.filter(p => !existingIds.has(p.id));
+                return [...prev, ...newPosts];
+            });
 
-            // Update cursor and hasMore
-            setCursor(data.next_cursor);
+            cursorRef.current = data.next_cursor || null;
             setHasMore(data.has_more);
 
-        } catch (err: any) {
-            console.error('Failed to fetch posts:', err);
-            setError(err.response?.data?.message || 'Failed to load posts');
+        } catch (err) {
+            const axiosError = AxiosError<ApiError>
+            setError('Failed to fetch posts.');
+            console.log(axiosError);
         } finally {
             setLoading(false);
             isLoadingRef.current = false;
         }
-    }, [cursor, hasMore, limit]);
+    }, [hasMore, limit]);
 
-    // load more posts
+    // Load more posts
     const loadMore = useCallback(() => {
-        fetchPosts(false);
+        fetchPosts();
     }, [fetchPosts]);
 
     useEffect(() => {
-        fetchPosts(true);
+        if (!initialLoadRef.current) {
+            initialLoadRef.current = true;
+            fetchPosts();
+        }
     }, []);
 
     return {
@@ -61,4 +71,4 @@ export function usePagination(limit: number = REQUEST_CURSOR_LIMIT) {
         hasMore,
         loadMore,
     };
-};
+}
