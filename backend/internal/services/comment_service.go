@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gossip-with-go/internal/models"
+	"gossip-with-go/internal/utils"
 
 	"gorm.io/gorm"
 )
@@ -14,6 +15,13 @@ type CommentService struct {
 
 func NewCommentService(db *gorm.DB) *CommentService {
 	return &CommentService{DB: db}
+}
+
+type CommentWithUsername struct {
+	models.Comment
+	Username string `json:"username"`
+
+	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
 }
 
 // creates a comment directly on a post
@@ -91,29 +99,81 @@ func (s *CommentService) incrementPostCommentCount(postID uint) error {
 }
 
 // retrieves all root comments for a post (paginated)
-func (s *CommentService) GetRootCommentsByPostID(postID uint, limit int, offset int) ([]models.Comment, error) {
-	var comments []models.Comment
+func (s *CommentService) GetRootCommentsByPostID(postID uint, limit int, offset int, currentUser uint) ([]CommentWithUsername, error) {
+	var comments []CommentWithUsername
 	
-	err := s.DB.Where("post_id = ? AND parent_comment_id IS NULL", postID).
+	err := s.DB.
+		Table("comments").
+		Select("comments.*, users.username").
+		Joins("JOIN users ON users.id = comments.user_id").
+		Where("post_id = ? AND parent_comment_id IS NULL", postID).
 		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).
 		Find(&comments).
 		Error
+
+	if err := s.encrichWithInteractionData(comments, currentUser); err != nil {
+		return nil, err
+	}
 	
+	utils.DebugLog("comments:", comments);
 	return comments, err
 }
 
+func (s *CommentService) encrichWithInteractionData(comments []CommentWithUsername, currentUserID uint) error {
+	if len(comments) == 0 {
+		return nil
+	}
+
+	commentIDs := make([]uint, len(comments))
+	for i, post := range comments {
+		commentIDs[i] = post.ID
+	}
+
+	// get current user's likes in ONE query
+	var userLikes []models.Like
+	if currentUserID > 0 {
+		s.DB.Where("user_id = ? AND likeable_type = ? AND likeable_id IN ?", 
+			currentUserID, "comment", commentIDs).
+			Find(&userLikes)
+	}
+
+	// use map for fast lookup
+	userLikesMap := make(map[uint]bool)
+	for _, like := range userLikes {
+		userLikesMap[like.LikeableID] = true
+	}
+
+	// populate comment fields
+	for i := range comments {
+		commentID := comments[i].ID
+		comments[i].UserHasLiked = userLikesMap[commentID] // set to user liked
+	}
+
+	utils.DebugLog("final comments:", comments)
+
+	return nil
+}
+
 // retrieves all replies for a specific comment (paginated)
-func (s *CommentService) GetRepliesByCommentID(commentID uint, limit int, offset int) ([]models.Comment, error) {
-	var replies []models.Comment
-	
-	err := s.DB.Where("parent_comment_id = ?", commentID).
+func (s *CommentService) GetRepliesByCommentID(commentID uint, limit int, offset int, currentUser uint) ([]CommentWithUsername, error) {
+	var replies []CommentWithUsername
+
+	err := s.DB.
+		Table("comments").
+		Select("comments.*, users.username").
+		Joins("JOIN users ON users.id = comments.user_id").
+		Where("parent_comment_id = ?", commentID).
 		Order("created_at ASC").
 		Limit(limit).
 		Offset(offset).
 		Find(&replies).
 		Error
+
+	if err := s.encrichWithInteractionData(replies, currentUser); err != nil {
+		return nil, err
+	}
 	
 	return replies, err
 }

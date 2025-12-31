@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"gossip-with-go/internal/models"
 	"gossip-with-go/internal/services"
 	"gossip-with-go/internal/utils"
 	"net/http"
@@ -82,6 +81,12 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 
 // GET /api/posts/:id/comments
 func (h *CommentHandler) GetRootComments(c *gin.Context) {
+	var userID uint = 0
+
+	if v, exists := c.Get("userID"); exists {
+		userID = v.(uint)
+	}
+
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseUint(postIDStr, 10, 32)
 	if err != nil {
@@ -103,7 +108,7 @@ func (h *CommentHandler) GetRootComments(c *gin.Context) {
 	}
 
 	// get root comments
-	comments, err := h.commentService.GetRootCommentsByPostID(uint(postID), limit, offset)
+	comments, err := h.commentService.GetRootCommentsByPostID(uint(postID), limit, offset, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -118,7 +123,7 @@ func (h *CommentHandler) GetRootComments(c *gin.Context) {
 
 	// for each root comment, get the reply count
 	type CommentWithReplyCount struct {
-		models.Comment
+		services.CommentWithUsername
 		ReplyCount int64 `json:"reply_count"`
 	}
 
@@ -129,7 +134,7 @@ func (h *CommentHandler) GetRootComments(c *gin.Context) {
 			replyCount = 0 // default to 0
 		}
 		commentsWithCounts[i] = CommentWithReplyCount{
-			Comment:    comment,
+			CommentWithUsername:    comment,
 			ReplyCount: replyCount,
 		}
 	}
@@ -144,6 +149,12 @@ func (h *CommentHandler) GetRootComments(c *gin.Context) {
 
 // GET /api/comments/:id/replies
 func (h *CommentHandler) GetReplies(c *gin.Context) {
+	var userID uint = 0
+
+	if v, exists := c.Get("userID"); exists {
+		userID = v.(uint)
+	}
+	
 	commentIDStr := c.Param("id")
 	commentID, err := strconv.ParseUint(commentIDStr, 10, 32)
 	if err != nil {
@@ -165,11 +176,13 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 	}
 
 	// get replies
-	replies, err := h.commentService.GetRepliesByCommentID(uint(commentID), limit, offset)
+	replies, err := h.commentService.GetRepliesByCommentID(uint(commentID), limit, offset, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	utils.DebugLog("Replies: ",replies)
 
 	// get total reply count
 	totalCount, err := h.commentService.GetReplyCount(uint(commentID))
