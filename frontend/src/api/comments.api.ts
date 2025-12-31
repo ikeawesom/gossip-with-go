@@ -1,5 +1,4 @@
 import { REQUEST_CURSOR_LIMIT, REQUEST_CURSOR_LIMIT_REPLIES, REQUEST_OFFSET } from "../lib/constants";
-import type { RepliesResponse } from "../types/comments";
 import type { ResponseType } from "../types/res";
 import apiClient from "./axios.config";
 
