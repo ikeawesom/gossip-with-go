@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { postApi } from '../api/posts.api';
 import type { PostType, TrendingPostsResponse } from '../types/post';
+import { REQUEST_CURSOR_LIMIT } from '../lib/constants';
 
-export function usePagination(limit: number = 10) {
+export function usePagination(limit: number = REQUEST_CURSOR_LIMIT) {
     const [posts, setPosts] = useState<PostType[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
