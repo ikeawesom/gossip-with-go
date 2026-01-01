@@ -51,29 +51,27 @@ export default function SearchBar() {
       {showDrop && (
         <>
           <div className="absolute left-0 top-0 z-0 pt-12 bg-white shadow-md rounded-t-3xl rounded-b-md w-full overflow-hidden">
-            <div className="w-full">
-              <div className="flex items-center justify-around gap-3 w-full mt-2 border-b border-gray-dark/20 pb-2">
+            <div className="w-full py-2 shadow-xs border-b border-gray-dark/20 flex flex-col items-start justify-center gap-2">
+              <div className="flex items-center justify-start px-2 gap-3 w-full">
                 {queryTypes.map((type: QueryType, index: number) => (
-                  <button
+                  <p
                     key={index}
                     onClick={() => setQueryType(type)}
                     className={twMerge(
-                      "cursor-pointer hover:opacity-70 duration-150 rounded-full px-4 py-1",
-                      queryType === type
-                        ? "text-white bg-primary"
-                        : "text-primary bg-primary/10"
+                      "cursor-pointer hover:opacity-70 duration-150 custom",
+                      queryType === type ? "text-primary" : "text-primary/50"
                     )}
                   >
                     {`${type.substring(0, 1).toUpperCase()}${type.substring(
                       1,
                       type.length
                     )}`}
-                  </button>
+                  </p>
                 ))}
               </div>
               {query.length > 0 && !loading && (
-                <p className="custom fine-print text-xs p-2">
-                  {results.length} results.
+                <p className="custom fine-print text-xs pl-2">
+                  {results.length} results
                 </p>
               )}
             </div>
