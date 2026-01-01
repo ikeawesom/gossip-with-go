@@ -1,6 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
 import pageReducer from "./pages/pageSlice";
-import queryReducer from "./search/querySlice";
 import authReducer from "./auth/authSlice"
 import {
     persistStore,
@@ -27,7 +26,6 @@ const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 export const store = configureStore({
     reducer: {
         page: pageReducer,
-        query: queryReducer,
         auth: persistedAuthReducer,
     },
     middleware: (getDefault) =>
