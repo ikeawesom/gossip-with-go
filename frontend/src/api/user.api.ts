@@ -7,4 +7,18 @@ export const userApi = {
         const response = await apiClient.get(`/users/${username}`);
         return response.data;
     },
+
+    // get user followers
+    getFollowers: async (username: string): Promise<ResponseType> => {
+        const response = await apiClient.get(`/users/${username}/followers`);
+        console.log("API RESPONSE:", response.data);
+        return response.data
+    },
+
+    // get user followings
+    getFollowings: async (username: string): Promise<ResponseType> => {
+        const response = await apiClient.get(`/users/${username}/followings`);
+        console.log("API RESPONSE:", response.data);
+        return response.data
+    }
 }
