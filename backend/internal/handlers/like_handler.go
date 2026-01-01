@@ -20,7 +20,7 @@ func NewLikeHandler(likeService *services.LikeService) *LikeHandler {
 	}
 }
 
-// GET /api/likes/toggle
+// POST /api/likes/toggle
 func (h *LikeHandler) ToggleLike(c *gin.Context) {
 	log.Printf("Getting user_id...")
 	userID, exists := c.Get("userID")
