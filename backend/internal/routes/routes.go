@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler, queryHandler *handlers.QueryHandler) {
+func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler, queryHandler *handlers.QueryHandler, followHandler *handlers.FollowHandler) {
 	// CORS configuration
 	cfg := config.AppConfig
 	r.Use(cors.New(cors.Config{
@@ -53,7 +53,9 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		// user routes
 		users := api.Group("/users")
 		{
-			users.GET("/:username", userHandler.GetUserByUsername)
+			users.GET("/:username", middleware.AuthOptional(), userHandler.GetUserByUsername)
+			users.GET("/:username/followers", userHandler.GetFollowersByUsername)
+			users.GET("/:username/followings", userHandler.GetFollowingsByUsername)
 		}
 
 		// post routes
@@ -84,7 +86,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			reposts.GET("/user/:username", repostHandler.GetUserReposts)
 			
 			// authenticted endpoints for reposts
-			reposts.POST("/toggle", middleware.AuthOptional(),repostHandler.ToggleRepost)
+			reposts.POST("/toggle", middleware.AuthRequired(),repostHandler.ToggleRepost)
 			reposts.GET("/status",middleware.AuthRequired(), repostHandler.GetRepostStatus)
 			reposts.POST("/update-visibility",middleware.AuthRequired(), repostHandler.UpdateRepostVisibility)
 			
@@ -105,6 +107,11 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 
 		api.GET("/query", queryHandler.GetResultsByType)
 		
+		follow := api.Group("/follow") 
+		{
+			follow.POST("/toggle", middleware.AuthRequired(), followHandler.ToggleFollow)
+		}
+
 		// private API routes example
 		protected := api.Group("")
 		protected.Use(middleware.AuthRequired())
