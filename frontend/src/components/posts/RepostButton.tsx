@@ -69,7 +69,7 @@ export default function RepostButton({
       <p
         className={twMerge(
           "custom text-green tabular-nums min-w-[2ch] text-right",
-          reposted ? "text-red" : "text-gray-dark"
+          reposted ? "text-primary" : "text-gray-dark"
         )}
       >
         {repostCount}

@@ -37,7 +37,7 @@ label {
   @apply text-sm;
 }
 
-p:not(.fine-print) {
+p:not(.custom) {
   @apply text-gray-dark;
 }
 
