@@ -1,3 +1,5 @@
+import type { StateTriggerType } from "./res";
+
 export interface Comment {
     id: number;
     post_id: number;
@@ -45,9 +47,7 @@ export interface RepliesResponse {
     has_more: boolean;
 }
 
-export interface CommentTriggers {
+export interface CommentTriggers extends StateTriggerType {
     postID?: number;
     commentID?: number;
-    trigger: React.Dispatch<React.SetStateAction<boolean>>;
-    triggerBool: boolean;
 }
