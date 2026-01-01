@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"gossip-with-go/internal/models"
-	"gossip-with-go/internal/utils"
 	"log"
 	"sort"
 
@@ -57,7 +56,7 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 		}
 		return nil, err
 	}
-	log.Printf("found author ID: %d for username: %s", author.ID, author)
+	log.Printf("found author ID: %d for username: %s", author.ID, author.Username)
 
 	var posts []PostWithUsername
 	if err := s.DB.
@@ -297,6 +296,8 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 			Find(&userLikes)
 	}
 
+	// utils.DebugLog("User likes:", userLikes)
+
 	// get current user's reposts
 	var userReposts []models.Repost
 	if currentUserID > 0 {
@@ -380,7 +381,7 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 		}
 	}
 
-	utils.DebugLog("final posts:", posts)
+	// utils.DebugLog("final posts:", posts)
 
 	return nil
 }
