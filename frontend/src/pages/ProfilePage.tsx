@@ -16,10 +16,10 @@ import type { PostType } from "../types/post";
 import CreatePostForm from "../components/posts/CreatePostForm";
 import PostCard from "../components/posts/PostCard";
 import Modal from "../components/utils/Modal";
+import FollowButton from "../components/follow/FollowButton";
+import FollowerFollowingSection from "../components/follow/FollowerFollowingSection";
 
 export default function ProfilePage() {
-  // const { user } = useSelector((state: RootState) => state.auth);
-  // const navigate = useNavigate();
   const { user_id } = useParams<{ user_id: string }>();
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
@@ -32,11 +32,11 @@ export default function ProfilePage() {
   const [postState, setPostState] = useState<"loading" | "success" | "invalid">(
     "loading"
   );
+  const [update, setUpdate] = useState(false);
   const [visitingUser, setVisitingUser] = useState<User>();
 
   const [userPosts, setUserPosts] = useState<PostType[]>([]);
 
-  // console.log(userPosts);
   useEffect(() => {
     const getVisitingUser = async () => {
       try {
@@ -49,7 +49,7 @@ export default function ProfilePage() {
     };
 
     getVisitingUser();
-  }, []);
+  }, [update]);
 
   const getUserPosts = async (username: string) => {
     try {
@@ -74,7 +74,8 @@ export default function ProfilePage() {
       dispatch(checkAuth());
       toast.success("Signed out successfully");
     } catch (err: any) {
-      toast.error(err.message);
+      console.log(err);
+      toast.error("Could not sign out. Please try again later.");
     }
   };
 
@@ -98,7 +99,20 @@ export default function ProfilePage() {
       ) : (
         <div className="flex items-center justify-between gap-4 border-b border-gray-dark/20 pb-5">
           <div>
-            <h1 className="mb-1">{username}</h1>
+            <div className="flex items-center justify-start gap-4">
+              <h1 className="mb-1">{username}</h1>
+              {!isCurrentUser && visitingUser && (
+                <FollowButton
+                  trigger={setUpdate}
+                  triggerBool={update}
+                  visitingUser={visitingUser}
+                  currentUser={user}
+                />
+              )}
+            </div>
+            {visitingUser && (
+              <FollowerFollowingSection visitingUser={visitingUser} />
+            )}
             <p className="fine-print">Joined on {createdDate.time}</p>
           </div>
           {isCurrentUser && (
