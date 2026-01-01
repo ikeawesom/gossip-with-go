@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler) {
+func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler, queryHandler *handlers.QueryHandler) {
 	// CORS configuration
 	cfg := config.AppConfig
 	r.Use(cors.New(cors.Config{
@@ -102,6 +102,8 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			comments.POST("/:id",middleware.AuthRequired(), commentHandler.UpdateComment)           
 			comments.DELETE("/:id",middleware.AuthRequired(), commentHandler.DeleteComment)         
 		}
+
+		api.GET("/query", queryHandler.GetResultsByType)
 		
 		// private API routes example
 		protected := api.Group("")
