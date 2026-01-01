@@ -31,15 +31,15 @@ func (s *LikeService) ToggleLike(userID uint, likeableType string, likeableID ui
 	// if like exists, delete it (unlike)
 	if result.Error == nil {
 		if err := s.DB.Delete(&existingLike).Error; err != nil {
-			return false, fmt.Errorf("failed to unlike: %w", err)
+			return true, fmt.Errorf("failed to unlike: %w", err)
 		}
 
 		// decrement the like count on the post/comment
 		if err := s.decrementLikeCount(likeableType, likeableID); err != nil {
-			return false, fmt.Errorf("failed to decrement like count: %w", err)
+			return true, fmt.Errorf("failed to decrement like count: %w", err)
 		}
 
-		return false, nil
+		return false, nil // false = unliked
 	}
 
 	// if like doesn't exist, create it
