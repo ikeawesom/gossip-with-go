@@ -1,19 +1,21 @@
+import { useEffect, useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import useQuery, { type QueryResult } from "../../hooks/useQuery";
+import SpinnerPrimary from "../spinner/SpinnerPrimary";
+import type { TopicSearchResult, UserSearchResult } from "../../types/query";
+import type { PostType } from "../../types/post";
+import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../lib/helpers";
-import type { QueryPeek } from "../../types/query";
-import { useQuery } from "../../hooks/useQuery";
-import { useEffect, useRef } from "react";
+
+const queryTypes = ["users", "posts"] as QueryType[];
+export type QueryType = "users" | "posts"; // | "topics"
 
 export default function SearchBar() {
-  const {
-    filteredResults,
-    handleQuery,
-    handleRedirect,
-    isLoading,
-    query,
-    isShowResults,
-    showResults,
-    hideResults,
-  } = useQuery();
+  const [showDrop, setShowDrop] = useState(false);
+  const [query, setQuery] = useState("");
+  const [queryType, setQueryType] = useState<QueryType>("users");
+  const { loading, results } = useQuery(query, queryType);
+  const navigate = useNavigate();
 
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -23,61 +25,126 @@ export default function SearchBar() {
         searchRef.current &&
         !searchRef.current.contains(event.target as Node)
       ) {
-        hideResults();
+        setShowDrop(false);
       }
     };
 
-    if (isShowResults) {
+    if (showDrop) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isShowResults]);
+  }, [showDrop]);
 
   return (
     <div ref={searchRef} className="w-full relative">
       <input
-        onClick={showResults}
-        onChange={handleQuery}
+        onClick={() => setShowDrop(true)}
+        onChange={(e) => setQuery(e.target.value)}
         className="relative z-10"
         type="text"
-        placeholder="Search for topics"
+        placeholder="Search"
         value={query}
       />
-      {isShowResults && (
+      {showDrop && (
         <>
           <div className="absolute left-0 top-0 z-0 pt-12 bg-white shadow-md rounded-t-3xl rounded-b-md w-full overflow-hidden">
-            <ul className="border-t max-h-[50vh] border-t-fine-print/50 overflow-y-scroll">
-              {isLoading ? (
-                <li className="h-[100px] grid place-items-center text-fine-print text-center p-2 border-b border-gray-light">
-                  Loading...
+            <div className="w-full">
+              <div className="flex items-center justify-around gap-3 w-full mt-2 border-b border-gray-dark/20 pb-2">
+                {queryTypes.map((type: QueryType, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => setQueryType(type)}
+                    className={twMerge(
+                      "cursor-pointer hover:opacity-70 duration-150 rounded-full px-4 py-1",
+                      queryType === type
+                        ? "text-white bg-primary"
+                        : "text-primary bg-primary/10"
+                    )}
+                  >
+                    {`${type.substring(0, 1).toUpperCase()}${type.substring(
+                      1,
+                      type.length
+                    )}`}
+                  </button>
+                ))}
+              </div>
+              {query.length > 0 && !loading && (
+                <p className="custom fine-print text-xs p-2">
+                  {results.length} results.
+                </p>
+              )}
+            </div>
+
+            <ul
+              className={twMerge(
+                "max-h-[50vh] overflow-y-scroll",
+                results.length > 0 && "min-h-[100px]"
+              )}
+            >
+              {loading ? (
+                <li className="h-[100px] grid place-items-center p-2 border-b border-gray-light">
+                  <SpinnerPrimary />
                 </li>
-              ) : filteredResults.length > 0 ? (
-                [...filteredResults]
-                  .sort((a, b) => b.likes - a.likes)
-                  .map((result: QueryPeek) => (
-                    <li
-                      onClick={() => handleRedirect(result)}
-                      key={result.id}
-                      className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
-                    >
-                      <div>
-                        <h3>{result.title}</h3>
-                        <p>{result.desc.slice(0, 200)}...</p>
-                        <div className="flex w-full items-center justify-between gap-6 ">
-                          <p className="fine-print">{result.author_id}</p>
-                          <div className="flex items-center justify-center gap-3">
-                            <p className="fine-print">{result.likes} ❤︎</p>
-                            <p className="fine-print">
-                              {formatDate(result.date).time}
-                            </p>
+              ) : results.length > 0 ? (
+                results.map((item: QueryResult, index: number) => {
+                  let url: string;
+
+                  if (queryType === "users") {
+                    const user = item as UserSearchResult;
+                    url = `/${user.username}`;
+                    return (
+                      <li
+                        onClick={() => navigate(url)}
+                        key={index}
+                        className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
+                      >
+                        {user.username}
+                      </li>
+                    );
+                  } else if (queryType === "posts") {
+                    const post = item as PostType;
+                    url = `/${post.username}/posts/${post.id}`;
+                    return (
+                      <li
+                        onClick={() => navigate(url)}
+                        key={index}
+                        className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
+                      >
+                        <div>
+                          <div className="flex items-center justify-start gap-2">
+                            <h4 className="custom font-bold">{post.title}</h4> •{" "}
+                            <p>{post.username}</p>
                           </div>
+                          <div className="flex items-center justify-between">
+                            <p className="line-clamp-3">{post.content}...</p>
+                            <p className="fine-print">{post.like_count} ❤︎</p>
+                          </div>
+                          <p className="fine-print custom text-xs">
+                            {
+                              formatDate(new Date(post.updated_at).getTime())
+                                .time
+                            }
+                          </p>
                         </div>
-                      </div>
-                    </li>
-                  ))
+                      </li>
+                    );
+                  } else {
+                    const topic = item as TopicSearchResult;
+                    url = `/topics/${topic.id}`;
+                    return (
+                      <li
+                        onClick={() => navigate(url)}
+                        key={index}
+                        className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
+                      >
+                        {}
+                      </li>
+                    );
+                  }
+                })
               ) : (
                 <li className="h-[100px] grid place-items-center text-fine-print text-center p-2 border-b border-gray-light">
                   {query.length > 0
