@@ -11,6 +11,9 @@ type User struct {
 	Username  string         `gorm:"size:50;uniqueIndex;not null" json:"username"`
 	Email     string         `gorm:"size:320;uniqueIndex;not null" json:"email"`
 	Password  string         `gorm:"not null" json:"-"`
+
+	FollowerCount    int            `gorm:"default:0;not null" json:"follower_count"`
+	FollowingCount    int            `gorm:"default:0;not null" json:"following_count"`
 	
 	EmailVerified      bool      `gorm:"default:false" json:"email_verified"`
 	VerificationToken  *string   `gorm:"size:255;uniqueIndex" json:"-"`
