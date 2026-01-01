@@ -2,8 +2,15 @@ export interface User {
     id: number;
     username: string;
     email: string;
-    created_at: string;
     email_verified: boolean;
+
+    follower_count: number;
+    following_count: number;
+
+    user_has_followed: boolean;
+    user_is_being_followed: boolean;
+
+    created_at: string;
 }
 
 export interface AuthResponse {
