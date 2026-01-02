@@ -2,18 +2,13 @@ import NavBar from "./NavBar";
 import type { DefaultCustomProps } from "../../lib/constants";
 import { twMerge } from "tailwind-merge";
 
-interface NavSectionProps extends DefaultCustomProps {
-  showAccount?: boolean;
-}
-
 export default function NavSection({
   children,
   className,
-  showAccount,
-}: NavSectionProps) {
+}: DefaultCustomProps) {
   return (
     <section>
-      <NavBar showAccount={showAccount} />
+      <NavBar />
       <section className="pt-18 w-full flex items-start justify-center min-h-screen from-primary/30 to-primary/5 bg-linear-145">
         <div className={twMerge("w-full max-w-[800px] p-6", className)}>
           {children}
