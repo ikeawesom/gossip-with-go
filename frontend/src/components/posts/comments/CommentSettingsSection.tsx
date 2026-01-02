@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { CommentTriggers } from "../../../types/comments";
 import DeleteCommentButton from "./DeleteCommentButton";
 import Modal from "../../utils/Modal";
+import ModalTitle from "../../utils/ModalTitle";
 
 export default function SettingsSection({
   trigger,
@@ -18,10 +19,11 @@ export default function SettingsSection({
         •••
       </button>
       {showSettings && (
-        <Modal close={() => setShowSettings(false)} className="max-w-[300px]">
-          <h3 className="text-2xl font-semibold border-b border-gray-dark/20 pb-2 text-center w-full mb-4">
-            Comment Settings
-          </h3>
+        <Modal
+          close={() => setShowSettings(false)}
+          className="max-w-[300px] p-4"
+        >
+          <ModalTitle className="mb-3">Comment Settings</ModalTitle>
           <DeleteCommentButton
             trigger={trigger}
             triggerBool={triggerBool}
