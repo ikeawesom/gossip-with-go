@@ -11,6 +11,7 @@ import SpinnerSecondary from "../../spinner/SpinnerSecondary";
 import type { ApiError } from "../../../types/auth";
 import type { AxiosError } from "axios";
 import { commentsApi } from "../../../api/comments.api";
+import ModalTitle from "../../utils/ModalTitle";
 
 export default function RepyButton({
   comment,
@@ -75,29 +76,31 @@ export default function RepyButton({
       {showForm && (
         <Modal
           close={() => setShowForm(false)}
-          className="w-full flex-col flex items-center justify-center gap-6"
+          className="w-full flex-col flex items-center justify-center gap-4"
         >
-          <div className="bg-white rounded-md p-4 flex flex-col w-full gap-1 items-start justify-start">
-            <div className="flex items-center justify-start gap-1 pb-1">
-              <Link
-                className="font-bold text-sm text-primary hover:opacity-70 duration-150"
-                to={`/${username}`}
+          <ModalTitle>
+            <div className="bg-white shadow-xs border border-gray-dark/10 rounded-md p-4 flex flex-col w-full gap-1 items-start justify-start mb-2">
+              <div className="flex items-center justify-start gap-1 pb-1">
+                <Link
+                  className="font-bold text-sm text-primary hover:opacity-70 duration-150"
+                  to={`/${username}`}
+                >
+                  {username}
+                </Link>
+                <p>•</p>
+                <p className="fine-print">{newDate}</p>
+              </div>
+              <div
+                className="overflow-y-scroll w-full"
+                style={{ scrollbarWidth: "none" }}
               >
-                {username}
-              </Link>
-              <p>•</p>
-              <p className="fine-print">{newDate}</p>
+                <p className="whitespace-pre-wrap">{content}</p>
+              </div>
             </div>
-            <div
-              className="overflow-y-scroll w-full"
-              style={{ scrollbarWidth: "none" }}
-            >
-              <p className="whitespace-pre-wrap">{content}</p>
-            </div>
-          </div>
+          </ModalTitle>
           <form
             onSubmit={handleCreateReply}
-            className="w-full flex flex-col items-start justify-start gap-4 border-t border-gray-dark/20 pt-5"
+            className="w-full flex flex-col items-start justify-start gap-4"
           >
             <textarea
               value={replyContent}
