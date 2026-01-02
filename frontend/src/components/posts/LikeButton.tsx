@@ -4,7 +4,7 @@ import { likesApi } from "../../api/likes.api";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../state/store";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface LikeButtonProps {
   targetId: number;
@@ -28,11 +28,14 @@ export default function LikeButton({
 
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleToggleLike = async () => {
     if (!isAuthenticated) {
       toast.info("Please sign in to interact with posts!");
-      navigate("/auth/login");
+      navigate("/auth/login", {
+        state: { prev_page: location.pathname },
+      });
       return;
     }
 

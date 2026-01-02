@@ -5,7 +5,7 @@ import PrimaryButton from "../utils/PrimaryButton";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
 import type { AxiosError } from "axios";
 import type { ApiError } from "../../types/auth";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { CommentTriggers } from "../../types/comments";
 
 export default function CreateRootCommentForm({
@@ -16,6 +16,7 @@ export default function CreateRootCommentForm({
   const [content, setContent] = useState<string>();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const cachedCommentKey = `comment_${postID}`;
 
@@ -58,7 +59,9 @@ export default function CreateRootCommentForm({
       const axiosError = err as AxiosError<ApiError>;
       if (axiosError.status === 401) {
         toast.info("Please sign in to interact with posts!");
-        navigate("/auth/login");
+        navigate("/auth/login", {
+          state: { prev_page: location.pathname },
+        });
       } else {
         console.log(axiosError.response);
         toast.error("An unexpected error has occurred. Please try again later");

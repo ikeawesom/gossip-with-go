@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import PrimaryButton from "../../utils/PrimaryButton";
 import type { RootState } from "../../../state/store";
 import { toast } from "sonner";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Modal from "../../utils/Modal";
 import type { IndivComment } from "../IndividualComment";
@@ -25,11 +25,14 @@ export default function RepyButton({
   const [showForm, setShowForm] = useState(false);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isShowForm = () => {
     if (!isAuthenticated) {
       toast.info("Please sign in to interact with posts!");
-      navigate("/auth/login");
+      navigate("/auth/login", {
+        state: { prev_page: location.pathname },
+      });
     } else {
       setShowForm(true);
     }
