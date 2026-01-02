@@ -8,7 +8,7 @@ import type { RootState } from "../../state/store";
 import ReplyButton from "./comments/ReplyButton";
 import useShowReplies from "../../hooks/useShowReplies";
 import { twMerge } from "tailwind-merge";
-import SettingsSection from "./comments/SettingsSection";
+import CommentSettingsSection from "./comments/CommentSettingsSection";
 
 export interface IndivComment extends CommentTriggers {
   comment: Comment;
@@ -54,7 +54,7 @@ export default function IndividualComment({
             <p className="fine-print">{newDate}</p>
           </div>
           {isValidUser && (
-            <SettingsSection
+            <CommentSettingsSection
               trigger={trigger}
               triggerBool={triggerBool}
               commentID={id}
@@ -147,7 +147,7 @@ export default function IndividualComment({
                       <p className="fine-print">{replyDate}</p>
                     </div>
                     {isValidUser && (
-                      <SettingsSection
+                      <CommentSettingsSection
                         trigger={trigger}
                         triggerBool={triggerBool}
                         commentID={id}

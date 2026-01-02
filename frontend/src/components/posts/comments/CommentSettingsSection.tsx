@@ -4,7 +4,7 @@ import DeleteCommentButton from "./DeleteCommentButton";
 import Modal from "../../utils/Modal";
 import ModalTitle from "../../utils/ModalTitle";
 
-export default function SettingsSection({
+export default function CommentSettingsSection({
   trigger,
   triggerBool,
   commentID,
