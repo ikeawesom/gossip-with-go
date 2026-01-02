@@ -55,7 +55,7 @@ p.success {
 }
 
 p.topic-tag {
-  @apply text-xs px-2 py-1 rounded-md text-white;
+  @apply text-xs px-2 py-1 rounded-md text-white w-fit;
 }
 
 .smart-wrap {
