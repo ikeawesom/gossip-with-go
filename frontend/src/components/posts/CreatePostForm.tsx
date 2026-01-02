@@ -5,6 +5,7 @@ import PrimaryButton from "../utils/PrimaryButton";
 import { postApi } from "../../api/posts.api";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
+import ModalTitle from "../utils/ModalTitle";
 
 export default function CreatePostForm({
   username,
@@ -60,9 +61,7 @@ export default function CreatePostForm({
       onSubmit={handlePosts}
       className="w-full flex flex-col items-start justify-start gap-3"
     >
-      <h3 className="text-2xl font-semibold border-b border-gray-dark/20 w-full pb-2">
-        {curPost ? "Edit Post" : "Share your thoughts"}
-      </h3>
+      <ModalTitle>{curPost ? "Edit Post" : "Share your thoughts"}</ModalTitle>
       <input
         value={postDetails.title}
         onChange={(e) =>

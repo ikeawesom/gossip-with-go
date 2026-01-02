@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { postApi } from "../../api/posts.api";
 import PrimaryButton from "../utils/PrimaryButton";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
+import ModalTitle from "../utils/ModalTitle";
 
 export default function DeletePostForm({
   postID,
@@ -15,7 +16,7 @@ export default function DeletePostForm({
   close: () => void;
 }) {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [deleteText, setDeleteText] = useState({
     username: "",
@@ -36,7 +37,9 @@ export default function DeletePostForm({
     } catch (err: any) {
       const { status } = err;
       if (status === 401) {
-        navigate("/auth/login");
+        navigate("/auth/login", {
+          state: { prev_page: location.pathname },
+        });
         toast.error("Your session has ended. Please sign in again.");
       } else {
         toast.error(
@@ -52,9 +55,7 @@ export default function DeletePostForm({
       onSubmit={handleDelete}
       className="w-full flex flex-col items-start justify-start gap-3"
     >
-      <h3 className="text-2xl font-semibold border-b border-gray-dark/20 w-full pb-2">
-        Delete Post
-      </h3>
+      <ModalTitle>Delete Post</ModalTitle>
       <div className="w-full">
         <label
           htmlFor="topics"

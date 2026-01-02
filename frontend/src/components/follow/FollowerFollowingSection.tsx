@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
 import { userApi } from "../../api/user.api";
 import { useNavigate } from "react-router-dom";
+import ModalTitle from "../utils/ModalTitle";
 
 interface FollowResponse {
   id: number;
@@ -84,9 +85,9 @@ export default function FollowerFollowingSection({
       </div>
       {showFollows && (
         <Modal close={() => setShowFollows(false)}>
-          <h3 className="text-2xl font-semibold border-b border-gray-dark/20 w-full pb-2">
+          <ModalTitle className="mb-3">
             <span className="font-bold text-primary">{username}</span> Followers
-          </h3>
+          </ModalTitle>
           <div className="w-full bg-white rounded-md min-h-[200px] overflow-y-scroll">
             {loading ? (
               <div className="w-full h-[200px] grid place-items-center">
@@ -114,11 +115,11 @@ export default function FollowerFollowingSection({
       )}
       {showFollowings && (
         <Modal close={() => setShowFollowings(false)}>
-          <h3 className="text-2xl font-semibold border-b border-gray-dark/20 w-full pb-2">
+          <ModalTitle className="mb-3">
             <span className="font-bold text-primary">{username}</span>{" "}
             Followings
-          </h3>
-          <div className="w-full bg-white rounded-md min-h-[200px] overflow-y-scroll overflow-x-hidden hover:bg-gray mt-3">
+          </ModalTitle>
+          <div className="w-full bg-white rounded-md min-h-[200px] overflow-y-scroll overflow-x-hidden hover:bg-gray">
             {loading ? (
               <div className="w-full h-[200px] grid place-items-center">
                 <SpinnerPrimary />
