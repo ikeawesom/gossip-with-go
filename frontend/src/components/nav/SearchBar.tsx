@@ -14,10 +14,18 @@ export default function SearchBar() {
   const [showDrop, setShowDrop] = useState(false);
   const [query, setQuery] = useState("");
   const [queryType, setQueryType] = useState<QueryType>("users");
-  const { loading, results } = useQuery(query, queryType);
+  const { loading, results, resetResults } = useQuery(query, queryType);
   const navigate = useNavigate();
 
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const handleNavigate = (url: string) => {
+    navigate(url);
+    setQuery("");
+    setQueryType("users");
+    setShowDrop(false);
+    resetResults();
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -95,7 +103,7 @@ export default function SearchBar() {
                     url = `/${user.username}`;
                     return (
                       <li
-                        onClick={() => navigate(url)}
+                        onClick={() => handleNavigate(url)}
                         key={index}
                         className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                       >
@@ -107,7 +115,7 @@ export default function SearchBar() {
                     url = `/${post.username}/posts/${post.id}`;
                     return (
                       <li
-                        onClick={() => navigate(url)}
+                        onClick={() => handleNavigate(url)}
                         key={index}
                         className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                       >
@@ -134,7 +142,7 @@ export default function SearchBar() {
                     url = `/topics/${topic.id}`;
                     return (
                       <li
-                        onClick={() => navigate(url)}
+                        onClick={() => handleNavigate(url)}
                         key={index}
                         className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                       >

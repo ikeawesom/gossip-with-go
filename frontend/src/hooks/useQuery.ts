@@ -14,6 +14,11 @@ export default function useQuery(searchQuery: string, queryType: QueryType) {
     const [results, setResults] = useState<QueryResults>([]);
     const [loading, setLoading] = useState(false);
 
+    const resetResults = () => {
+        setResults([]);
+        setLoading(false);
+    }
+
     const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
     useEffect(() => {
@@ -54,5 +59,6 @@ export default function useQuery(searchQuery: string, queryType: QueryType) {
     return {
         results,
         loading,
+        resetResults
     };
 };
