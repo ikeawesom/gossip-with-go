@@ -18,12 +18,12 @@ export default function AccountMenu({ username }: { username: string }) {
 
   return (
     <>
-      <button
+      <div
         onClick={() => setShowMenu(true)}
-        className="flex items-center justify-end gap-2 rounded-md px-2 py-1 hover:bg-white/10 duration-150 cursor-pointer"
+        className="hover:brightness-110 duration-150 cursor-pointer bg-white/60 flex items-center justify-center gap-1 backdrop-blur-md border border-white/20 rounded-full shadow-sm p-2"
       >
-        <img alt="Menu" src="/icons/icon_menu.svg" width={50} height={50} />
-      </button>
+        <img alt="Menu" src="/icons/icon_menu.svg" width={24} height={24} />
+      </div>
       {showMenu && (
         <Modal
           close={() => setShowMenu(false)}
