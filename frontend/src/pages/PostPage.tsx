@@ -18,6 +18,7 @@ import DeletePostForm from "../components/posts/DeletePostForm";
 import LongContent from "../components/posts/LongContent";
 import PostInteractionSection from "../components/posts/PostInteractionSection";
 import CommentSection from "../components/posts/CommentSection";
+import ModalTitle from "../components/utils/ModalTitle";
 
 type PostPageParams = {
   user_id: string;
@@ -26,14 +27,15 @@ type PostPageParams = {
 
 export default function PostPage() {
   const { user_id, post_id } = useParams<PostPageParams>();
+  const { user } = useSelector((state: RootState) => state.auth);
   const [status, setStatus] = useState<"loading" | "invalid" | "success">(
     "loading"
   );
   const [postData, setPostData] = useState<PostType>();
   const [isEditing, setIsEditing] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
-  const { user } = useSelector((state: RootState) => state.auth);
   const isCurrentUser = user?.username === user_id;
 
   const fetchPost = async (username: string, post_id: string) => {
@@ -77,8 +79,8 @@ export default function PostPage() {
           return (
             <div className="flex w-full items-start justify-start gap-1 flex-col">
               <Card>
-                <div className="flex items-start justify-between">
-                  <div className="flex flex-col items-start justify-center gap-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col items-start justify-center gap-2 flex-1">
                     <h1 className="text-3xl font-semibold">{title}</h1>
                     <p className="text-gray-dark">
                       <Link
@@ -98,32 +100,12 @@ export default function PostPage() {
                     </Link>
                   </div>
                   {isCurrentUser && (
-                    <div className="flex items-start justify-end gap-2">
-                      <SecondaryButton
-                        onClick={() => setIsEditing(true)}
-                        className="text-xs flex items-center justify-center gap-2 px-3"
-                      >
-                        Edit
-                        <img
-                          alt="Edit"
-                          src="/icons/icon_pencil.svg"
-                          height={15}
-                          width={15}
-                        />
-                      </SecondaryButton>
-                      <PrimaryButton
-                        onClick={() => setIsDelete(true)}
-                        className="text-xs flex items-center justify-center gap-2 px-3 from-red/80 border-red/20 hover:from-red/60 to-red"
-                      >
-                        Delete
-                        <img
-                          alt="Edit"
-                          src="/icons/icon_trash.svg"
-                          height={15}
-                          width={15}
-                        />
-                      </PrimaryButton>
-                    </div>
+                    <button
+                      onClick={() => setShowSettings(!showSettings)}
+                      className="px-2 rounded-md cursor-pointer hover:bg-gray-dark/20 duration-150"
+                    >
+                      •••
+                    </button>
                   )}
                 </div>
                 <LongContent
@@ -161,6 +143,45 @@ export default function PostPage() {
             postID={postData?.id ?? 0}
             username={user_id ?? ""}
           />
+        </Modal>
+      )}
+
+      {showSettings && (
+        <Modal
+          close={() => setShowSettings(false)}
+          className="max-w-[300px] p-4"
+        >
+          <ModalTitle className="mb-3">Post Settings</ModalTitle>
+          <SecondaryButton
+            onClick={() => {
+              setShowSettings(false);
+              setIsEditing(true);
+            }}
+            className="text-xs flex items-center justify-center gap-2 px-3 w-full mb-3"
+          >
+            Edit
+            <img
+              alt="Edit"
+              src="/icons/icon_pencil.svg"
+              height={15}
+              width={15}
+            />
+          </SecondaryButton>
+          <PrimaryButton
+            onClick={() => {
+              setShowSettings(false);
+              setIsDelete(true);
+            }}
+            className="text-xs flex items-center w-full justify-center gap-2 px-3 from-red/80 border-red/20 hover:from-red/60 to-red"
+          >
+            Delete
+            <img
+              alt="Edit"
+              src="/icons/icon_trash.svg"
+              height={15}
+              width={15}
+            />
+          </PrimaryButton>
         </Modal>
       )}
     </NavSection>
