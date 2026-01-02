@@ -14,6 +14,7 @@ import NavSection from "./components/nav/NavSection.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import TopicPage from "./pages/TopicPage.tsx";
 import AllTopicsPage from "./pages/AllTopicsPage.tsx";
+import TrendingPostsPage from "./pages/TrendingPostsPage.tsx";
 // import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 
 createRoot(document.getElementById("root")!).render(
@@ -25,6 +26,7 @@ createRoot(document.getElementById("root")!).render(
           <AuthInitializer>
             <Routes>
               <Route path="/" element={<App />} />
+              <Route path="/trending" element={<TrendingPostsPage />} />
               <Route path="/topics/:topic_id" element={<TopicPage />} />
               <Route path="/topics" element={<AllTopicsPage />} />
               <Route path="/auth/:auth_option" element={<AuthPage />} />
