@@ -5,7 +5,7 @@ export default function Card({ className, children }: DefaultCustomProps) {
   return (
     <div
       className={twMerge(
-        "bg-white/60 backdrop-blur-md border border-white/20 rounded-xl shadow-sm p-6 w-full max-w-[800px]",
+        "from-white/90 to-white/50 bg-linear-to-br backdrop-blur-md border border-white/20 rounded-xl shadow-sm p-6 w-full max-w-[800px]",
         className
       )}
     >
