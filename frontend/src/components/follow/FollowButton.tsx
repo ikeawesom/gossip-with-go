@@ -4,7 +4,7 @@ import { followApi } from "../../api/follow.api";
 import { toast } from "sonner";
 import { useState } from "react";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { StateTriggerType } from "../../types/res";
 
 interface FollowTrigger extends StateTriggerType {
@@ -21,11 +21,14 @@ export default function FollowButton({
   const [following, setIsFollowing] = useState(user_has_followed);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleFollow = async () => {
     if (!currentUser) {
       toast.info("Please sign in to interact with users!");
-      return navigate("/auth/login");
+      return navigate("/auth/login", {
+        state: { prev_page: location.pathname },
+      });
     }
     if (!visitingUser) return;
     setLoading(true);
