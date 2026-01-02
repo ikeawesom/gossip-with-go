@@ -101,7 +101,7 @@ export default function PostPage() {
                     <div className="flex items-start justify-end gap-2">
                       <SecondaryButton
                         onClick={() => setIsEditing(true)}
-                        className="rounded-md text-xs flex items-center justify-center gap-2 border-none px-3"
+                        className="text-xs flex items-center justify-center gap-2 px-3"
                       >
                         Edit
                         <img
@@ -113,7 +113,7 @@ export default function PostPage() {
                       </SecondaryButton>
                       <PrimaryButton
                         onClick={() => setIsDelete(true)}
-                        className="text-xs bg-red rounded-md flex items-center justify-center gap-2 border-none px-3"
+                        className="text-xs flex items-center justify-center gap-2 px-3 from-red/80 border-red/20 hover:from-red/60 to-red"
                       >
                         Delete
                         <img
