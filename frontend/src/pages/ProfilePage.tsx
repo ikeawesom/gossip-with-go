@@ -38,9 +38,11 @@ export default function ProfilePage() {
   const [userPosts, setUserPosts] = useState<PostType[]>([]);
 
   useEffect(() => {
+    if (!user_id) return;
+
     const getVisitingUser = async () => {
       try {
-        const { data } = await userApi.getVisitingUser(user_id ?? "");
+        const { data } = await userApi.getVisitingUser(user_id);
         setVisitingUser(data.user);
         setUserState("success");
       } catch (err: any) {
@@ -49,7 +51,7 @@ export default function ProfilePage() {
     };
 
     getVisitingUser();
-  }, [update]);
+  }, [update, user_id]);
 
   const getUserPosts = async (username: string) => {
     try {
