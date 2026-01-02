@@ -11,8 +11,8 @@
   --color-gray-light: #ececec;
   --color-gray-dark: #343434;
   --color-fine-print: #939393;
-  --color-red: rgb(158, 15, 17);
-  --color-red-light: #ffb3ad;
+  --color-red: #9e0f11;
+  --color-red-light: #c10007;
   --color-green: #31ab3d;
   --color-green-light: #adffb3;
 }
@@ -55,7 +55,7 @@ p.success {
 }
 
 p.topic-tag {
-  @apply text-xs px-2 py-1 rounded-full text-white;
+  @apply text-xs px-2 py-1 rounded-md text-white;
 }
 
 .smart-wrap {
@@ -66,7 +66,7 @@ p.topic-tag {
 input,
 select,
 textarea {
-  @apply bg-white placeholder-fine-print rounded-full p-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-gray-dark w-full;
+  @apply bg-white placeholder-fine-print rounded-md p-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-gray-dark w-full;
 }
 
 input.not-rounded,
