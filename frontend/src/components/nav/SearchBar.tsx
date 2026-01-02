@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import useQuery, { type QueryResult } from "../../hooks/useQuery";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
@@ -6,60 +6,56 @@ import type { TopicSearchResult, UserSearchResult } from "../../types/query";
 import type { PostType } from "../../types/post";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../lib/helpers";
+import Modal from "../utils/Modal";
+import Logo from "../utils/Logo";
 
 const queryTypes = ["users", "posts"] as QueryType[];
 export type QueryType = "users" | "posts"; // | "topics"
 
 export default function SearchBar() {
-  const [showDrop, setShowDrop] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [queryType, setQueryType] = useState<QueryType>("users");
   const { loading, results, resetResults } = useQuery(query, queryType);
   const navigate = useNavigate();
 
-  const searchRef = useRef<HTMLDivElement>(null);
+  const resetQuery = () => {
+    setQuery("");
+    setQueryType("users");
+    setShowSearch(false);
+    resetResults();
+    setShowSearch(false);
+  };
 
   const handleNavigate = (url: string) => {
     navigate(url);
-    setQuery("");
-    setQueryType("users");
-    setShowDrop(false);
-    resetResults();
+    resetQuery();
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
-        setShowDrop(false);
-      }
-    };
-
-    if (showDrop) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showDrop]);
-
   return (
-    <div ref={searchRef} className="w-full relative">
-      <input
-        onClick={() => setShowDrop(true)}
-        onChange={(e) => setQuery(e.target.value)}
-        className="relative z-10"
-        type="text"
-        placeholder="Search"
-        value={query}
-      />
-      {showDrop && (
-        <>
-          <div className="absolute left-0 top-0 z-0 pt-12 bg-white shadow-md rounded-t-3xl rounded-b-md w-full overflow-hidden">
-            <div className="w-full py-2 shadow-xs border-b border-gray-dark/20 flex flex-col items-start justify-center gap-2">
+    <>
+      <div className="w-full relative bg-white/60 backdrop-blur-md border border-white/20 rounded-full p-1 shadow-sm flex items-center justify-start gap-3 pl-3">
+        <Logo small link color />
+        <input
+          onClick={() => setShowSearch(true)}
+          className="relative z-10 custom bg-white placeholder-fine-print rounded-full px-4 py-2 border focus:shadow-none border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/80 text-gray-dark w-full"
+          type="text"
+          placeholder="Search"
+          onChange={(e) => setQuery(e.target.value)}
+          value=""
+        />
+      </div>
+      {showSearch && (
+        <Modal close={resetQuery}>
+          <input
+            className="relative z-10 custom bg-white placeholder-fine-print rounded-full px-4 py-2 border focus:shadow-none shadow-sm border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/80 text-gray-dark w-full mb-2"
+            type="text"
+            placeholder="Search"
+            onChange={(e) => setQuery(e.target.value)}
+            value={query}
+          />
+          <div className="w-full overflow-hidden">
+            <div className="w-full py-2 pt-0 shadow-xs border-b border-gray-dark/20 flex flex-col items-start justify-center gap-2">
               <div className="flex items-center justify-start px-2 gap-3 w-full">
                 {queryTypes.map((type: QueryType, index: number) => (
                   <p
@@ -86,7 +82,7 @@ export default function SearchBar() {
 
             <ul
               className={twMerge(
-                "max-h-[50vh] overflow-y-scroll",
+                "max-h-[50vh] overflow-y-scroll bg-white rounded-md mt-3",
                 results.length > 0 && "min-h-[100px]"
               )}
             >
@@ -160,8 +156,8 @@ export default function SearchBar() {
               )}
             </ul>
           </div>
-        </>
+        </Modal>
       )}
-    </div>
+    </>
   );
 }
