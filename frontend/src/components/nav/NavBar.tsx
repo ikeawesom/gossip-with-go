@@ -1,9 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
-import Logo from "../utils/Logo";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../state/store";
 import AccountMenu from "../auth/AccountMenu";
+import PrimaryButton from "../utils/PrimaryButton";
+import SecondaryButton from "../utils/SecondaryButton";
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -13,25 +14,34 @@ export default function NavBar() {
   const page = location.pathname;
 
   return (
-    <nav className="w-full grid place-items-center fixed top-0 left-0 bg-primary text-white py-4 px-12 z-10 shadow-md">
-      <div className="max-w-[1000px] flex items-stretch justify-between w-full gap-6">
-        <div className="self-center">
-          <Logo link />
-        </div>
+    <nav className="w-full grid place-items-center fixed top-0 left-0 text-white py-4 px-12 z-10">
+      <div className="max-w-[1000px] flex items-center justify-between w-full gap-6">
         <SearchBar />
         {user ? (
           <AccountMenu username={user.username} />
         ) : (
-          <button
-            className="font-bold text-lg whitespace-nowrap hover:bg-white/15 duration-150 rounded-md px-4 cursor-pointer"
-            onClick={() =>
-              navigate("/auth/login", {
-                state: { prev_page: page },
-              })
-            }
-          >
-            Sign In
-          </button>
+          <div className="bg-white/60 flex items-center justify-center gap-1 backdrop-blur-md border border-white/20 shadow-sm p-1 rounded-full">
+            <SecondaryButton
+              className="home-sign-in"
+              onClick={() =>
+                navigate("/auth/login", {
+                  state: { prev_page: page },
+                })
+              }
+            >
+              Sign In
+            </SecondaryButton>
+            <PrimaryButton
+              className="home-sign-up"
+              onClick={() =>
+                navigate("/auth/register", {
+                  state: { prev_page: page },
+                })
+              }
+            >
+              Get Started
+            </PrimaryButton>
+          </div>
         )}
       </div>
     </nav>
