@@ -10,7 +10,7 @@ export default function PrimaryButton({
   return (
     <button
       className={twMerge(
-        "bg-primary shadow-sm text-white px-4 py-2 rounded-md font-bold hover:opacity-80 hover:shadow-md cursor-pointer duration-150",
+        "from-primary/80 to-primary bg-linear-to-br text-white whitespace-nowrap cursor-pointer border border-white/30 px-4 py-2 text-sm rounded-full shadow-sm duration-300 transition-colors hover:from-primary/60",
         className
       )}
       {...props}

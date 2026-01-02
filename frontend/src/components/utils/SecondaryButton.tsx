@@ -1,5 +1,4 @@
 import { twMerge } from "tailwind-merge";
-import PrimaryButton from "./PrimaryButton";
 import type { ButtonProps } from "./PrimaryButton";
 
 export default function SecondaryButton({
@@ -8,14 +7,14 @@ export default function SecondaryButton({
   ...props
 }: ButtonProps) {
   return (
-    <PrimaryButton
+    <button
       className={twMerge(
-        "bg-white border border-gray-light text-gray-dark",
+        "text-primary whitespace-nowrap cursor-pointer border px-4 py-2 text-sm font-bold rounded-full shadow-sm border-white from-white to-white/10 bg-linear-to-br hover:to-primary/15 transition-colors duration-300",
         className
       )}
       {...props}
     >
       {children}
-    </PrimaryButton>
+    </button>
   );
 }
