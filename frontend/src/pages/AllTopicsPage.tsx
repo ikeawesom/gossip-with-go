@@ -21,15 +21,15 @@ export default function AllTopicsPage() {
               >
                 <div
                   className={twMerge(
-                    "absolute left-0 top-0 w-full h-full opacity-50 -translate-x-full group-hover:translate-0 duration-300",
+                    "absolute left-0 top-0 w-full h-full opacity-50 -translate-x-full ease-in-out group-hover:translate-0 duration-400",
                     DEFAULT_TOPICS[topic_id].color
                   )}
                 />
-                <div className="relative z-10 flex flex-col items-center justify-center gap-3">
+                <div className="group-hover:scale-105 duration-400 ease-in-out relative z-10 flex flex-col items-center justify-center gap-3">
                   <h4 className="text-center custom">
                     {DEFAULT_TOPICS[topic_id].title}
                   </h4>
-                  <img alt="hi" src={route} width={40} height={40} />
+                  <img alt="route" src={route} width={40} height={40} />
                 </div>
               </Card>
             </Link>

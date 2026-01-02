@@ -36,15 +36,16 @@ export default function PostCard({
     <div className="w-full">
       <Link to={url} className="w-full">
         <Card className="flex items-center justify-between gap-6 group hover:brightness-110 duration-150 smart-wrap">
-          <div className="w-full flex flex-col items-start justify-start gap-3">
+          <div className="w-full flex flex-col items-start justify-start gap-2">
             <div className="flex items-center justify-start gap-2">
               {showTopic && <TopicTag topic_id={topic} />}
-              <h4 className="custom font-bold">{title}</h4> • <p>{user}</p>
+              <p className="custom text-primary text-sm">{user}</p> •{" "}
+              <p>
+                Posted {newDateStr.date ? "on" : ""} {newDateStr.time}
+              </p>
             </div>
+            <h4 className="custom font-bold line-clamp-2">{title}</h4>
             <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
-            <p className="fine-print">
-              Posted {newDateStr.date ? "on" : ""} {newDateStr.time}
-            </p>
           </div>
           {!hideArrow && (
             <ArrowRight
