@@ -56,7 +56,7 @@ export default function TrendingFeed() {
   }, [handleObserver]);
 
   return (
-    <div className="flex items-center justify-center gap-5 flex-col mt-4 border-t border-t-gray-dark/20 pt-6">
+    <div className="flex items-center justify-center gap-5 flex-col">
       {posts.map((post: PostType, index: number) => (
         <PostCard key={index} post={post} showTopic />
       ))}
