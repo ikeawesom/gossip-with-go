@@ -1,11 +1,16 @@
 import { twMerge } from "tailwind-merge";
-import { getTopicColor } from "../../lib/helpers";
-import { DEFAULT_TOPICS } from "../../lib/constants";
+import { COLORS_ARR } from "../../lib/constants";
 
-export default function TopicTag({ topic_id }: { topic_id: string }) {
+export default function TopicTag({
+  topic_class,
+  topic_name,
+}: {
+  topic_class: string;
+  topic_name: string;
+}) {
   return (
-    <p className={twMerge("topic-tag", getTopicColor(topic_id))}>
-      {DEFAULT_TOPICS[topic_id].title}
+    <p className={twMerge("topic-tag", COLORS_ARR[topic_class]?.color)}>
+      {topic_name}
     </p>
   );
 }
