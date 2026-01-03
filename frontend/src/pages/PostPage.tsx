@@ -36,12 +36,16 @@ export default function PostPage() {
   const [isDelete, setIsDelete] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  const [update, setUpdate] = useState(false);
+
   const isCurrentUser = user?.username === user_id;
 
   const fetchPost = async (username: string, post_id: string) => {
     try {
       const res = await postApi.getUserPostByID(username, post_id);
-      setPostData(res.data.post);
+      const fetchedPost = res.data.post as PostType;
+      setPostData(fetchedPost);
+      console.log(fetchedPost);
       setStatus("success");
     } catch (err: any) {
       console.log(err);
@@ -53,7 +57,7 @@ export default function PostPage() {
     if (user_id && post_id) {
       fetchPost(user_id, post_id);
     }
-  }, [user_id, post_id]);
+  }, [user_id, post_id, update]);
 
   return (
     <NavSection>
@@ -64,8 +68,16 @@ export default function PostPage() {
       ) : (
         postData &&
         (() => {
-          const { created_at, title, username, topic, content, updated_at } =
-            postData;
+          const {
+            created_at,
+            title,
+            username,
+            topic,
+            topic_name,
+            topic_class,
+            content,
+            updated_at,
+          } = postData;
           const isDate = formatDate(new Date(created_at).getTime(), true).date;
           const newDate = formatDate(new Date(created_at).getTime(), true).time;
 
@@ -96,7 +108,10 @@ export default function PostPage() {
                       to={`/topics/${topic}`}
                       className="hover:brightness-125 duration-150"
                     >
-                      <TopicTag topic_id={topic} />
+                      <TopicTag
+                        topic_class={topic_class}
+                        topic_name={topic_name}
+                      />
                     </Link>
                   </div>
                   {isCurrentUser && (
@@ -131,8 +146,10 @@ export default function PostPage() {
           <CreatePostForm
             close={() => setIsEditing(false)}
             username={user_id ?? ""}
-            reload={() => fetchPost(user_id ?? "", post_id ?? "")}
+            trigger={setUpdate}
+            triggerBool={update}
             curPost={postData}
+            topic={postData ? postData.topic : -1}
           />
         </Modal>
       )}
