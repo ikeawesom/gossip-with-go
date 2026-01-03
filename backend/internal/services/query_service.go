@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"gossip-with-go/internal/models"
+	"gossip-with-go/internal/utils"
 
 	"gorm.io/gorm"
 )
@@ -52,9 +53,26 @@ func (s *QueryService) QueryUsers(searchQuery string) ([]QueryUserResponse, erro
 	return users, nil
 }
 
-func (s *QueryService) QueryTopics(searchQuery string) ([]QueryTopicResponse, error) {
-	// TODO
-	return nil, nil
+func (s *QueryService) QueryTopics(searchQuery string) ([]TopicsWithUsername, error) {
+	var topics []TopicsWithUsername
+	updatedSearch := "%" + searchQuery + "%"
+
+	if err := s.DB.Table("topics").
+			Select("topics.*, users.username").
+			Joins("JOIN users ON topics.created_by = users.id").
+			Where("topics.topic_name ILIKE ? OR topics.description ILIKE ?", updatedSearch).
+			Order("follower_count DESC").
+			Find(&topics).Error;
+
+			err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					return nil, errors.New("no results found")
+				}
+				return nil, err
+			}
+
+	utils.DebugLog("Topics Result:", topics)
+	return topics, nil
 }
 
 func (s *QueryService) QueryPosts(searchQuery string) ([]QueryPostResponse, error) {
