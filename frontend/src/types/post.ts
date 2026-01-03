@@ -1,7 +1,11 @@
 export interface PostType {
     id: number;
     user_id: number;
-    topic: string;
+
+    topic: number;
+    topic_name: string;
+    topic_class: string;
+
     title: string;
     content: string;
     username?: string;
@@ -25,7 +29,8 @@ export interface CreatePostRequest {
     username: string;
     title: string;
     content: string;
-    topic: string;
+    topic: number;
+    topicName: string
 }
 
 export interface TrendingPostsResponse {
@@ -37,5 +42,4 @@ export interface TrendingPostsResponse {
 export interface TrendingPostsParams {
     limit?: number;
     cursor?: number;
-    userID?: number;
 }
