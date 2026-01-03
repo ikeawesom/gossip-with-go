@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import type { TopicSearchResult, UserSearchResult } from "../types/query";
+import type { UserSearchResult } from "../types/query";
 import type { PostType } from "../types/post";
 import { queryApi } from "../api/query.api";
 import type { QueryType } from "../components/nav/SearchBar";
 import { toast } from "sonner";
+import type { Topic } from "../types/topics";
 
-export type QueryResult = UserSearchResult | TopicSearchResult | PostType
-export type QueryResults = UserSearchResult[] | TopicSearchResult[] | PostType[]
+export type QueryResult = Topic | UserSearchResult | PostType
+export type QueryResults = Topic[] | UserSearchResult[] | PostType[]
 
 const QUERY_DEBOUNCE = 500;
 
@@ -38,7 +39,11 @@ export default function useQuery(searchQuery: string, queryType: QueryType) {
             try {
                 const response = await queryApi.query(searchQuery, queryType);
                 const { results } = response.data;
-                setResults(results);
+                if (results) {
+                    setResults(results);
+                } else {
+                    throw new Error("invalid")
+                }
             } catch (err: any) {
                 toast.error("Search error.")
                 console.log(err);
