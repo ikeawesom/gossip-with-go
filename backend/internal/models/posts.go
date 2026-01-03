@@ -9,7 +9,7 @@ import (
 type Post struct {
 	ID        uint   `gorm:"primaryKey" json:"id"`
 	UserID    uint   `gorm:"not null;index" json:"user_id"`
-	Topic     string   `gorm:"not null;index" json:"topic"`
+	Topic     uint   `gorm:"not null;index" json:"topic"`
 	Title	  string `gorm:"type:text;not null" json:"title"`
 	Content   string `gorm:"type:text;not null" json:"content"`
 
@@ -32,7 +32,7 @@ func (Post) TableName() string {
 type PostResponse struct {
 	ID        uint      `json:"id"`
 	UserID    uint      `json:"user_id"`
-	Topic     string   `json:"topic"`
+	Topic     uint   `json:"topic"`
 	Title	  string    `json:"title"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"created_at"`
