@@ -13,7 +13,7 @@ export interface PageType {
 }
 const pages = [
   { id: "/trending", title: "Trending" },
-  { id: "/for-you", title: "For You" },
+  { id: "/following", title: "Following" },
 ] as PageType[];
 
 export default function NavBar() {
