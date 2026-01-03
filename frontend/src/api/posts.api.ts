@@ -10,14 +10,19 @@ export const postApi = {
     },
 
     // get posts by topic
-    getPostsByTopic: async (topic: string): Promise<ResponseType> => {
+    getPostsByTopic: async (topic: number): Promise<ResponseType> => {
         const response = await apiClient.get(`/posts/topic/${topic}`);
         return response.data;
     },
 
     // create new post
     createPost: async (postData: CreatePostRequest): Promise<ResponseType> => {
-        const response = await apiClient.post(`/posts/create`, postData);
+        const response = await apiClient.post(`/posts/create`, {
+            username: postData.username,
+            title: postData.title,
+            content: postData.content,
+            topic: Number(postData.topic),
+        });
         return response.data;
     },
 
