@@ -69,13 +69,13 @@ func (s *UserService) enrichFollowersFollowings(user *UserWithFollowers, current
 
 		// current user has followed this user
 		s.DB.Table("follows").
-			Where("follower_id = ? AND following_id = ?", currentUser, userID).
+			Where("follower_id = ? AND following_id = ? AND follow_type = ?", currentUser, userID, "user").
 			Count(&count)
 		user.UserHasFollowed = count > 0
 
 		// current user being followed by this user
 		s.DB.Table("follows").
-			Where("follower_id = ? AND following_id = ?", userID, currentUser).
+			Where("follower_id = ? AND following_id = ? AND follow_type = ?", userID, currentUser, "user").
 			Count(&count)
 		user.UserIsBeingFollowed = count > 0
 	}
@@ -89,7 +89,7 @@ func (s *UserService) enrichFollowersFollowings(user *UserWithFollowers, current
 	s.DB.Table("follows").
 		Select("users.username").
 		Joins("JOIN users ON users.id = follows.follower_id").
-		Where("follows.following_id = ?", userID).
+		Where("follows.following_id = ? AND follow_type = ?", userID, "user").
 		Order("follows.created_at DESC").
 		Limit(3).
 		Scan(&followers)
@@ -104,7 +104,7 @@ func (s *UserService) enrichFollowersFollowings(user *UserWithFollowers, current
 	s.DB.Table("follows").
 		Select("users.username").
 		Joins("JOIN users ON users.id = follows.following_id").
-		Where("follows.follower_id = ?", userID).
+		Where("follows.follower_id = ? AND follow_type = ?", userID, "user").
 		Order("follows.created_at DESC").
 		Limit(3).
 		Scan(&followings)
@@ -131,7 +131,7 @@ func (s* UserService) GetUserFollowers(username string) ([]FollowersListType, er
 				Table("users").
 				Select("follows.following_id, users.username").
 				Joins("JOIN follows ON follows.follower_id = users.id").
-				Where("following_id = ?", user.ID).
+				Where("following_id = ? AND follow_type = ?", user.ID, "user").
 				Find(&followers).Error; err != nil {
 					// user has no followers
 					return []FollowersListType{}, nil
@@ -154,7 +154,7 @@ func (s* UserService) GetUserFollowings(username string) ([]FollowersListType, e
 				Table("users").
 				Select("follows.following_id, users.username").
 				Joins("JOIN follows ON follows.following_id = users.id").
-				Where("follower_id = ?", user.ID).
+				Where("follower_id = ? AND follow_type = ?", user.ID, "user").
 				Find(&followers).Error; err != nil {
 					// user has no followers
 					return []FollowersListType{}, nil
