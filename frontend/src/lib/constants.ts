@@ -18,67 +18,72 @@ export const defaultError: errorType = {
     message: "An unknown error has occurred. Please try again later."
 }
 
-interface topicsType { [id: string]: { title: string, color: string, hover: string, src: string } };
+interface colorsType {
+    title: string;
+    color: string;
+    text: string;
+}
 
-export const DEFAULT_TOPICS = {
-    "general-discussion": {
-        title: "GENERAL DISCUSSION",
-        color: "bg-blue-600",
-        hover: "hover:bg-blue-700",
-        src: "icon_chat.svg",
+export const COLORS_ARR = {
+    "red": {
+        title: "Red",
+        color: "bg-red-500 text-white",
+        text: "text-red-500",
     },
-    introductions: {
-        title: "INTRODUCTIONS",
-        color: "bg-green-600",
-        hover: "hover:bg-green-700",
-        src: "icon_book.svg",
+    "blue": {
+        title: "Blue",
+        color: "bg-blue-500 text-white",
+        text: "text-blue-500",
+
     },
-    technology: {
-        title: "TECHNOLOGY",
-        color: "bg-purple-600",
-        hover: "hover:bg-purple-700",
-        src: "icon_tech.svg",
+    "green": {
+        title: "Green",
+        color: "bg-green-500 text-white",
+        text: "text-green-500",
     },
-    entertainment: {
-        title: "ENTERTAINMENT",
-        color: "bg-pink-600",
-        hover: "hover:bg-pink-700",
-        src: "icon_game.svg",
+    "yellow": {
+        title: "Yellow",
+        color: "bg-yellow-500 text-gray-900",
+        text: "text-yellow-500",
     },
-    "sports-fitness": {
-        title: "SPORTS & FITNESS",
-        color: "bg-red-600",
-        hover: "hover:bg-red-700",
-        src: "icon_basketball.svg",
+    "purple": {
+        title: "Purple",
+        color: "bg-purple-500 text-white",
+        text: "text-purple-500",
     },
-    "food-cooking": {
-        title: "FOOD & COOKING",
-        color: "bg-orange-600",
-        hover: "hover:bg-orange-700",
-        src: "icon_chef.svg",
+    "pink": {
+        title: "Pink",
+        color: "bg-pink-500 text-white",
+        text: "text-pink-500",
     },
-    "travel-adventure": {
-        title: "TRAVEL & ADVENTURE",
-        color: "bg-teal-600",
-        hover: "hover:bg-teal-700",
-        src: "icon_plane.svg",
+    "indigo": {
+        title: "Indigo",
+        color: "bg-indigo-500 text-white",
+        text: "text-indigo-500",
     },
-    "hobbies-crafts": {
-        title: "HOBBIES & CRAFTS",
-        color: "bg-indigo-600",
-        hover: "hover:bg-indigo-700",
-        src: "icon_paint.svg",
+    "orange": {
+        title: "Orange",
+        color: "bg-orange-500 text-white",
+        text: "text-orange-500",
     },
-    "career-education": {
-        title: "CAREER & EDUCATION",
-        color: "bg-yellow-600",
-        hover: "hover:bg-yellow-700",
-        src: "icon_graduate.svg",
+    "teal": {
+        title: "Teal",
+        color: "bg-teal-500 text-white",
+        text: "text-teal-500",
     },
-    others: {
-        title: "OTHERS",
-        color: "bg-gray-600",
-        hover: "hover:bg-gray-700",
-        src: "icon_question.svg",
+    "cyan": {
+        title: "Cyan",
+        color: "bg-cyan-500 text-gray-900",
+        text: "text-cyan-500",
     },
-} as topicsType;
+    "gray": {
+        title: "Gray",
+        color: "bg-gray-500 text-white",
+        text: "text-gray-500",
+    },
+    "white": {
+        title: "White",
+        color: "bg-white text-gray-900 border border-gray-300",
+        text: "text-gray-dark",
+    }
+} as { [id: string]: colorsType }

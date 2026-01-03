@@ -1,5 +1,4 @@
 import type { JSX } from "react/jsx-dev-runtime";
-import { DEFAULT_TOPICS } from "./constants";
 
 export type HTMLProps<T extends keyof JSX.IntrinsicElements> =
   React.ComponentPropsWithoutRef<T>;
@@ -65,8 +64,4 @@ export function maskEmail(email: string): string {
   const maskedDomain = maskedDomainParts.join('.');
 
   return `${maskedLocal}@${maskedDomain}`;
-}
-
-export function getTopicColor(topic_id: string) {
-  return DEFAULT_TOPICS[topic_id]?.color || "";
 }
