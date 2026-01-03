@@ -4,23 +4,19 @@ import type { User } from "../types/auth";
 import NavSection from "../components/nav/NavSection";
 import { formatDate } from "../lib/helpers";
 import { useParams } from "react-router-dom";
-import PrimaryButton from "../components/utils/PrimaryButton";
 import { useEffect, useState } from "react";
 import SpinnerPrimary from "../components/spinner/SpinnerPrimary";
 import { userApi } from "../api/user.api";
 import { postApi } from "../api/posts.api";
 import type { PostType } from "../types/post";
-import CreatePostForm from "../components/posts/CreatePostForm";
 import PostCard from "../components/posts/PostCard";
-import Modal from "../components/utils/Modal";
 import FollowButton from "../components/follow/FollowButton";
 import FollowerFollowingSection from "../components/follow/FollowerFollowingSection";
+import CreatePostTopicSection from "./CreatePostTopicSection";
 
 export default function ProfilePage() {
   const { user_id } = useParams<{ user_id: string }>();
   const { user } = useSelector((state: RootState) => state.auth);
-
-  const [showForm, setShowForm] = useState(false);
 
   const [userState, setUserState] = useState<"loading" | "success" | "invalid">(
     "loading"
@@ -52,8 +48,11 @@ export default function ProfilePage() {
   const getUserPosts = async (username: string) => {
     try {
       const res = await postApi.getPostByUsername(username);
-      setUserPosts(res.data.posts);
+      const posts = res.data.posts as PostType[];
+      setUserPosts(posts);
+      console.log(posts);
       setPostState("success");
+      if (res.data.posts) setPostState("success");
     } catch (err: any) {
       console.log(err);
       setPostState("invalid");
@@ -90,9 +89,10 @@ export default function ProfilePage() {
               <h1 className="mb-1">{username}</h1>
               {!isCurrentUser && visitingUser && (
                 <FollowButton
+                  followType="user"
                   trigger={setUpdate}
                   triggerBool={update}
-                  visitingUser={visitingUser}
+                  visitingEntity={visitingUser}
                   currentUser={user}
                 />
               )}
@@ -105,25 +105,18 @@ export default function ProfilePage() {
         </div>
       )}
       <div className="flex items-center justify-center w-full flex-col gap-4 py-4">
-        {isCurrentUser &&
-          (showForm ? (
-            <Modal close={() => setShowForm(false)}>
-              <CreatePostForm
-                close={() => setShowForm(false)}
-                reload={getUserPosts}
-                username={username}
-              />
-            </Modal>
-          ) : (
-            <PrimaryButton onClick={() => setShowForm(true)}>
-              Make a Post
-            </PrimaryButton>
-          ))}
+        {isCurrentUser && (
+          <CreatePostTopicSection
+            trigger={setUpdate}
+            triggerBool={update}
+            username={username}
+          />
+        )}
         {postState === "loading" ? (
           <SpinnerPrimary />
         ) : postState === "invalid" ? (
           <p>{username} has no posts yet.</p>
-        ) : (
+        ) : userPosts.length > 0 ? (
           <div className="w-full flex flex-col gap-4 items-center justify-center">
             {userPosts.map((post: PostType, index: number) => {
               return (
@@ -136,6 +129,8 @@ export default function ProfilePage() {
               );
             })}
           </div>
+        ) : (
+          <p>{username} has no posts yet.</p>
         )}
       </div>
     </NavSection>
