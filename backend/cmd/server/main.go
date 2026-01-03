@@ -36,6 +36,8 @@ func main() {
 	userService := services.NewUserService(db)
 	followService := services.NewFollowService(db)
 
+	topicService := services.NewTopicService(db)
+
 	postService := services.NewPostService(db)
 	likeService := services.NewLikeService(db)
 	repostService := services.NewRepostService(db)
@@ -47,6 +49,8 @@ func main() {
 	userHandler := handlers.NewUserHandler(userService)
 	followHandler := handlers.NewFollowHandler(followService)
 	
+	topicHandler := handlers.NewTopicHandler(topicService)
+
 	postHandler := handlers.NewPostHandler(postService)
 	likeHandler := handlers.NewLikeHandler(likeService)
 	repostHandler := handlers.NewRepostHandler(repostService)
@@ -55,7 +59,7 @@ func main() {
 	queryHandler := handlers.NewQueryHandler(queryService)
 
 	r := gin.Default()
-	routes.SetupRoutes(r, authHandler, userHandler, postHandler, likeHandler, repostHandler, commentHandler, queryHandler, followHandler)
+	routes.SetupRoutes(r, authHandler, userHandler, postHandler, likeHandler, repostHandler, commentHandler, queryHandler, followHandler, topicHandler)
 
 	// start server
 	serverAddr := ":" + cfg.Port
