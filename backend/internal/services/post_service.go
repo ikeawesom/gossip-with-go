@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"gossip-with-go/internal/models"
+	"gossip-with-go/internal/utils"
 	"log"
 	"sort"
 
@@ -27,7 +28,7 @@ type PaginationParams struct {
 }
 
 type PaginatedPostsResponse struct {
-	Posts      []PostWithUsername `json:"posts"`
+	Posts      []PostWithTopic `json:"posts"`
 	NextCursor *uint         `json:"next_cursor"`
 	HasMore    bool          `json:"has_more"`
 }
@@ -35,11 +36,18 @@ type PaginatedPostsResponse struct {
 type PostWithUsername struct {
 	models.Post
 	Username string `json:"username"`
-
+	
 	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
 	UserHasReposted bool  `gorm:"-" json:"user_has_reposted"` 
 	Likers       []string `gorm:"-" json:"likers"`
 	Reposters    []string `gorm:"-" json:"reposters"`
+}
+
+type PostWithTopic struct {
+	PostWithUsername
+
+	TopicName  string  `json:"topic_name"`
+	TopicClass string  `json:"topic_class"`
 }
 
 func NewPostService(db *gorm.DB) *PostService {
@@ -48,7 +56,7 @@ func NewPostService(db *gorm.DB) *PostService {
 	}
 }
 
-func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint) ([]PostWithUsername, error) {
+func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint) ([]PostWithTopic, error) {
 	var author models.User
 	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -58,13 +66,14 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 	}
 	log.Printf("found author ID: %d for username: %s", author.ID, author.Username)
 
-	var posts []PostWithUsername
+	var posts []PostWithTopic
 	if err := s.DB.
 				Table("posts").
-				Select("posts.*, users.username").
+				Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+				Joins("JOIN topics ON posts.topic = topics.id").
 				Joins("JOIN users ON users.id = posts.user_id").
-				Where("user_id = ?", author.ID).
-				Order("created_at DESC").
+				Where("posts.user_id = ?", author.ID).
+				Order("posts.created_at DESC").
 				Find(&posts).Error; err != nil {
 					if errors.Is(err, gorm.ErrRecordNotFound) {
 						return nil, errors.New("posts not found")
@@ -75,17 +84,20 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 	if err := s.encrichWithInteractionData(posts, currentUser); err != nil {
 		return nil, err
 	}	
+
+	// utils.DebugLog("Fetched Posts:", posts)
 	
 	return posts, nil
 }
 
-func (s *PostService) GetPostByTopic(topic string, currentUser uint) ([]PostWithUsername, error) {
-	var posts []PostWithUsername
+func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]PostWithTopic, error) {
+	var posts []PostWithTopic
 	if err := s.DB.
 				Table("posts").
-				Select("posts.*, users.username").
+				Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+				Joins("JOIN topics ON posts.topic = topics.id").
 				Joins("JOIN users ON users.id = posts.user_id").
-				Where("topic = ?", topic).
+				Where("topics.id = ?", topicID).
 				Order("created_at DESC").
 				Find(&posts).Error; err != nil {
 					if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -98,10 +110,12 @@ func (s *PostService) GetPostByTopic(topic string, currentUser uint) ([]PostWith
 		return nil, err
 	}
 
+	// utils.DebugLog("Posts:", posts)
+
 	return posts, nil
 }
 
-func (s *PostService) GetUserPostByID(authorUsername string, postID uint, currentUser uint) (*PostWithUsername, error) {
+func (s *PostService) GetUserPostByID(authorUsername string, postID uint, currentUser uint) (*PostWithTopic, error) {
 	var author models.User
 	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -110,16 +124,21 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 		return nil, err
 	}
 
-	var post PostWithUsername
-	if err := s.DB.Where("id = ? AND user_id = ?", postID, author.ID).Order("created_at DESC").First(&post).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("post not found")
-		}
-		return nil, err
-	}
+	var post PostWithTopic
+	if err := s.DB.
+			Table("posts").
+			Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+			Joins("JOIN topics ON posts.topic = topics.id").
+			Joins("JOIN users ON users.id = posts.user_id").
+			Where("posts.id = ? AND posts.user_id = ?", postID, author.ID).Order("created_at DESC").First(&post).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					return nil, errors.New("post not found")
+				}
+				return nil, err
+			}
 	post.Username = authorUsername
 
-	var post_array = []PostWithUsername{post}
+	var post_array = []PostWithTopic{post}
 
 	if err := s.encrichWithInteractionData(post_array, currentUser); err != nil {
 		return nil, err
@@ -129,7 +148,7 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 	return &(post_array[0]), nil
 }
 
-func (s *PostService) CreatePost(username, topic, title, content string) error {
+func (s *PostService) CreatePost(username, title, content string, topic uint) error {
 	// get userID of username
 	var user models.User
 	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
@@ -138,22 +157,37 @@ func (s *PostService) CreatePost(username, topic, title, content string) error {
 
 	log.Printf("found user ID %d for username %s", user.ID, username)
 	
+	topicID := uint(topic);
+
 	// create post
 	newPost := models.Post{
 		UserID: user.ID,
-		Topic: topic,
+		Topic: topicID,
 		Title: title,
 		Content: content,
 	}
 
+	utils.DebugLog("new post:", newPost)
+
 	if err := s.DB.Create(&newPost).Error; err != nil {
+		utils.DebugLog("error:", err)
 		return err
 	}
+
+	// increment post count on topic
+	if err := s.DB.
+			Table("topics").
+			Where("id = ?", topicID).
+			Update("post_count", gorm.Expr("post_count + ?", 1)).
+			Error; err != nil {
+				utils.DebugLog("error:", err)
+				return err
+			}
 
 	return nil
 }
 
-func (s *PostService) EditPost(postID uint, username, topic, title, content string) error {
+func (s *PostService) EditPost(postID uint, username, title, content string, topic uint) error {
     var user models.User
     if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
         return errors.New("user not found")
@@ -195,7 +229,7 @@ func (s *PostService) DeletePost(postID uint, username string) error {
 
     log.Printf("found user ID %d for username %s", user.ID, username)
 
-    var post models.Post
+    var post PostWithTopic
     if err := s.DB.First(&post, postID).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
             return errors.New("post not found")
@@ -212,6 +246,14 @@ func (s *PostService) DeletePost(postID uint, username string) error {
    if err := s.DB.Delete(&post).Error; err != nil {
         return err
     }
+
+	// decrement post count on topic
+	if err := s.DB.Table("topics").
+		Where("id = ? AND post_count > 0", post.Topic).
+		Update("post_count", gorm.Expr("post_count - ?", 1)).
+		Error; err != nil {
+			return err
+		}
 
     log.Printf("successfully updated post %d", postID)
     return nil
@@ -230,14 +272,15 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 
 	query := s.DB.
 		Table("posts").
-		Select("posts.*, users.username").
+		Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+		Joins("JOIN topics ON posts.topic = topics.id").
 		Joins("JOIN users ON users.id = posts.user_id")
 
 	if params.Cursor > 0 {
 		query = query.Where("posts.id < ?", params.Cursor)
 	}
 
-	var posts []PostWithUsername
+	var posts []PostWithTopic
 	if err := query.
 		Order("posts.created_at DESC").
 		Limit(params.Limit + 1). // fetch +1 to check if there are more posts
@@ -278,7 +321,7 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 	}, nil
 }
 
-func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, currentUserID uint) error {
+func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentUserID uint) error {
 	if len(posts) == 0 {
 		return nil
 	}
@@ -386,7 +429,7 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithUsername, curre
 	return nil
 }
 
-func sortPostsByScore(posts []PostWithUsername) {
+func sortPostsByScore(posts []PostWithTopic) {
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].Score > posts[j].Score
 	})

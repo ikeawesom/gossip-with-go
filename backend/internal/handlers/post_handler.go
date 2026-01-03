@@ -24,27 +24,15 @@ type GetPostByUsernameRequest struct {
 	Username string `json:"username" binding:"required"`
 }
 
-type GetPostByTopicRequest struct {
-	Topic string `json:"topic" binding:"required"`
-}
-
-type CreatePostRequest struct {
-	Username string `json:"username" binding:"required"`
-	Title    string `json:"title" binding:"required"`
-	Content  string `json:"content" binding:"required"`
-	Topic    string `json:"topic" binding:"required"`
-}
-
-
 type EditPostRequest struct {
     Title   string `json:"title" binding:"required"`
     Content string `json:"content" binding:"required"`
-    Topic   string `json:"topic" binding:"required"`
+    Topic   uint `json:"topic" binding:"required"`
 }
 
-type DeletePostRequest struct {
-	PostID uint `json:"post_id" binding:"required"`
-	UserID uint `json:"user_id" binding:"required"`
+type CreatePostRequest struct {
+	EditPostRequest
+	Username string `json:"username" binding:"required"`
 }
 
 func (h *PostHandler) GetPostsByUsername(c *gin.Context) {
@@ -77,13 +65,19 @@ func (h *PostHandler) GetPostsByTopic(c *gin.Context) {
 		userID = v.(uint)
 	}
 
-	req := GetPostByTopicRequest{
-		Topic: c.Param("topic"),
+	log.Printf("User: %s",userID);
+
+	topicStr := c.Param("topic")
+
+	topicID, err := strconv.Atoi(topicStr)
+	if err != nil || topicID <= 0 {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid topic ID parameter", nil)
+		return
 	}
 
-	log.Printf("searching for posts from %s", req.Topic)
+	log.Printf("searching for posts from %s", topicID)
 
-	posts, err := h.PostService.GetPostByTopic(req.Topic, userID)
+	posts, err := h.PostService.GetPostByTopic(topicID, userID)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
 		log.Println(err)
@@ -115,6 +109,8 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 		log.Println(err)
 		return
 	}
+
+	utils.DebugLog("post", post)
 
 	utils.SuccessResponse(c, http.StatusOK, "Post retrieved successfully", gin.H{"post": post})
 }
@@ -178,7 +174,9 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 	}
 	log.Printf("creating post for user %s", req.Username)
 
-	err := h.PostService.CreatePost(req.Username, req.Topic, req.Title, req.Content)
+	utils.DebugLog("Req:", req)
+
+	err := h.PostService.CreatePost(req.Username, req.Title, req.Content, uint(req.Topic))
 	if err != nil {
 		log.Println(err)
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
@@ -211,7 +209,7 @@ func (h *PostHandler) EditPost(c *gin.Context) {
 
     log.Printf("editing post %d for user %s", postID, username.(string))
 
-    err = h.PostService.EditPost(uint(postID), username.(string), req.Topic, req.Title, req.Content)
+    err = h.PostService.EditPost(uint(postID), username.(string), req.Title, req.Content, req.Topic)
     if err != nil {
         log.Println(err)
         if err.Error() == "post not found" {
