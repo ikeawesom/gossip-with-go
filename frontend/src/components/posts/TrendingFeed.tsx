@@ -79,7 +79,7 @@ export default function TrendingFeed() {
           <span>
             Start sharing{" "}
             <Link
-              className="text-sm text-primary hover:opacity-70 duration-150 font-bold"
+              className="text-primary hover:opacity-70 duration-150 font-bold"
               to={`/${user ? user.username : "auth/register"}`}
             >
               here
