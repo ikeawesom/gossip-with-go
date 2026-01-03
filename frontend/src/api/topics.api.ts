@@ -1,7 +1,6 @@
 import apiClient from "./axios.config"
 import type { ResponseType } from "../types/res"
 import type { CreateTopicType } from "../components/topics/CreateTopicForm";
-import type { TrendingPostsParams } from "../types/post";
 
 export const topicApi = {
     // create topic
