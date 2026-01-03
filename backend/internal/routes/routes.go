@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler, queryHandler *handlers.QueryHandler, followHandler *handlers.FollowHandler) {
+func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler, queryHandler *handlers.QueryHandler, followHandler *handlers.FollowHandler, topicHandler *handlers.TopicHandler) {
 	// CORS configuration
 	cfg := config.AppConfig
 	r.Use(cors.New(cors.Config{
@@ -106,6 +106,15 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		}
 
 		api.GET("/query", queryHandler.GetResultsByType)
+
+		// topics
+		topics := api.Group("/topics")
+		{
+			topics.GET("/trending", topicHandler.GetTrendingTopics)
+			topics.GET("/:topicID", middleware.AuthOptional(), topicHandler.GetTopicByID)
+			topics.POST("/create", middleware.AuthRequired(), topicHandler.CreateTopic)
+			topics.POST("/delete/:topicID", middleware.AuthRequired(), topicHandler.DeletePost)
+		}
 		
 		follow := api.Group("/follow") 
 		{
