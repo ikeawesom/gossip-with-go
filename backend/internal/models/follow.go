@@ -4,8 +4,11 @@ import "time"
 
 type Follow struct {
 	ID          uint      `gorm:"primaryKey"`
+
+	FollowType  string    `gorm:"not null;index:uniqueIndex:idx_follower_following"`
 	FollowerID  uint      `gorm:"not null;index;uniqueIndex:idx_follower_following"`
 	FollowingID uint      `gorm:"not null;index;uniqueIndex:idx_follower_following"`
+	
 	CreatedAt   time.Time
 }
 

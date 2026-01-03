@@ -27,15 +27,16 @@ func (h *FollowHandler) ToggleFollow(c *gin.Context) {
 	}
 
 	var request struct {
-		FollowingID uint `json:"following_id" binding:"required"`
+		FollowingID uint    `json:"following_id" binding:"required"`
+		FollowType  string  `json:"follow_type" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Following ID required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Following ID and Follow Type required"})
 		return
 	}
 
-	isFollow, err := h.followService.ToggleFollow(request.FollowingID, userID.(uint))
+	isFollow, err := h.followService.ToggleFollow(request.FollowingID, request.FollowType, userID.(uint))
 	if (err != nil) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
