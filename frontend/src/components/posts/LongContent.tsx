@@ -35,7 +35,7 @@ export default function LongContent({
       <p
         ref={contentRef}
         className={twMerge(
-          "smart-wrap whitespace-pre-wrap",
+          "custom text-sm smart-wrap whitespace-pre-wrap",
           !isExpanded && (largeClamp ? "line-clamp-3" : "line-clamp-6")
         )}
       >
