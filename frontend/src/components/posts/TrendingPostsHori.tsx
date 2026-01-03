@@ -12,7 +12,14 @@ export default function TrendingPostsHori() {
   return (
     <>
       <HoriScrollSection
-        icon="/icons/posts/icon_hot.svg"
+        icon={
+          <img
+            src="/icons/posts/icon_hot.svg"
+            width={25}
+            height={25}
+            className="ml-1"
+          />
+        }
         scrollAmount={600}
         title="Trending Posts"
       >
@@ -20,7 +27,15 @@ export default function TrendingPostsHori() {
           <SpinnerPrimary />
         ) : (
           posts.map((post: PostType, index: number) => {
-            const { title, content, created_at, username, topic, id } = post;
+            const {
+              title,
+              content,
+              created_at,
+              username,
+              topic_class,
+              topic_name,
+              id,
+            } = post;
 
             const newDateStr = formatDate(new Date(created_at).getTime(), true);
             return (
@@ -31,7 +46,10 @@ export default function TrendingPostsHori() {
               >
                 <Card className="hover:brightness-110 flex flex-col justify-between items-start duration-150 ease-in-out p-4 gap-2">
                   <div className="flex flex-col items-start justify-start gap-2">
-                    <TopicTag topic_id={topic} />
+                    <TopicTag
+                      topic_class={topic_class}
+                      topic_name={topic_name}
+                    />
                     <h3 className="smart-wrap line-clamp-1">{title}</h3>
                     <p className="line-clamp-2">{content}</p>
                   </div>

@@ -6,18 +6,32 @@ import { useState } from "react";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { StateTriggerType } from "../../types/res";
+import type { Topic } from "../../types/topics";
+import SecondaryButton from "../utils/SecondaryButton";
 
 interface FollowTrigger extends StateTriggerType {
-  visitingUser: User;
+  visitingEntity: User | Topic;
   currentUser: User | null;
+  followType: "user" | "topic";
 }
+
+function isUser(entity: User | Topic): entity is User {
+  return "user_is_being_followed" in entity;
+}
+
 export default function FollowButton({
   currentUser,
-  visitingUser,
+  visitingEntity,
   trigger,
   triggerBool,
+  followType,
 }: FollowTrigger) {
-  const { user_has_followed, user_is_being_followed } = visitingUser;
+  const { user_has_followed } = visitingEntity;
+
+  const user_is_being_followed = isUser(visitingEntity)
+    ? visitingEntity.user_is_being_followed
+    : false;
+
   const [following, setIsFollowing] = useState(user_has_followed);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -25,15 +39,20 @@ export default function FollowButton({
 
   const toggleFollow = async () => {
     if (!currentUser) {
-      toast.info("Please sign in to interact with users!");
+      toast.info(
+        `Please sign in to interact with ${
+          followType === "user" ? "users" : "topics"
+        }!`
+      );
       return navigate("/auth/login", {
         state: { prev_page: location.pathname },
       });
     }
-    if (!visitingUser) return;
+    if (!visitingEntity) return;
     setLoading(true);
     try {
-      await followApi.toggleFollow(visitingUser.id);
+      console.log(visitingEntity.id);
+      await followApi.toggleFollow(visitingEntity.id, followType);
       setIsFollowing(!following);
       trigger(!triggerBool);
     } catch (err) {
@@ -44,12 +63,14 @@ export default function FollowButton({
     }
   };
 
-  return (
+  return following ? (
+    <SecondaryButton disabled={loading} onClick={toggleFollow}>
+      {loading ? <SpinnerSecondary /> : "Unfollow"}
+    </SecondaryButton>
+  ) : (
     <PrimaryButton disabled={loading} onClick={toggleFollow}>
       {loading ? (
         <SpinnerSecondary />
-      ) : following ? (
-        "Unfollow"
       ) : user_is_being_followed ? (
         "Follow Back"
       ) : (

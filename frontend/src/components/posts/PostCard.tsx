@@ -23,7 +23,8 @@ export default function PostCard({
     title,
     username: fetched_username,
     id,
-    topic,
+    topic_name,
+    topic_class,
   } = post;
 
   const newDateStr = formatDate(new Date(created_at).getTime(), true);
@@ -38,7 +39,9 @@ export default function PostCard({
         <Card className="flex items-center justify-between gap-6 group hover:brightness-110 duration-150 smart-wrap">
           <div className="w-full flex flex-col items-start justify-start gap-2">
             <div className="flex items-center justify-start gap-2">
-              {showTopic && <TopicTag topic_id={topic} />}
+              {showTopic && (
+                <TopicTag topic_class={topic_class} topic_name={topic_name} />
+              )}
               <p className="custom text-primary text-sm">{user}</p> •{" "}
               <p>
                 Posted {newDateStr.date ? "on" : ""} {newDateStr.time}

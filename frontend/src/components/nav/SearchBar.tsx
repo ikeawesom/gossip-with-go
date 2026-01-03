@@ -2,15 +2,16 @@ import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import useQuery, { type QueryResult } from "../../hooks/useQuery";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
-import type { TopicSearchResult, UserSearchResult } from "../../types/query";
+import type { UserSearchResult } from "../../types/query";
 import type { PostType } from "../../types/post";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../lib/helpers";
 import Modal from "../utils/Modal";
 import Logo from "../utils/Logo";
+import type { Topic } from "../../types/topics";
 
-const queryTypes = ["users", "posts"] as QueryType[];
-export type QueryType = "users" | "posts"; // | "topics"
+const queryTypes = ["users", "posts", "topics"] as QueryType[];
+export type QueryType = "users" | "posts" | "topics";
 
 export default function SearchBar() {
   const [showSearch, setShowSearch] = useState(false);
@@ -134,15 +135,21 @@ export default function SearchBar() {
                       </li>
                     );
                   } else {
-                    const topic = item as TopicSearchResult;
-                    url = `/topics/${topic.id}`;
+                    const topic = item as Topic;
+                    const { id, topic_name, username } = topic;
+                    url = `/topics/${id}`;
                     return (
                       <li
-                        onClick={() => handleNavigate(url)}
+                        onClick={() => navigate(url)}
                         key={index}
-                        className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
+                        className="text-sm p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                       >
-                        {}
+                        {topic_name}
+                        <p className="fine-print custom text-xs">
+                          {topic.username === "admin"
+                            ? "FREE TOPICS"
+                            : `Created by ${username}`}
+                        </p>
                       </li>
                     );
                   }
