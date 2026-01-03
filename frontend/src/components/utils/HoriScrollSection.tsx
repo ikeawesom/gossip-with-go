@@ -9,7 +9,7 @@ export default function HoriScrollSection({
   icon,
   children,
 }: {
-  icon?: string;
+  icon?: React.ReactNode;
   scrollAmount?: number;
   title: string;
   children: React.ReactNode;
@@ -51,12 +51,10 @@ export default function HoriScrollSection({
   };
   return (
     <div className="w-full flex items-start justify-center gap-1 flex-col">
-      <div className="w-full flex items-center justify-between gap-3">
-        <h3 className="flex items-center justify-start gap-1">
+      <div className="w-full flex items-center justify-between gap-1">
+        <h3 className="flex items-center justify-start">
           {title}
-          {icon && (
-            <img src={icon} alt={title.toLowerCase()} width={25} height={25} />
-          )}
+          {icon && icon}
         </h3>
         <div className="flex items-center justify-end gap-3">
           <Card
