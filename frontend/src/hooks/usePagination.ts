@@ -3,10 +3,10 @@ import { postApi } from '../api/posts.api';
 import type { PostType, TrendingPostsResponse } from "../types/post"
 import type { ApiError } from '../types/auth';
 import { AxiosError } from 'axios';
-import { REQUEST_CURSOR_LIMIT } from '../lib/constants';
 
+export type PaginationType = "following" | "trending"
 
-export function usePagination(limit: number = REQUEST_CURSOR_LIMIT) {
+export function usePagination(limit: number, type: PaginationType) {
     const [posts, setPosts] = useState<PostType[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export function usePagination(limit: number = REQUEST_CURSOR_LIMIT) {
                 ...(cursorRef.current ? { cursor: cursorRef.current } : {}),
             };
 
-            const response = await postApi.getTrendingPosts(params);
+            const response = await postApi.getPaginationPosts(type, params);
             const data = response.data as TrendingPostsResponse;
 
             setPosts(prev => {

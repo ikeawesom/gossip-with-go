@@ -1,4 +1,5 @@
-import type { CreatePostRequest, TrendingPostsParams } from "../types/post";
+import type { PaginationType } from "../hooks/usePagination";
+import type { CreatePostRequest, PaginationParams } from "../types/post";
 import type { ResponseType } from "../types/res";
 import apiClient from "./axios.config";
 
@@ -46,7 +47,8 @@ export const postApi = {
         return response.data
     },
 
-    getTrendingPosts: async (params?: TrendingPostsParams): Promise<ResponseType> => {
+    // get posts for pagination
+    getPaginationPosts: async (paginationType: PaginationType, params?: PaginationParams): Promise<ResponseType> => {
         const queryParams = new URLSearchParams();
 
         if (params?.limit) {
@@ -57,11 +59,9 @@ export const postApi = {
             queryParams.append('cursor', params.cursor.toString());
         }
 
-        const url = `trending${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+        const url = `${paginationType}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
         const response = await apiClient.get(`/posts/${url}`);
 
         return response.data;
     },
-
-
 }

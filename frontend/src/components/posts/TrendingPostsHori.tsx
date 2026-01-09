@@ -8,7 +8,7 @@ import { formatDate } from "../../lib/helpers";
 import TopicTag from "../topics/TopicTag";
 
 export default function TrendingPostsHori() {
-  const { posts, loading } = usePagination(6);
+  const { posts, loading } = usePagination(6, "trending");
   return (
     <>
       <HoriScrollSection

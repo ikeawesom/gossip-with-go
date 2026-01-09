@@ -10,7 +10,10 @@ import type { PostType } from "../../types/post";
 
 export default function TrendingFeed() {
   const { user } = useSelector((state: RootState) => state.auth);
-  const { posts, loading, error, hasMore, loadMore } = usePagination(10);
+  const { posts, loading, error, hasMore, loadMore } = usePagination(
+    10,
+    "trending"
+  );
 
   // ref for the "load more" trigger element
   const loadMoreRef = useRef<HTMLDivElement>(null);
