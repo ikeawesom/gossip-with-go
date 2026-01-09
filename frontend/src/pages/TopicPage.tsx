@@ -97,15 +97,22 @@ export default function TopicPage() {
                   <h3 className="custom text-5xl flex-1">
                     {topic?.topic_name}
                   </h3>
-                  <p className="custom text-fine-print text-sm mt-1">
-                    Created by{" "}
-                    <Link
-                      className="text-primary hover:opacity-70 duration-150 cursor-pointer"
-                      to={`/${topic?.username}`}
-                    >
-                      {topic?.username}
-                    </Link>
-                  </p>
+
+                  {topic.username === "admin" ? (
+                    <p className="custom text-fine-print text-sm mt-2">
+                      FREE TOPICS
+                    </p>
+                  ) : (
+                    <p className="custom text-fine-print text-sm mt-2">
+                      Created by{" "}
+                      <Link
+                        className="text-primary hover:opacity-70 duration-150 cursor-pointer"
+                        to={`/${topic?.username}`}
+                      >
+                        {topic?.username}
+                      </Link>
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center justify-end gap-3">
                   <FollowButton

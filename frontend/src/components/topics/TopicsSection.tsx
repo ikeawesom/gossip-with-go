@@ -84,7 +84,11 @@ export default function TopicsSection() {
                     </span>
                   </div>
                 </div>
-                <p className="fine-print">Created by {username}</p>
+                <p className="fine-print">
+                  {username === "admin"
+                    ? "FREE TOPICS"
+                    : `Created by ${username}`}
+                </p>
               </Card>
             </Link>
           );
