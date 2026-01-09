@@ -15,6 +15,7 @@ export default function SignOutButton() {
     try {
       await authApi.logout();
       dispatch(checkAuth());
+      console.log("Signed out");
       // window.location.reload();
     } catch (err: any) {
       console.log(err);
