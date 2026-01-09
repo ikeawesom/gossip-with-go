@@ -6,8 +6,9 @@ const BACKEND = "https://gossip-with-go.fly.dev";
 
 export default async function handler(req: Request) {
     const url = new URL(req.url);
+    console.log("[CONFIG] url:", url);
 
-    const path = url.pathname.replace("/api", "");
+    const path = url.pathname.replace(/^\/api/, "");
     const targetUrl = BACKEND + path + url.search;
 
     const headers = new Headers(req.headers);
@@ -21,7 +22,10 @@ export default async function handler(req: Request) {
         redirect: "manual",
     });
 
-    const responseHeaders = new Headers(res.headers);
+    const responseHeaders = new Headers();
+    res.headers.forEach((v, k) => responseHeaders.set(k, v));
+
+    console.log("[CONFIG] res:", JSON.stringify(res));
 
     return new Response(res.body, {
         status: res.status,
