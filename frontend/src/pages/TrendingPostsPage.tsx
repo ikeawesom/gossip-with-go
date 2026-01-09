@@ -1,10 +1,12 @@
 import NavSection from "../components/nav/NavSection";
-import TrendingFeed from "../components/posts/TrendingFeed";
+import PostsFeed from "../components/posts/PostsFeed";
+import TopicsSection from "../components/topics/TopicsSection";
 
 export default function TrendingPostsPage() {
   return (
     <NavSection>
-      <h2 className="pb-3 mb-4 w-full border-b border-gray-dark/20 flex items-center justify-start gap-1">
+      <TopicsSection />
+      <h2 className="pb-3 w-full border-b border-gray-dark/20 flex items-center justify-start gap-1 mt-6 mb-4">
         Trending Posts
         <img
           src="/icons/posts/icon_hot.svg"
@@ -13,7 +15,7 @@ export default function TrendingPostsPage() {
           height={30}
         />
       </h2>
-      <TrendingFeed />
+      <PostsFeed type="trending" />
     </NavSection>
   );
 }

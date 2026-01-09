@@ -14,7 +14,6 @@ function App() {
     >
       <TrendingPostsHori />
       <TopicsSection />
-      {/* <TrendingFeed /> */}
     </NavSection>
   );
 }

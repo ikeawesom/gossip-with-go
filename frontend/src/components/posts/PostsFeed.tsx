@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
-import { usePagination } from "../../hooks/usePagination";
+import { usePagination, type PaginationType } from "../../hooks/usePagination";
 import PostCard from "./PostCard";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
 import { Link } from "react-router-dom";
@@ -8,12 +8,9 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../state/store";
 import type { PostType } from "../../types/post";
 
-export default function TrendingFeed() {
+export default function PostsFeed({ type }: { type: PaginationType }) {
   const { user } = useSelector((state: RootState) => state.auth);
-  const { posts, loading, error, hasMore, loadMore } = usePagination(
-    10,
-    "trending"
-  );
+  const { posts, loading, error, hasMore, loadMore } = usePagination(10, type);
 
   // ref for the "load more" trigger element
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -60,15 +57,28 @@ export default function TrendingFeed() {
 
   return (
     <div className="flex items-center justify-center gap-5 flex-col">
-      {posts.map((post: PostType, index: number) => (
-        <PostCard key={index} post={post} showTopic />
-      ))}
+      {type === "following" && !loading && posts.length === 0 ? (
+        <p className="text-center py-8 custom text-gray-dark">
+          Oops, looks like you are not following any users or topics. Start
+          expanding your network or explore trending posts{" "}
+          <Link
+            to="/trending"
+            className="text-primary hover:opacity-70 duration-150"
+          >
+            here
+          </Link>
+          !
+        </p>
+      ) : (
+        posts.map((post: PostType, index: number) => (
+          <PostCard key={index} post={post} showTopic />
+        ))
+      )}
       {!error && loading && (
         <div className="w-full grid place-items-center p-6">
           <SpinnerPrimary size={24} />
         </div>
       )}
-      {}
 
       {!error && !loading && hasMore && (
         <div ref={loadMoreRef} className="w-full grid place-items-center p-6">
