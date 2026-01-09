@@ -15,7 +15,7 @@ export default function SignOutButton() {
     try {
       await authApi.logout();
       dispatch(checkAuth());
-      window.location.reload();
+      // window.location.reload();
     } catch (err: any) {
       console.log(err);
       toast.error("Could not sign out. Please try again later.");
