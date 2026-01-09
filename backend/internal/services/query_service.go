@@ -60,7 +60,7 @@ func (s *QueryService) QueryTopics(searchQuery string) ([]TopicsWithUsername, er
 	if err := s.DB.Table("topics").
 			Select("topics.*, users.username").
 			Joins("JOIN users ON topics.created_by = users.id").
-			Where("topics.topic_name ILIKE ? OR topics.description ILIKE ?", updatedSearch).
+			Where("topics.topic_name ILIKE ? OR topics.description ILIKE ?", updatedSearch, updatedSearch).
 			Order("follower_count DESC").
 			Find(&topics).Error;
 
