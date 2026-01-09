@@ -140,7 +140,7 @@ export default function SearchBar() {
                     url = `/topics/${id}`;
                     return (
                       <li
-                        onClick={() => navigate(url)}
+                        onClick={() => handleNavigate(url)}
                         key={index}
                         className="text-sm p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                       >
