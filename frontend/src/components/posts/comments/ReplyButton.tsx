@@ -88,13 +88,13 @@ export default function RepyButton({
                   {username}
                 </Link>
                 <p>•</p>
-                <p className="fine-print">{newDate}</p>
+                <p className="fine-print font-normal">{newDate}</p>
               </div>
               <div
                 className="overflow-y-scroll w-full"
                 style={{ scrollbarWidth: "none" }}
               >
-                <p className="whitespace-pre-wrap">{content}</p>
+                <p className="whitespace-pre-wrap font-normal">{content}</p>
               </div>
             </div>
           </ModalTitle>
