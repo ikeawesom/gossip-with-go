@@ -5,12 +5,10 @@ import { checkAuth } from "../../state/auth/authSlice";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 export default function SignOutButton() {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
 
   const handleSignout = async () => {
     setLoading(true);
@@ -18,7 +16,6 @@ export default function SignOutButton() {
       await authApi.logout();
       dispatch(checkAuth());
       toast.success("Signed out successfully");
-      navigate("/", { replace: true });
     } catch (err: any) {
       console.log(err);
       toast.error("Could not sign out. Please try again later.");
