@@ -92,7 +92,7 @@ export default function TopicPage() {
         <NavSection>
           <div className="w-full flex flex-col items-start justify-start gap-4">
             <div className="w-full flex flex-col items-start justify-start gap-1 border-b border-gray-dark/20 pb-4">
-              <div className="flex items-center justify-between gap-3 w-full md:flex-row flex-col">
+              <div className="flex md:items-center items-start justify-between gap-3 w-full md:flex-row flex-col">
                 <div>
                   <h3 className="custom text-5xl flex-1 line-clamp-3">
                     {topic?.topic_name}

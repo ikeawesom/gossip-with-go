@@ -60,7 +60,7 @@ export default function HoriScrollSection({
           <Card
             onClick={scrollBack}
             className={twMerge(
-              "group grid place-items-center p-2 px-1 rounded-lg",
+              "group grid place-items-center md:p-2 md:px-1 p-2 rounded-lg",
               !before
                 ? "cursor-not-allowed opacity-70"
                 : "cursor-pointer hover:from-white duration-300"
@@ -71,7 +71,7 @@ export default function HoriScrollSection({
           <Card
             onClick={scrollNext}
             className={twMerge(
-              "group grid place-items-center p-2 px-1 rounded-lg",
+              "group grid place-items-center md:p-2 md:px-1 p-2 rounded-lg",
               !more
                 ? "cursor-not-allowed opacity-70"
                 : "cursor-pointer hover:from-white duration-300"
