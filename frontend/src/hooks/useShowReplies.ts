@@ -7,8 +7,7 @@ import type { RepliesResponse } from '../types/comments';
 import type { Comment } from "../types/comments"
 
 export default function useShowReplies(id: number) {
-    const limit = REQUEST_CURSOR_LIMIT_REPLIES;
-
+    const [limit, setLimit] = useState(REQUEST_CURSOR_LIMIT_REPLIES);
     const [showReplies, setShowReplies] = useState(false);
     const [allLoaded, setAllLoaded] = useState(false);
     const [replies, setReplies] = useState<Comment[]>([]);
@@ -17,7 +16,6 @@ export default function useShowReplies(id: number) {
     const [offSet, setOffset] = useState(0)
 
     const fetchReplies = useCallback(async () => {
-        if (!hasMore) return;
         if (loading) return;
 
         setLoading(true);
@@ -44,6 +42,10 @@ export default function useShowReplies(id: number) {
 
     const handleHideAllReplies = () => {
         setShowReplies(false);
+        setOffset(0);
+        setLimit(replies.length)
+        setReplies([])
+        setAllLoaded(false);
     }
 
     useEffect(() => {
@@ -55,13 +57,11 @@ export default function useShowReplies(id: number) {
     // load more replies
     const loadMore = useCallback(() => {
         setShowReplies(true)
-        if (!allLoaded) {
-            fetchReplies();
-            console.log("fetching new replies...")
-        }
+        fetchReplies();
+        console.log("fetching new replies...")
     }, [fetchReplies]);
 
     return {
-        replies, loadMore, showReplies, allLoaded, handleHideAllReplies
+        replies, loadMore, showReplies, allLoaded, handleHideAllReplies, loading
     };
 }

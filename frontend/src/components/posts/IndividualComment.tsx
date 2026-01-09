@@ -9,6 +9,7 @@ import ReplyButton from "./comments/ReplyButton";
 import useShowReplies from "../../hooks/useShowReplies";
 import { twMerge } from "tailwind-merge";
 import CommentSettingsSection from "./comments/CommentSettingsSection";
+import SpinnerPrimary from "../spinner/SpinnerPrimary";
 
 export interface IndivComment extends CommentTriggers {
   comment: Comment;
@@ -20,8 +21,15 @@ export default function IndividualComment({
   triggerBool,
 }: IndivComment) {
   const { user } = useSelector((state: RootState) => state.auth);
-  const { replies, loadMore, showReplies, allLoaded, handleHideAllReplies } =
-    useShowReplies(comment.id);
+  const {
+    replies,
+    loadMore,
+    showReplies,
+    allLoaded,
+    handleHideAllReplies,
+    loading,
+  } = useShowReplies(comment.id);
+
   const {
     content,
     created_at,
@@ -82,13 +90,7 @@ export default function IndividualComment({
               <>
                 <p>•</p>
                 <p
-                  onClick={
-                    allLoaded
-                      ? showReplies
-                        ? handleHideAllReplies
-                        : loadMore
-                      : loadMore
-                  }
+                  onClick={loadMore}
                   className={twMerge(
                     "custom text-gray-dark text-sm flex items-center justify-center gap-1 cursor-pointer hover:opacity-70 duration-150"
                   )}
@@ -168,6 +170,11 @@ export default function IndividualComment({
               </div>
             );
           })}
+          {loading && (
+            <div className="w-full h-8 grid place-items-center">
+              <SpinnerPrimary size={20} />
+            </div>
+          )}
           {!allLoaded ? (
             <p
               className="custom text-sm cursor-pointer hover:opacity-70 duration-150"
