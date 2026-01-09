@@ -90,7 +90,7 @@ export default function IndividualComment({
               <>
                 <p>•</p>
                 <p
-                  onClick={loadMore}
+                  onClick={!allLoaded ? loadMore : handleHideAllReplies}
                   className={twMerge(
                     "custom text-gray-dark text-sm flex items-center justify-center gap-1 cursor-pointer hover:opacity-70 duration-150"
                   )}
