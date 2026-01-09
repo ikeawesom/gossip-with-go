@@ -157,6 +157,48 @@ func (h *PostHandler) GetTrendingPosts(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", result)
 }
 
+func (h *PostHandler) GetFollowingPosts(c *gin.Context) {
+	var userID uint = 0
+
+	if v, exists := c.Get("userID"); exists {
+		userID = v.(uint)
+	}
+
+	limitStr := c.DefaultQuery("limit", utils.GetLimitStr()) 
+	cursorStr := c.Query("cursor")              // empty string if not provided
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit <= 0 {
+		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid limit parameter", nil)
+		return
+	}
+
+	var cursor uint
+	if cursorStr != "" {
+		cursorUint64, err := strconv.ParseUint(cursorStr, 10, 32)
+		if err != nil {
+			utils.ErrorResponse(c, http.StatusBadRequest, "Invalid cursor parameter", nil)
+			return
+		}
+		cursor = uint(cursorUint64)
+	}
+
+	params := services.PaginationParams{
+		Limit:  limit,
+		Cursor: cursor,
+		UserID: userID,
+	}
+
+	log.Println("[HANLDER] Attempting to fetch following posts...")
+	result, err := h.PostService.GetFollowingPosts(params)
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to fetch posts", err.Error())
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", result)
+}
+
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	username, exists := c.Get("username")
     if !exists {

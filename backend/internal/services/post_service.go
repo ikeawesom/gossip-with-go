@@ -321,6 +321,77 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 	}, nil
 }
 
+func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPostsResponse, error) {
+	log.Println("[SERVICE FOLLOWING] User ID:", params.UserID)
+
+	// validate parameters
+	if params.Limit <= 0 {
+		params.Limit = 10 // default to 10 posts per page
+	}
+	if params.Limit > 50 {
+		params.Limit = 50 // maximum 50 posts per page
+	}
+
+	query := s.DB.
+		Table("posts").
+		Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+		Joins("JOIN topics ON posts.topic = topics.id").
+		Joins("JOIN users ON users.id = posts.user_id").
+		Joins(`LEFT JOIN follows AS user_follows ON 
+			user_follows.follower_id = ? AND 
+			user_follows.follow_type = 'user' AND 
+			user_follows.following_id = posts.user_id`, params.UserID).
+		Joins(`LEFT JOIN follows AS topic_follows ON 
+			topic_follows.follower_id = ? AND 
+			topic_follows.follow_type = 'topic' AND 
+			topic_follows.following_id = posts.topic`, params.UserID).
+		Where("user_follows.id IS NOT NULL OR topic_follows.id IS NOT NULL")
+
+	if params.Cursor > 0 {
+		query = query.Where("posts.id < ?", params.Cursor)
+	}
+
+	var posts []PostWithTopic
+	if err := query.
+		Order("posts.created_at DESC").
+		Limit(params.Limit + 1). // fetch +1 to check if there are more posts
+		Find(&posts).Error; err != nil {
+		return nil, err
+	}
+
+	log.Println("[SERVICE] Fetched posts...")
+
+	posts = CalculatePostScores(posts)
+	sortPostsByScore(posts)
+
+	// check if there are more posts (because of +1 earlier)
+	hasMore := len(posts) > params.Limit
+	if hasMore {
+		posts = posts[:params.Limit] // trim to limit
+	}
+
+	// only enrich if user is authenticated - HERE
+	if (params.UserID > 0) {
+		log.Println("Enriching likes data...")
+		if err := s.encrichWithInteractionData(posts, params.UserID); err != nil {
+			return nil, err
+		}
+	}
+
+	// Determine next cursor
+	var nextCursor *uint
+	if hasMore && len(posts) > 0 {
+		lastPostID := posts[len(posts)-1].ID
+		nextCursor = &lastPostID
+	}
+
+	return &PaginatedPostsResponse{
+		Posts:      posts,
+		NextCursor: nextCursor,
+		HasMore:    hasMore,
+	}, nil
+}
+
 func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentUserID uint) error {
 	if len(posts) == 0 {
 		return nil
