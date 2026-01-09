@@ -20,12 +20,7 @@ function App() {
   }, [isAuthenticated]);
 
   return (
-    <NavSection
-      className={twMerge(
-        "flex flex-col items-center justify-center w-full gap-4",
-        DEV_MODE ? "border border-red-500" : ""
-      )}
-    >
+    <NavSection className="flex flex-col items-center justify-center w-full gap-4">
       <SpinnerPrimary />
     </NavSection>
   );
