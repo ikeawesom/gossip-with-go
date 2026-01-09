@@ -47,6 +47,7 @@ func (h* TopicHandler) CreateTopic(c *gin.Context) {
 	userID, exists := c.Get("userID");
 	if !exists {
 		utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
+		log.Print("User not authenticated")
         return
 	}
 
@@ -77,6 +78,7 @@ func (h *TopicHandler) DeletePost(c *gin.Context) {
 	userID, exists := c.Get("userID");
 	if !exists {
 		utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
+		log.Print("User not authenticated")
         return
 	}
 
@@ -92,6 +94,7 @@ func (h *TopicHandler) DeletePost(c *gin.Context) {
 	err = h.TopicService.DeleteTopics(userID.(uint), uint(topicID))
 
     if err != nil {
+        log.Println(err)
         if err.Error() == "post not found" {
             utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)
             return

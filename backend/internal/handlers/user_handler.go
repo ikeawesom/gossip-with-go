@@ -40,6 +40,7 @@ func (h *UserHandler) GetUserByUsername(c *gin.Context) {
 	user, err := h.UserService.GetUserByUsername(req)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusUnauthorized, err.Error(), nil)
+		log.Println(err)
 		return
 	}
 
@@ -64,6 +65,7 @@ func (h *UserHandler) GetFollowersByUsername(c *gin.Context) {
 	user, err := h.UserService.GetUserFollowers(req.Username)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusUnauthorized, err.Error(), nil)
+		log.Println(err)
 		return
 	}
 
@@ -88,6 +90,7 @@ func (h *UserHandler) GetFollowingsByUsername(c *gin.Context) {
 	user, err := h.UserService.GetUserFollowings(req.Username)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusUnauthorized, err.Error(), nil)
+		log.Println(err)
 		return
 	}
 

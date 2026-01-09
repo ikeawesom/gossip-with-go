@@ -3,6 +3,7 @@ package handlers
 import (
 	"gossip-with-go/internal/services"
 	"gossip-with-go/internal/utils"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func (h *QueryHandler) GetResultsByType(c *gin.Context) {
 		QueryType: c.Query("type"),
 	}
 
+	log.Printf("Query: %s | Query Type: %s", req.Query, req.QueryType)
 	var (
 		results interface{}
 		err     error

@@ -20,6 +20,7 @@ export const apiClient = axios.create({
 // request interceptor to add auth headers
 apiClient.interceptors.request.use(
     (config) => {
+        // You can add custom headers here if needed
         return config;
     },
     (error) => {
