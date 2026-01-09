@@ -265,34 +265,32 @@ func setTokenCookies(c *gin.Context, accessToken, refreshToken string) {
 	cfg := config.AppConfig
 
 	// determine SameSite mode based on environment
-	sameSiteMode := http.SameSiteLaxMode // default for development
-	if cfg.CookieDomain != "localhost" {
-		sameSiteMode = http.SameSiteNoneMode
+	sameSiteMode := http.SameSiteNoneMode
+	if cfg.CookieSameSite == "Strict" {
+		sameSiteMode = http.SameSiteStrictMode
 	}
 
-	// access token cookie
-	c.SetSameSite(sameSiteMode) 
-	c.SetCookie(
-		"access_token",
-		accessToken,
-		int(cfg.JWTAccessTokenExpiry.Seconds()),
-		"/",
-		cfg.CookieDomain,
-		cfg.CookieSecure,
-		true, 
-	)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "access_token",
+		Value:    accessToken,
+		Path:     "/",
+		Domain:   cfg.CookieDomain,
+		MaxAge:   int(cfg.JWTAccessTokenExpiry.Seconds()),
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: sameSiteMode,
+	})
 
-	// refresh token cookie
-	c.SetSameSite(sameSiteMode)
-	c.SetCookie(
-		"refresh_token",
-		refreshToken,
-		int(cfg.JWTRefreshTokenExpiry.Seconds()),
-		"/",
-		cfg.CookieDomain,
-		cfg.CookieSecure,
-		true, 
-	)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/",
+		Domain:   cfg.CookieDomain,
+		MaxAge:   int(cfg.JWTRefreshTokenExpiry.Seconds()),
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: sameSiteMode,
+	})
 }
 
 func setAccessTokenCookie(c *gin.Context, accessToken string) {
