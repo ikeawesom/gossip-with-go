@@ -50,12 +50,12 @@ export default function HoriScrollSection({
     }
   };
   return (
-    <div className="w-full flex items-start justify-center gap-1 flex-col">
+    <div className="w-full flex items-start justify-center gap-2 flex-col">
       <div className="w-full flex items-center justify-between gap-1">
-        <h3 className="flex items-center justify-start">
+        <h2 className="flex items-center justify-start">
           {title}
           {icon && icon}
-        </h3>
+        </h2>
         <div className="flex items-center justify-end gap-3">
           <Card
             onClick={scrollBack}

@@ -124,14 +124,14 @@ export default function TopicPage() {
               </div>
               <p className="custom text-sm my-2">{topic?.description}</p>
               <div className="flex items-center justify-start gap-2">
-                <h4 className="custom text-gray-dark">
+                <p className="custom text-gray-dark text-sm">
                   {topic?.post_count}{" "}
                   {`post${topic?.post_count === 1 ? "" : "s"} `}
-                </h4>
-                <h4 className="custom text-gray-dark">•</h4>
-                <h4 className="custom text-gray-dark">
+                </p>
+                <p className="custom text-gray-dark text-sm">•</p>
+                <p className="custom text-gray-dark text-sm">
                   {topic?.follower_count} followers
-                </h4>
+                </p>
               </div>
             </div>
             {status === "loading" ? (
