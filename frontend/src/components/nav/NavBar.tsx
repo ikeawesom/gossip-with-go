@@ -34,7 +34,9 @@ export default function NavBar() {
               to={`${page.id}`}
               className={twMerge(
                 "whitespace-nowrap text-primary/80 text-sm",
-                curPage === page.id && "font-bold text-primary"
+                curPage === page.id
+                  ? "font-bold text-primary"
+                  : "hover:opacity-70 duration-150"
               )}
             >
               {page.title}
