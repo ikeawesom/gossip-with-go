@@ -1,6 +1,4 @@
-import { twMerge } from "tailwind-merge";
 import NavSection from "./components/nav/NavSection";
-import { DEV_MODE } from "./lib/constants";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "./state/store";
