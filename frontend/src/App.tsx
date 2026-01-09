@@ -1,10 +1,24 @@
 import { twMerge } from "tailwind-merge";
 import NavSection from "./components/nav/NavSection";
-import TopicsSection from "./components/topics/TopicsSection";
 import { DEV_MODE } from "./lib/constants";
-import TrendingPostsHori from "./components/posts/TrendingPostsHori";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "./state/store";
+import { useEffect } from "react";
+import SpinnerPrimary from "./components/spinner/SpinnerPrimary";
 
 function App() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/following", { replace: true });
+    } else {
+      navigate("trending", { replace: true });
+    }
+  }, [isAuthenticated]);
+
   return (
     <NavSection
       className={twMerge(
@@ -12,8 +26,7 @@ function App() {
         DEV_MODE ? "border border-red-500" : ""
       )}
     >
-      <TrendingPostsHori />
-      <TopicsSection />
+      <SpinnerPrimary />
     </NavSection>
   );
 }
