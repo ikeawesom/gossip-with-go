@@ -13,7 +13,7 @@ import type { Topic } from "../../types/topics";
 const queryTypes = ["users", "posts", "topics"] as QueryType[];
 export type QueryType = "users" | "posts" | "topics";
 
-export default function SearchBar() {
+export default function SearchBar({ hideLogo }: { hideLogo?: boolean }) {
   const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [queryType, setQueryType] = useState<QueryType>("users");
@@ -35,8 +35,13 @@ export default function SearchBar() {
 
   return (
     <>
-      <div className="w-full relative bg-white/60 backdrop-blur-md border border-white/20 rounded-full p-1 shadow-sm flex items-center justify-start gap-3 pl-3">
-        <Logo small link color />
+      <div
+        className={twMerge(
+          "w-full relative bg-white/60 backdrop-blur-md border border-white/20 rounded-full p-1 shadow-sm flex items-center justify-start gap-3",
+          !hideLogo && "pl-3"
+        )}
+      >
+        {!hideLogo && <Logo small link color />}
         <input
           onClick={() => setShowSearch(true)}
           className="relative z-10 custom bg-white placeholder-fine-print rounded-full px-4 py-2 border focus:shadow-none border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary/80 text-gray-dark w-full"
@@ -155,7 +160,7 @@ export default function SearchBar() {
                   }
                 })
               ) : (
-                <li className="h-[100px] grid place-items-center text-fine-print text-center p-2 border-b border-gray-light">
+                <li className="text-sm md:text-base h-[100px] grid place-items-center text-fine-print text-center p-2 border-b border-gray-light">
                   {query.length > 0
                     ? "Hmm, no results were found. Try another keyword."
                     : "Search a headline or some key words to get started!"}
