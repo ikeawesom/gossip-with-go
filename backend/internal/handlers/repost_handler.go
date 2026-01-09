@@ -3,7 +3,6 @@ package handlers
 import (
 	"gossip-with-go/internal/services"
 	"gossip-with-go/internal/utils"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -20,19 +19,13 @@ func NewRepostHandler(repostService *services.RepostService) *RepostHandler {
 	}
 }
 
-// POST /api/reposts/toggle
 func (h *RepostHandler) ToggleRepost(c *gin.Context) {
-	log.Printf("Getting user_id...")
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		log.Println(c)
-		log.Printf("User not found")
 		return
 	}
 	
-	log.Printf("Got user: %s", userID)
-
 	var request struct {
 		PostID     uint   `json:"post_id" binding:"required"`
 		Visibility string `json:"visibility" binding:"required"` // public, friends or private
@@ -43,7 +36,6 @@ func (h *RepostHandler) ToggleRepost(c *gin.Context) {
 		return
 	}
 
-	log.Println("Attempting to repost...")
 	isReposted, err := h.repostService.ToggleRepost(userID.(uint), request.PostID, request.Visibility)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
