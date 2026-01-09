@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
 import { topicApi } from "../../api/topics.api";
 import { COLORS_ARR } from "../../lib/constants";
+import { trimString } from "../../lib/helpers";
 
 export default function TopicsSection() {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -62,7 +63,9 @@ export default function TopicsSection() {
             >
               <Card className="hover:brightness-110 flex flex-col justify-between items-start duration-150 ease-in-out py-3 px-4 gap-1">
                 <div className="flex items-center justify-start gap-6">
-                  <h4 className={COLORS_ARR[topic_class].text}>{topic_name}</h4>
+                  <h4 className={COLORS_ARR[topic_class].text}>
+                    {trimString(topic_name, 25)}
+                  </h4>
                   <div className="flex items-center justify-start gap-2">
                     <span className="flex items-center justify-start gap-1">
                       {follower_count}{" "}
