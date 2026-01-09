@@ -65,3 +65,10 @@ export function maskEmail(email: string): string {
 
   return `${maskedLocal}@${maskedDomain}`;
 }
+
+export function trimString(s: string, n: number) {
+  if (s.length > n) {
+    return s.substring(0, n - 3) + "...";
+  }
+  return s;
+}
