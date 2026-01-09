@@ -39,7 +39,7 @@ export interface TrendingPostsResponse {
     has_more: boolean;
 }
 
-export interface TrendingPostsParams {
+export interface PaginationParams {
     limit?: number;
     cursor?: number;
 }
