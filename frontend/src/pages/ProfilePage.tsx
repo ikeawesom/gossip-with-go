@@ -50,7 +50,6 @@ export default function ProfilePage() {
       const res = await postApi.getPostByUsername(username);
       const posts = res.data.posts as PostType[];
       setUserPosts(posts);
-      console.log(posts);
       setPostState("success");
       if (res.data.posts) setPostState("success");
     } catch (err: any) {
@@ -83,18 +82,20 @@ export default function ProfilePage() {
       {userState === "invalid" ? (
         <p className="text-center">User not found.</p>
       ) : (
-        <div className="flex items-center justify-between gap-4 border-b border-gray-dark/20 pb-5">
-          <div>
-            <div className="flex items-center justify-start gap-4">
+        <div className="flex items-center justify-between gap-4 border-b border-gray-dark/20 pb-5 w-full">
+          <div className="w-full">
+            <div className="flex md:flex-row flex-col items-start md:items-center justify-start gap-2 md:gap-4 w-full">
               <h1 className="mb-1">{username}</h1>
               {!isCurrentUser && visitingUser && (
-                <FollowButton
-                  followType="user"
-                  trigger={setUpdate}
-                  triggerBool={update}
-                  visitingEntity={visitingUser}
-                  currentUser={user}
-                />
+                <div className="md:mb-0 mb-4 w-full">
+                  <FollowButton
+                    followType="user"
+                    trigger={setUpdate}
+                    triggerBool={update}
+                    visitingEntity={visitingUser}
+                    currentUser={user}
+                  />
+                </div>
               )}
             </div>
             {visitingUser && (

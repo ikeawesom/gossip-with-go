@@ -64,11 +64,19 @@ export default function FollowButton({
   };
 
   return following ? (
-    <SecondaryButton disabled={loading} onClick={toggleFollow}>
+    <SecondaryButton
+      className="md:w-fit w-full"
+      disabled={loading}
+      onClick={toggleFollow}
+    >
       {loading ? <SpinnerSecondary /> : "Unfollow"}
     </SecondaryButton>
   ) : (
-    <PrimaryButton disabled={loading} onClick={toggleFollow}>
+    <PrimaryButton
+      className="md:w-fit w-full"
+      disabled={loading}
+      onClick={toggleFollow}
+    >
       {loading ? (
         <SpinnerSecondary />
       ) : user_is_being_followed ? (

@@ -92,9 +92,9 @@ export default function TopicPage() {
         <NavSection>
           <div className="w-full flex flex-col items-start justify-start gap-4">
             <div className="w-full flex flex-col items-start justify-start gap-1 border-b border-gray-dark/20 pb-4">
-              <div className="flex items-center justify-between gap-3 w-full">
+              <div className="flex items-center justify-between gap-3 w-full md:flex-row flex-col">
                 <div>
-                  <h3 className="custom text-5xl flex-1">
+                  <h3 className="custom text-5xl flex-1 line-clamp-3">
                     {topic?.topic_name}
                   </h3>
 
@@ -114,7 +114,7 @@ export default function TopicPage() {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center justify-end gap-3">
+                <div className="flex items-center md:justify-end gap-3 md:w-fit w-full justify-center md:mb-0 mb-3">
                   <FollowButton
                     trigger={setUpdate}
                     triggerBool={update}
@@ -123,7 +123,10 @@ export default function TopicPage() {
                     followType="topic"
                   />
                   {userFollows && user && (
-                    <PrimaryButton onClick={() => setCreatePost(true)}>
+                    <PrimaryButton
+                      className="md:w-fit w-full"
+                      onClick={() => setCreatePost(true)}
+                    >
                       Make a Post
                     </PrimaryButton>
                   )}

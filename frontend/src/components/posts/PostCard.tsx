@@ -40,15 +40,19 @@ export default function PostCard({
           <div className="w-full flex flex-col items-start justify-start gap-2">
             <div className="flex items-center justify-start gap-2">
               {showTopic && (
-                <TopicTag topic_class={topic_class} topic_name={topic_name} />
+                <TopicTag
+                  trim
+                  topic_class={topic_class}
+                  topic_name={topic_name}
+                />
               )}
-              <p className="custom text-primary text-sm">{user}</p> •{" "}
-              <p>
-                Posted {newDateStr.date ? "on" : ""} {newDateStr.time}
-              </p>
+              <p className="custom text-primary text-sm">{user}</p>{" "}
             </div>
             <h4 className="custom font-bold line-clamp-2">{title}</h4>
             <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
+            <p className="fine-print">
+              Posted {newDateStr.date ? "on" : ""} {newDateStr.time}
+            </p>
           </div>
           {!hideArrow && (
             <ArrowRight
