@@ -26,7 +26,7 @@ export function formatDate(timestamp: number, includeTime?: boolean): { date: bo
 
   if (includeTime) {
     const tempDate = new Date();
-    tempDate.setHours(tempDate.getHours() + 8); // adjust to SGT
+    // tempDate.setHours(tempDate.getHours() + 8); // adjust to SGT
     const now = tempDate.getTime();
     const diffMs = now - timestamp;
     const diffSecs = Math.floor(diffMs / 1000);
