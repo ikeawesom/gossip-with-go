@@ -1,11 +1,11 @@
 import NavSection from "../components/nav/NavSection";
 import TopicsSection from "../components/topics/TopicsSection";
 import PostsFeed from "../components/posts/PostsFeed";
-import usePWAModal from "../hooks/pwa/usePWAModal";
-import PWAModal from "../components/pwa/PWAModal";
+// import usePWAModal from "../hooks/pwa/usePWAModal";
+// import PWAModal from "../components/pwa/PWAModal";
 
 export default function FollowingPage() {
-  const { handleClose, showPWA } = usePWAModal();
+  // const { handleClose, showPWA } = usePWAModal();
 
   return (
     <>
@@ -24,7 +24,7 @@ export default function FollowingPage() {
         </h2>
         <PostsFeed type="following" />
       </NavSection>
-      {showPWA && <PWAModal close={handleClose} />}
+      {/* {showPWA && <PWAModal close={handleClose} />} */}
     </>
   );
 }

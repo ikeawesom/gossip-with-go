@@ -1,11 +1,12 @@
 import NavSection from "../components/nav/NavSection";
 import PostsFeed from "../components/posts/PostsFeed";
 import TopicsSection from "../components/topics/TopicsSection";
-import PWAModal from "../components/pwa/PWAModal";
-import usePWAModal from "../hooks/pwa/usePWAModal";
+// import PWAModal from "../components/pwa/PWAModal";
+// import usePWAModal from "../hooks/pwa/usePWAModal";
 
 export default function TrendingPostsPage() {
-  const { handleClose, showPWA } = usePWAModal();
+  // const { handleClose, showPWA } = usePWAModal();
+
   return (
     <>
       <NavSection>
@@ -21,7 +22,7 @@ export default function TrendingPostsPage() {
         </h2>
         <PostsFeed type="trending" />
       </NavSection>
-      {showPWA && <PWAModal close={handleClose} />}
+      {/* {showPWA && <PWAModal close={handleClose} />} */}
     </>
   );
 }
