@@ -32,7 +32,7 @@ export default function DeleteCommentButton({
     <PrimaryButton
       disabled={loading}
       onClick={handleDelete}
-      className="text-xs from-red/60 to-red rounded-md flex items-center justify-center gap-2 border-none px-3 w-full"
+      className="text-xs from-red/60 hover:from-red/50 to-red rounded-md flex items-center justify-center gap-2 border-none px-3 w-full"
     >
       {loading ? (
         <SpinnerSecondary size={15} />
