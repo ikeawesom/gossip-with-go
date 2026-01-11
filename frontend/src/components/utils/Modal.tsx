@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 import type { DefaultCustomProps } from "../../lib/constants";
 import Card from "./Card";
 
-interface ModalProps extends DefaultCustomProps {
+export interface ModalProps extends DefaultCustomProps {
   close?: () => void;
 }
 
