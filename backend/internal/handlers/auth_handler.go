@@ -76,24 +76,20 @@ func (h *AuthHandler) Signup(c *gin.Context) {
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
-	log.Println("Attempting login")
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ValidationErrorResponse(c, err.Error())
 		return
 	}
-	// log.Fatal("FORCED ERROR")
 
 	// authenticate user
 	user, err := h.AuthService.Login(req.Username, req.Password)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusUnauthorized, err.Error(), nil)
-		log.Println(err)
+		
 		return
 	}
 
-	log.Println("after auth");
-	
 	// generate tokens
 	cfg := config.AppConfig
 	accessToken, refreshToken, err := utils.GenerateTokenPair(
@@ -108,11 +104,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to generate tokens", nil)
 		return
 	}
-	log.Println("generated token");
 
 	// set cookies
 	setTokenCookies(c, accessToken, refreshToken)
-	log.Println("set cookies");
 
 	utils.SuccessResponse(c, http.StatusOK, "Login successful", gin.H{
 		"user": user.ToResponse(),
@@ -122,7 +116,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 func (h *AuthHandler) Logout(c *gin.Context) {
 	// clear cookies
 	clearTokenCookies(c)
-	log.Println("Logged out")
 	utils.SuccessResponse(c, http.StatusOK, "Logout successful", nil)
 }
 

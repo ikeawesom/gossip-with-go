@@ -45,7 +45,6 @@ export default function PostPage() {
       const res = await postApi.getUserPostByID(username, post_id);
       const fetchedPost = res.data.post as PostType;
       setPostData(fetchedPost);
-      console.log(fetchedPost);
       setStatus("success");
     } catch (err: any) {
       console.log(err);

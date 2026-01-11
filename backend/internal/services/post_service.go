@@ -4,7 +4,6 @@ import (
 	"errors"
 	"gossip-with-go/internal/models"
 	"gossip-with-go/internal/utils"
-	"log"
 	"sort"
 
 	"gorm.io/gorm"
@@ -64,7 +63,6 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 		}
 		return nil, err
 	}
-	log.Printf("found author ID: %d for username: %s", author.ID, author.Username)
 
 	var posts []PostWithTopic
 	if err := s.DB.
@@ -85,8 +83,6 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 		return nil, err
 	}	
 
-	// utils.DebugLog("Fetched Posts:", posts)
-	
 	return posts, nil
 }
 
@@ -109,8 +105,6 @@ func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]PostWithT
 	if err := s.encrichWithInteractionData(posts, currentUser); err != nil {
 		return nil, err
 	}
-
-	// utils.DebugLog("Posts:", posts)
 
 	return posts, nil
 }
@@ -155,8 +149,6 @@ func (s *PostService) CreatePost(username, title, content string, topic uint) er
 		return err
 	}
 
-	log.Printf("found user ID %d for username %s", user.ID, username)
-	
 	topicID := uint(topic);
 
 	// create post
@@ -192,9 +184,6 @@ func (s *PostService) EditPost(postID uint, username, title, content string, top
     if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
         return errors.New("user not found")
     }
-
-    log.Printf("found user ID %d for username %s", user.ID, username)
-
     var post models.Post
     if err := s.DB.First(&post, postID).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -216,9 +205,7 @@ func (s *PostService) EditPost(postID uint, username, title, content string, top
     if err := s.DB.Save(&post).Error; err != nil {
         return err
     }
-
-    log.Printf("successfully updated post %d", postID)
-    return nil
+   return nil
 }
 
 func (s *PostService) DeletePost(postID uint, username string) error {
@@ -226,9 +213,6 @@ func (s *PostService) DeletePost(postID uint, username string) error {
     if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
         return errors.New("user not found")
     }
-
-    log.Printf("found user ID %d for username %s", user.ID, username)
-
     var post PostWithTopic
     if err := s.DB.First(&post, postID).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -254,13 +238,10 @@ func (s *PostService) DeletePost(postID uint, username string) error {
 		Error; err != nil {
 			return err
 		}
-
-    log.Printf("successfully updated post %d", postID)
-    return nil
+   return nil
 }
 
 func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPostsResponse, error) {
-	log.Println("[SERVICE] User ID:", params.UserID)
 
 	// validate parameters
 	if params.Limit <= 0 {
@@ -288,7 +269,6 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		return nil, err
 	}
 
-	log.Println("[SERVICE] Fetched posts...")
 
 	posts = CalculatePostScores(posts)
 	sortPostsByScore(posts)
@@ -301,13 +281,12 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 
 	// only enrich if user is authenticated - HERE
 	if (params.UserID > 0) {
-		log.Println("Enriching likes data...")
 		if err := s.encrichWithInteractionData(posts, params.UserID); err != nil {
 			return nil, err
 		}
 	}
 
-	// Determine next cursor
+	// determine next cursor
 	var nextCursor *uint
 	if hasMore && len(posts) > 0 {
 		lastPostID := posts[len(posts)-1].ID
@@ -322,7 +301,6 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 }
 
 func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPostsResponse, error) {
-	log.Println("[SERVICE FOLLOWING] User ID:", params.UserID)
 
 	// validate parameters
 	if params.Limit <= 0 {
@@ -359,7 +337,6 @@ func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPost
 		return nil, err
 	}
 
-	log.Println("[SERVICE] Fetched posts...")
 
 	posts = CalculatePostScores(posts)
 	sortPostsByScore(posts)
@@ -372,7 +349,6 @@ func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPost
 
 	// only enrich if user is authenticated - HERE
 	if (params.UserID > 0) {
-		log.Println("Enriching likes data...")
 		if err := s.encrichWithInteractionData(posts, params.UserID); err != nil {
 			return nil, err
 		}

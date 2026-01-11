@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"gossip-with-go/internal/config"
@@ -72,7 +71,6 @@ func (s *AuthService) Signup(username, email, password string) (*models.User, er
 }
 
 func (s *AuthService) Login(username, password string) (*models.User, error) {
-	log.Println("Service: Authenticating user...")
 	var user models.User
 	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -196,7 +194,6 @@ func (s *AuthService) CheckResetToken(token string) error {
 
 func (s *AuthService) ResetPassword(token, newPassword string) error {
 	var user models.User
-	log.Println("Resetting...")
 	if err := s.DB.Where("reset_token = ?", token).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("invalid or expired reset token")
@@ -209,8 +206,6 @@ func (s *AuthService) ResetPassword(token, newPassword string) error {
 		return errors.New("reset token has expired")
 	}
 	
-	log.Printf("valid token")
-
 	// hash new password
 	hashedPassword, err := utils.HashPassword(newPassword)
 	if err != nil {

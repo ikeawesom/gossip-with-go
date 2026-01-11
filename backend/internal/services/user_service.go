@@ -3,8 +3,6 @@ package services
 import (
 	"errors"
 	"gossip-with-go/internal/models"
-	"gossip-with-go/internal/utils"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -55,8 +53,6 @@ func (s *UserService) GetUserByUsername(params GetUserByUsernameParams) (*UserWi
 		return nil, err
 	}
 
-	log.Printf("[SERVICE] Current user: %s", params.CurrentUserID)
-	utils.DebugLog("[SERVICE] user:", user)
 	return &user, nil
 }
 

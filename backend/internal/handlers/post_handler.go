@@ -3,7 +3,6 @@ package handlers
 import (
 	"gossip-with-go/internal/services"
 	"gossip-with-go/internal/utils"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -46,12 +45,9 @@ func (h *PostHandler) GetPostsByUsername(c *gin.Context) {
 		Username: c.Param("username"),
 	}
 
-	log.Printf("searching for posts by %s", req.Username)
-
 	posts, err := h.PostService.GetPostByUsername(req.Username, userID)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
-		log.Println(err)
 		return
 	}
 
@@ -65,8 +61,6 @@ func (h *PostHandler) GetPostsByTopic(c *gin.Context) {
 		userID = v.(uint)
 	}
 
-	log.Printf("User: %s",userID);
-
 	topicStr := c.Param("topic")
 
 	topicID, err := strconv.Atoi(topicStr)
@@ -75,12 +69,10 @@ func (h *PostHandler) GetPostsByTopic(c *gin.Context) {
 		return
 	}
 
-	log.Printf("searching for posts from %s", topicID)
-
 	posts, err := h.PostService.GetPostByTopic(topicID, userID)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
-		log.Println(err)
+		
 		return
 	}
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"posts": posts})
@@ -95,7 +87,6 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 
 	username := c.Param("username")
 	postIDParam := c.Param("postID")
-	log.Printf("searching for post ID %s by user %s", postIDParam, username)
 
 	postID, err := utils.ParseUintParam(postIDParam)
 	if err != nil {
@@ -106,7 +97,6 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 	post, err := h.PostService.GetUserPostByID(username, postID, userID)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
-		log.Println(err)
 		return
 	}
 
@@ -147,7 +137,6 @@ func (h *PostHandler) GetTrendingPosts(c *gin.Context) {
 		UserID: userID,
 	}
 
-	log.Println("[HANLDER] Attempting to fetch trending posts...")
 	result, err := h.PostService.GetTrendingPosts(params)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to fetch posts", err.Error())
@@ -189,7 +178,6 @@ func (h *PostHandler) GetFollowingPosts(c *gin.Context) {
 		UserID: userID,
 	}
 
-	log.Println("[HANLDER] Attempting to fetch following posts...")
 	result, err := h.PostService.GetFollowingPosts(params)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to fetch posts", err.Error())
@@ -200,27 +188,22 @@ func (h *PostHandler) GetFollowingPosts(c *gin.Context) {
 }
 
 func (h *PostHandler) CreatePost(c *gin.Context) {
-	username, exists := c.Get("username")
+	_, exists := c.Get("username")
     if !exists {
         utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
-		log.Print("User not authenticated")
         return
     }
-
-	log.Printf("creating post for user %s", username.(string))
 
 	var req CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.ValidationErrorResponse(c, err.Error())
 		return
 	}
-	log.Printf("creating post for user %s", req.Username)
 
 	utils.DebugLog("Req:", req)
 
 	err := h.PostService.CreatePost(req.Username, req.Title, req.Content, uint(req.Topic))
 	if err != nil {
-		log.Println(err)
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
@@ -245,15 +228,11 @@ func (h *PostHandler) EditPost(c *gin.Context) {
     username, exists := c.Get("username")
     if !exists {
         utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
-		log.Print("User not authenticated")
         return
     }
 
-    log.Printf("editing post %d for user %s", postID, username.(string))
-
     err = h.PostService.EditPost(uint(postID), username.(string), req.Title, req.Content, req.Topic)
     if err != nil {
-        log.Println(err)
         if err.Error() == "post not found" {
             utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)
             return
@@ -280,15 +259,11 @@ func (h *PostHandler) DeletePost(c *gin.Context) {
     username, exists := c.Get("username")
     if !exists {
         utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
-		log.Print("User not authenticated")
         return
     }
 
-    log.Printf("deleting post %d for user %s", postID, username.(string))
-
 	err = h.PostService.DeletePost(uint(postID), username.(string))
     if err != nil {
-        log.Println(err)
         if err.Error() == "post not found" {
             utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)
             return

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"gossip-with-go/internal/models"
 	"gossip-with-go/internal/utils"
-	"log"
 	"sort"
 	"time"
 
@@ -167,8 +166,6 @@ func (s *TopicsService) GetTrendingTopics() (*[]TopicWithScore, error) {
 		Find(&topics).Error; err != nil {
 		return nil, err
 	}
-
-	log.Println("[SERVICE] Fetched topics...")
 
 	// Calculate scores and sort
 	topics = CalculateTopicScores(topics)

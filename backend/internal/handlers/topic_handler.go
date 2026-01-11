@@ -3,7 +3,6 @@ package handlers
 import (
 	"gossip-with-go/internal/services"
 	"gossip-with-go/internal/utils"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -47,7 +46,6 @@ func (h* TopicHandler) CreateTopic(c *gin.Context) {
 	userID, exists := c.Get("userID");
 	if !exists {
 		utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
-		log.Print("User not authenticated")
         return
 	}
 
@@ -62,7 +60,6 @@ func (h* TopicHandler) CreateTopic(c *gin.Context) {
 		return
 	}
 
-	log.Printf("creating topic for user %s", userID)
 	topic, err := h.TopicService.CreateTopic(userID.(uint), request.TopicName, request.TopicDesc, request.TopicClass)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -78,7 +75,6 @@ func (h *TopicHandler) DeletePost(c *gin.Context) {
 	userID, exists := c.Get("userID");
 	if !exists {
 		utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
-		log.Print("User not authenticated")
         return
 	}
 
@@ -89,12 +85,10 @@ func (h *TopicHandler) DeletePost(c *gin.Context) {
         return
     }
 
-    log.Printf("deleting topic %d from user %s", topicID, userID.(string))
-
 	err = h.TopicService.DeleteTopics(userID.(uint), uint(topicID))
 
     if err != nil {
-        log.Println(err)
+        
         if err.Error() == "post not found" {
             utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)
             return

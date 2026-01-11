@@ -3,7 +3,6 @@ package handlers
 import (
 	"gossip-with-go/internal/services"
 	"gossip-with-go/internal/utils"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -22,16 +21,11 @@ func NewLikeHandler(likeService *services.LikeService) *LikeHandler {
 
 // POST /api/likes/toggle
 func (h *LikeHandler) ToggleLike(c *gin.Context) {
-	log.Printf("Getting user_id...")
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		log.Println(c)
-		log.Printf("User not found")
 		return
 	}
-
-	log.Printf("Got user: %s", userID)
 
 	var request struct {
 		TargetID     uint   `json:"target_id" binding:"required"` // post or comment ID
@@ -43,7 +37,6 @@ func (h *LikeHandler) ToggleLike(c *gin.Context) {
 		return
 	}
 
-	log.Println("Attempting to like...")
 	isLiked, err := h.likeService.ToggleLike(userID.(uint), request.Type, request.TargetID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
