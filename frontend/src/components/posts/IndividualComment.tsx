@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { Comment, CommentTriggers } from "../../types/comments";
 import LongContent from "./LongContent";
 import { formatDate } from "../../lib/helpers";
@@ -21,6 +21,9 @@ export default function IndividualComment({
   triggerBool,
 }: IndivComment) {
   const { user } = useSelector((state: RootState) => state.auth);
+  const location = useLocation();
+  const postOwner = location.pathname.split("/")[1];
+
   const {
     replies,
     loadMore,
@@ -38,9 +41,11 @@ export default function IndividualComment({
     id,
     user_id,
     user_has_liked,
+    is_pinned,
   } = comment;
 
-  const isValidUser = user?.id === user_id;
+  const isPostOwner = user?.username === postOwner;
+  const isValidUser = user?.id === user_id || isPostOwner;
 
   const newDate = formatDate(
     new Date(created_at).getTime(),
@@ -61,13 +66,25 @@ export default function IndividualComment({
             <p>•</p>
             <p className="fine-print">{newDate}</p>
           </div>
-          {isValidUser && (
-            <CommentSettingsSection
-              trigger={trigger}
-              triggerBool={triggerBool}
-              commentID={id}
-            />
-          )}
+          <div className="flex items-center justify-end">
+            {is_pinned && (
+              <img
+                src="/icons/comments/icon_pin.svg"
+                width={15}
+                height={15}
+                alt="Pinned"
+              />
+            )}
+            {isValidUser && (
+              <CommentSettingsSection
+                isPinned={is_pinned}
+                isPostOwner={isPostOwner}
+                trigger={trigger}
+                triggerBool={triggerBool}
+                commentID={id}
+              />
+            )}
+          </div>
         </div>
         <div className="flex w-full items-center justify-between">
           <LongContent largeClamp left content={content} />
