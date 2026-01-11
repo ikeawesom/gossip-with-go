@@ -266,9 +266,9 @@ func setTokenCookies(c *gin.Context, accessToken, refreshToken string) {
 
 	// determine SameSite mode based on environment
 	sameSiteMode := http.SameSiteLaxMode // default for development
-	if cfg.CookieDomain != "localhost" {
-		sameSiteMode = http.SameSiteNoneMode
-	}
+	// if cfg.CookieDomain != "localhost" {
+	// 	sameSiteMode = http.SameSiteNoneMode
+	// }
 
 	// access token cookie
 	c.SetSameSite(sameSiteMode) 
@@ -300,9 +300,9 @@ func setAccessTokenCookie(c *gin.Context, accessToken string) {
 
 	// determine SameSite mode based on environment
 	sameSiteMode := http.SameSiteLaxMode // default for development
-	if cfg.CookieDomain != "localhost" {
-		sameSiteMode = http.SameSiteNoneMode
-	}
+	// if cfg.CookieDomain != "localhost" {
+	// 	sameSiteMode = http.SameSiteNoneMode
+	// }
 
 	c.SetSameSite(sameSiteMode) 
 	c.SetCookie(
@@ -321,9 +321,9 @@ func clearTokenCookies(c *gin.Context) {
 
 	// determine SameSite mode based on environment
 	sameSiteMode := http.SameSiteLaxMode // default for development
-	if cfg.CookieDomain != "localhost" {
-		sameSiteMode = http.SameSiteNoneMode
-	}
+	// if cfg.CookieDomain != "localhost" {
+	// 	sameSiteMode = http.SameSiteNoneMode
+	// }
 
 	c.SetSameSite(sameSiteMode) 
 	c.SetCookie("access_token", "", -1, "/", cfg.CookieDomain, cfg.CookieSecure, true)
