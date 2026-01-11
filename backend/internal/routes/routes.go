@@ -97,13 +97,13 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		{
 			comments.GET("/post/:postID", middleware.AuthOptional(), commentHandler.GetRootComments)
 			
-			comments.GET("/:id/replies",middleware.AuthOptional(), commentHandler.GetReplies)
+			comments.GET("/:id/replies", middleware.AuthOptional(), commentHandler.GetReplies)
 			
 			// authenticted endpoints for comments
-			comments.POST("/root",middleware.AuthRequired(), commentHandler.CreateRootComment)      
-			comments.POST("/reply",middleware.AuthRequired(), commentHandler.CreateReply)           
-			comments.POST("/:id",middleware.AuthRequired(), commentHandler.UpdateComment)           
-			comments.DELETE("/:id",middleware.AuthRequired(), commentHandler.DeleteComment)         
+			comments.POST("/root", middleware.AuthRequired(), commentHandler.CreateRootComment)      
+			comments.POST("/reply", middleware.AuthRequired(), commentHandler.CreateReply)           
+			comments.GET("/toggle-pin/:id", middleware.AuthRequired(), commentHandler.PinComment)           
+			comments.DELETE("/:id", middleware.AuthRequired(), commentHandler.DeleteComment)         
 		}
 
 		api.GET("/query", queryHandler.GetResultsByType)
