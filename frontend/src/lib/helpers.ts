@@ -72,3 +72,15 @@ export function trimString(s: string, n: number) {
   }
   return s;
 }
+
+// PWA FUNCTIONS
+export function isStandalone() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as any).standalone === true
+  )
+}
+
+export function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+}
