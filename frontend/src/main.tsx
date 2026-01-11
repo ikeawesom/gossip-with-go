@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound.tsx";
 import TopicPage from "./pages/TopicPage.tsx";
 import TrendingPostsPage from "./pages/TrendingPostsPage.tsx";
 import FollowingPage from "./pages/FollowingPage.tsx";
+import { registerSW } from "virtual:pwa-register";
 // import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 
 createRoot(document.getElementById("root")!).render(
@@ -48,3 +49,16 @@ createRoot(document.getElementById("root")!).render(
     </Provider>
   </StrictMode>
 );
+
+registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    window.location.reload();
+  },
+});
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  (window as any).deferredPrompt = e;
+  window.dispatchEvent(new Event("pwa-installable"));
+});
