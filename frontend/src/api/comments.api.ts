@@ -35,15 +35,15 @@ export const commentsApi = {
         return response as any as ResponseType;
     },
 
-    // update an existing comment
-    updateComment: async (comment_id: number, content: string): Promise<ResponseType> => {
-        const response = await apiClient.post(`/comments/${comment_id}`, { content });
-        return response.data;
-    },
-
     // delete an existing comment
     deleteComment: async (comment_id: number): Promise<ResponseType> => {
         const response = await apiClient.delete(`/comments/${comment_id}`);
+        return response.data;
+    },
+
+    // pin an existing comment
+    togglePinComment: async (comment_id: number): Promise<ResponseType> => {
+        const response = await apiClient.get(`/comments/toggle-pin/${comment_id}`);
         return response.data;
     },
 }
