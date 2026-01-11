@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://gossip-with-go.dev/api/:path*"
+      "destination": "https://gossip-with-go.fly.dev/api/:path*"
     },
     { "source": "/(.*)", "destination": "/" }
   ]
