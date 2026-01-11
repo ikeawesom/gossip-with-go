@@ -48,7 +48,7 @@ export default function SearchBar({ hideLogo }: { hideLogo?: boolean }) {
           type="text"
           placeholder="Search"
           onChange={(e) => setQuery(e.target.value)}
-          value=""
+          value={query}
         />
       </div>
       {showSearch && (
