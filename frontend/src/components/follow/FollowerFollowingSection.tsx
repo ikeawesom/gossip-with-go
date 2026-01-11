@@ -23,11 +23,16 @@ export default function FollowerFollowingSection({
   const [list, setList] = useState<FollowResponse[]>([]);
   const navigate = useNavigate();
 
+  const handleClick = (username: string) => {
+    setShowFollowings(false);
+    setShowFollows(false);
+    navigate(`/${username}`);
+  };
+
   const fetchFollowers = async () => {
     setLoading(true);
     try {
       const res = await userApi.getFollowers(username);
-      console.log(res);
       const followers = res.data.user;
       setList(followers);
     } catch (err) {
@@ -43,7 +48,6 @@ export default function FollowerFollowingSection({
     setLoading(true);
     try {
       const res = await userApi.getFollowings(username);
-      console.log(res.data.user);
       const followings = res.data.user;
       setList(followings);
     } catch (err) {
@@ -97,7 +101,7 @@ export default function FollowerFollowingSection({
               <ul className="w-full">
                 {list.map((user: FollowResponse, index: number) => (
                   <li
-                    onClick={() => navigate(`/${user.username}`)}
+                    onClick={() => handleClick(user.username)}
                     className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                     key={index}
                   >
@@ -128,7 +132,7 @@ export default function FollowerFollowingSection({
               <ul className="w-full">
                 {list.map((user: FollowResponse, index: number) => (
                   <li
-                    onClick={() => navigate(`/${user.username}`)}
+                    onClick={() => handleClick(user.username)}
                     className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                     key={index}
                   >
