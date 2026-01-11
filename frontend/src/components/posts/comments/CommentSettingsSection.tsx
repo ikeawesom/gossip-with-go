@@ -3,11 +3,14 @@ import type { CommentTriggers } from "../../../types/comments";
 import DeleteCommentButton from "./DeleteCommentButton";
 import Modal from "../../utils/Modal";
 import ModalTitle from "../../utils/ModalTitle";
+import PinCommentButton from "./PinCommentButton";
 
 export default function CommentSettingsSection({
   trigger,
   triggerBool,
   commentID,
+  isPostOwner,
+  isPinned,
 }: CommentTriggers) {
   const [showSettings, setShowSettings] = useState(false);
   return (
@@ -23,12 +26,22 @@ export default function CommentSettingsSection({
           close={() => setShowSettings(false)}
           className="max-w-[300px] p-4"
         >
-          <ModalTitle className="mb-3">Comment Settings</ModalTitle>
-          <DeleteCommentButton
-            trigger={trigger}
-            triggerBool={triggerBool}
-            commentID={commentID}
-          />
+          <ModalTitle className="mb-3">Comment Settings</ModalTitle>{" "}
+          <div className="w-full flex flex-col items-center justify-center gap-2">
+            {isPostOwner && (
+              <PinCommentButton
+                isPinned={isPinned}
+                trigger={trigger}
+                triggerBool={triggerBool}
+                commentID={commentID}
+              />
+            )}
+            <DeleteCommentButton
+              trigger={trigger}
+              triggerBool={triggerBool}
+              commentID={commentID}
+            />
+          </div>
         </Modal>
       )}
     </>
