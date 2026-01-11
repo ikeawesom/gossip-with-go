@@ -14,6 +14,7 @@ export interface Comment {
     created_at: string;
     updated_at: string;
 
+    is_pinned?: boolean;
 
     reply_count?: number; // for root comments
 }
@@ -50,4 +51,6 @@ export interface RepliesResponse {
 export interface CommentTriggers extends StateTriggerType {
     postID?: number;
     commentID?: number;
+    isPostOwner?: boolean;
+    isPinned?: boolean
 }
