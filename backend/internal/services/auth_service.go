@@ -72,9 +72,9 @@ func (s *AuthService) Signup(username, email, password string) (*models.User, er
 
 func (s *AuthService) Login(username, password string) (*models.User, error) {
 	var user models.User
-	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
+	if err := s.DB.Where("username = ? AND email_verified = ?", username, true).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("invalid username or password")
+			return nil, errors.New("Invalid username or password.")
 		}
 		return nil, err
 	}
