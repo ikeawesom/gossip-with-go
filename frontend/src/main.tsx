@@ -56,3 +56,9 @@ registerSW({
     window.location.reload();
   },
 });
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  (window as any).deferredPrompt = e;
+  window.dispatchEvent(new Event("pwa-installable"));
+});
