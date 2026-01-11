@@ -59,10 +59,10 @@ export default function RegisterForm() {
       {success ? (
         <>
           <div className="w-full">
-            <h1 className="text-center mb-2">
+            <h3 className="text-xl text-center mb-2 smart-wrap custom">
               Email verification link sent to{" "}
-              <span className="text-primary">{email}</span>
-            </h1>
+              <span className="text-primary font-bold">{email}</span>
+            </h3>
             <p className="text-center">
               Please verify your email before creating an account.
             </p>
