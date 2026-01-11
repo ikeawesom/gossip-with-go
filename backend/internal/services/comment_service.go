@@ -107,6 +107,7 @@ func (s *CommentService) GetRootCommentsByPostID(postID uint, limit int, offset 
 		Select("comments.*, users.username").
 		Joins("JOIN users ON users.id = comments.user_id").
 		Where("post_id = ? AND parent_comment_id IS NULL", postID).
+		Order("is_pinned DESC").
 		Order("created_at DESC").
 		Limit(limit).
 		Offset(offset).
@@ -192,10 +193,7 @@ func (s *CommentService) GetCommentByID(commentID uint) (*models.Comment, error)
 	return &comment, nil
 }
 
-func (s *CommentService) UpdateComment(commentID uint, userID uint, newContent string) error {
-	if newContent == "" {
-		return errors.New("comment content cannot be empty")
-	}
+func (s *CommentService) TogglePin(commentID uint, userID uint) error {
 
 	// check if comment exists and belongs to the user
 	var comment models.Comment
@@ -206,15 +204,10 @@ func (s *CommentService) UpdateComment(commentID uint, userID uint, newContent s
 		return fmt.Errorf("failed to find comment: %w", err)
 	}
 
-	// check ownership
-	if comment.UserID != userID {
-		return errors.New("you can only edit your own comments")
-	}
-
-	// update the comment
-	result := s.DB.Model(&comment).Update("content", newContent)
+	// pin the comment
+	result := s.DB.Model(&comment).Update("is_pinned", !comment.IsPinned)
 	if result.Error != nil {
-		return fmt.Errorf("failed to update comment: %w", result.Error)
+		return fmt.Errorf("failed to toggle pin: %w", result.Error)
 	}
 
 	return nil

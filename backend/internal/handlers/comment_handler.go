@@ -203,8 +203,7 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 	})
 }
 
-// POST /api/comments/:id
-func (h *CommentHandler) UpdateComment(c *gin.Context) {
+func (h *CommentHandler) PinComment(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -218,23 +217,14 @@ func (h *CommentHandler) UpdateComment(c *gin.Context) {
 		return
 	}
 
-	var request struct {
-		Content string `json:"content" binding:"required"`
-	}
-	
-	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Content is required"})
-		return
-	}
-
-	err = h.commentService.UpdateComment(uint(commentID), userID.(uint), request.Content)
+	err = h.commentService.TogglePin(uint(commentID), userID.(uint))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Comment updated successfully",
+		"message": "Toggled pin successfully",
 	})
 }
 
