@@ -2,9 +2,9 @@ import { useState } from "react";
 import type { AxiosError } from "axios";
 import type { ApiError } from "../../../types/auth";
 import { commentsApi } from "../../../api/comments.api";
-import SpinnerSecondary from "../../spinner/SpinnerSecondary";
 import type { CommentTriggers } from "../../../types/comments";
 import SecondaryButton from "../../utils/SecondaryButton";
+import SpinnerPrimary from "../../spinner/SpinnerPrimary";
 
 export default function PinCommentButton({
   commentID,
@@ -35,7 +35,7 @@ export default function PinCommentButton({
       className="text-xs rounded-md flex items-center justify-center gap-2 border-none px-3 w-full"
     >
       {loading ? (
-        <SpinnerSecondary size={15} />
+        <SpinnerPrimary size={15} />
       ) : (
         <>
           {isPinned ? "Unpin Comment" : "Pin Comment"}
