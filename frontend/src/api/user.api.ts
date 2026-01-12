@@ -20,5 +20,12 @@ export const userApi = {
         const response = await apiClient.get(`/users/${username}/followings`);
         console.log("API RESPONSE:", response.data);
         return response.data
+    },
+
+    // edit profile
+    editProfile: async (id: number, username: string, bio: string): Promise<ResponseType> => {
+        const response = await apiClient.post(`/users/edit-profile`, { id, username, bio })
+        console.log("API RESPONSE:", response.data);
+        return response.data
     }
 }
