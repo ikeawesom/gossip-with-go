@@ -10,9 +10,10 @@ import { userApi } from "../api/user.api";
 import { postApi } from "../api/posts.api";
 import type { PostType } from "../types/post";
 import PostCard from "../components/posts/PostCard";
-import FollowButton from "../components/follow/FollowButton";
-import FollowerFollowingSection from "../components/follow/FollowerFollowingSection";
+import FollowButton from "../components/profile/follow/FollowButton";
+import FollowerFollowingSection from "../components/profile/follow/FollowerFollowingSection";
 import CreatePostTopicSection from "./CreatePostTopicSection";
+import BuzzSection from "../components/profile/BuzzSection";
 
 export default function ProfilePage() {
   const { user_id } = useParams<{ user_id: string }>();
@@ -72,7 +73,7 @@ export default function ProfilePage() {
       </NavSection>
     );
 
-  const { created_at, username } = visitingUser as User;
+  const { created_at, username, buzz } = visitingUser as User;
   const createdDate = formatDate(new Date(created_at).getTime());
 
   const isCurrentUser = user?.username === username;
@@ -84,10 +85,12 @@ export default function ProfilePage() {
       ) : (
         <div className="flex items-center justify-between gap-4 border-b border-gray-dark/20 pb-5 w-full">
           <div className="w-full">
-            <div className="flex md:flex-row flex-col items-start md:items-center justify-start gap-2 md:gap-4 w-full">
-              <h1 className="mb-1">{username}</h1>
+            <div className="flex md:flex-row flex-col items-start md:items-center md:justify-between justify-start gap-2 md:gap-4 w-full">
+              <div>
+                <h1>{username}</h1>
+              </div>
               {!isCurrentUser && visitingUser && (
-                <div className="md:mb-0 mb-4 w-full">
+                <div className="md:mb-0 mb-4 md:w-fit w-full">
                   <FollowButton
                     followType="user"
                     trigger={setUpdate}
@@ -101,6 +104,7 @@ export default function ProfilePage() {
             {visitingUser && (
               <FollowerFollowingSection visitingUser={visitingUser} />
             )}
+            <BuzzSection buzz={buzz} />
             <p className="fine-print">Joined on {createdDate.time}</p>
           </div>
         </div>
