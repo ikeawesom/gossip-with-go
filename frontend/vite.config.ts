@@ -15,7 +15,7 @@ export default defineConfig({
       enabled: true
     },
     includeAssets: [
-      'icon.png'
+      'favicon.svg'
     ],
     manifest: {
       name: 'Gossip With Go',
