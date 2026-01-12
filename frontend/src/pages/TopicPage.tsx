@@ -8,7 +8,7 @@ import SpinnerPrimary from "../components/spinner/SpinnerPrimary";
 import PostCard from "../components/posts/PostCard";
 import type { Topic } from "../types/topics";
 import { topicApi } from "../api/topics.api";
-import FollowButton from "../components/follow/FollowButton";
+import FollowButton from "../components/profile/follow/FollowButton";
 import { useSelector } from "react-redux";
 import type { RootState } from "../state/store";
 import CreatePostForm from "../components/posts/CreatePostForm";
