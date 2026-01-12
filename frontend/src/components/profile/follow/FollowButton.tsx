@@ -1,13 +1,13 @@
-import PrimaryButton from "../utils/PrimaryButton";
-import type { User } from "../../types/auth";
-import { followApi } from "../../api/follow.api";
+import PrimaryButton from "../../utils/PrimaryButton";
+import type { User } from "../../../types/auth";
+import { followApi } from "../../../api/follow.api";
 import { toast } from "sonner";
 import { useState } from "react";
-import SpinnerSecondary from "../spinner/SpinnerSecondary";
+import SpinnerSecondary from "../../spinner/SpinnerSecondary";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { StateTriggerType } from "../../types/res";
-import type { Topic } from "../../types/topics";
-import SecondaryButton from "../utils/SecondaryButton";
+import type { StateTriggerType } from "../../../types/res";
+import type { Topic } from "../../../types/topics";
+import SecondaryButton from "../../utils/SecondaryButton";
 
 interface FollowTrigger extends StateTriggerType {
   visitingEntity: User | Topic;
