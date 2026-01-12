@@ -26,6 +26,12 @@ type UserWithFollowers struct {
 	Followings          []string `gorm:"-" json:"followings"`
 }
 
+type UserWithBuzz struct {
+	UserWithFollowers
+
+	Buzz int `gorm:"-" json:"buzz"`
+}
+
 type GetUserRequest struct {
 	Username string `json:"username" binding:"required"`
 }
@@ -40,8 +46,8 @@ type FollowersListType struct {
 	Username string `json:"username"`
 }
 
-func (s *UserService) GetUserByUsername(params GetUserByUsernameParams) (*UserWithFollowers, error) {
-	var user UserWithFollowers
+func (s *UserService) GetUserByUsername(params GetUserByUsernameParams) (*UserWithBuzz, error) {
+	var user UserWithBuzz
 	if err := s.DB.Where("username = ?", params.Username).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("No user found with the given username")
@@ -53,10 +59,12 @@ func (s *UserService) GetUserByUsername(params GetUserByUsernameParams) (*UserWi
 		return nil, err
 	}
 
+	user.Buzz = s.CalculateUserBuzz(user.ID)
+
 	return &user, nil
 }
 
-func (s *UserService) enrichFollowersFollowings(user *UserWithFollowers, currentUser uint) error {
+func (s *UserService) enrichFollowersFollowings(user *UserWithBuzz, currentUser uint) error {
 	userID := user.ID
 
 	// current user relationship
