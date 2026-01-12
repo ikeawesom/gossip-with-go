@@ -10,6 +10,8 @@ export interface User {
     user_has_followed: boolean;
     user_is_being_followed: boolean;
 
+    buzz: number;
+
     created_at: string;
 }
 
