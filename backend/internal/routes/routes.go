@@ -56,6 +56,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			users.GET("/:username", middleware.AuthOptional(), userHandler.GetUserByUsername)
 			users.GET("/:username/followers", userHandler.GetFollowersByUsername)
 			users.GET("/:username/followings", userHandler.GetFollowingsByUsername)
+			users.POST("/edit-profile", middleware.AuthRequired(), userHandler.EditProfile)
 		}
 
 		// post routes
