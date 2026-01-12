@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import type { User } from "../../types/auth";
-import Modal from "../utils/Modal";
+import type { User } from "../../../types/auth";
+import Modal from "../../utils/Modal";
 import { toast } from "sonner";
-import SpinnerPrimary from "../spinner/SpinnerPrimary";
-import { userApi } from "../../api/user.api";
+import SpinnerPrimary from "../../spinner/SpinnerPrimary";
+import { userApi } from "../../../api/user.api";
 import { useNavigate } from "react-router-dom";
-import ModalTitle from "../utils/ModalTitle";
+import ModalTitle from "../../utils/ModalTitle";
 
 interface FollowResponse {
   id: number;
