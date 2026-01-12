@@ -5,6 +5,7 @@ import type { RootState } from "../../state/store";
 import AccountMenu from "../auth/AccountMenu";
 import { twMerge } from "tailwind-merge";
 import AuthButtons from "../auth/AuthButtons";
+import Logo from "../utils/Logo";
 
 export interface PageType {
   id: string;

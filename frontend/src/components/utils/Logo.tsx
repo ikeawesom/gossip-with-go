@@ -13,13 +13,14 @@ export default function Logo({
   return link ? (
     <Link to="/">
       {small ? (
-        <h2 className={`font-bold ${color ? "text-primary" : ""}`}>
-          {APP_NAME}
-        </h2>
+        <img src="/favicon.svg" height={40} width={40} alt="Gossip with Go" />
       ) : (
-        <h1 className={`font-bold ${color ? "text-primary" : ""}`}>
-          {APP_NAME}
-        </h1>
+        <div className="flex flex-col items-center justify-center gap-2">
+          <img src="/favicon.svg" height={60} width={60} alt="Gossip with Go" />
+          <h1 className={`font-bold ${color ? "text-primary" : ""}`}>
+            {APP_NAME}
+          </h1>
+        </div>
       )}
     </Link>
   ) : (

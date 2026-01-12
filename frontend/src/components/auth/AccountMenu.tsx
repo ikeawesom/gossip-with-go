@@ -40,7 +40,7 @@ export default function AccountMenu({
           className="flex flex-col items-start justify-center gap-2 text-sm max-w-[300px] p-4 text-gray-dark"
         >
           <div className="w-full flex-col flex items-center justify-center gap-5 md:hidden mb-1">
-            <Logo color />
+            <Logo link color />
 
             {pages.map((page: PageType, index: number) => (
               <Link
