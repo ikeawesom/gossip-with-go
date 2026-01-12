@@ -195,7 +195,7 @@ func (s *CommentService) GetCommentByID(commentID uint) (*models.Comment, error)
 
 func (s *CommentService) TogglePin(commentID uint, userID uint) error {
 
-	// check if comment exists and belongs to the user
+	// check if comment exists
 	var comment models.Comment
 	if err := s.DB.First(&comment, commentID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -214,18 +214,13 @@ func (s *CommentService) TogglePin(commentID uint, userID uint) error {
 }
 
 func (s *CommentService) DeleteComment(commentID uint, userID uint) error {
-	// check if comment exists and belongs to the user
+	// check if comment exists
 	var comment models.Comment
 	if err := s.DB.First(&comment, commentID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("comment not found")
 		}
 		return fmt.Errorf("failed to find comment: %w", err)
-	}
-
-	// check ownership
-	if comment.UserID != userID {
-		return errors.New("you can only delete your own comments")
 	}
 
 	if err := s.DB.Delete(&comment).Error; err != nil {
