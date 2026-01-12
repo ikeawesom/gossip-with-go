@@ -73,7 +73,7 @@ export default function FollowerFollowingSection({
 
   return (
     <>
-      <div className="flex items-center justify-start gap-2 pb-2">
+      <div className="flex items-center justify-start gap-2 pb-2 border-t border-gray-dark/20 pt-3 mt-3">
         <p
           onClick={() => setShowFollows(true)}
           className="custom text-sm cursor-pointer hover:opacity-70 duration-150"
