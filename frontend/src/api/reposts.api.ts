@@ -33,10 +33,8 @@ export const repostsApi = {
     // get all user reposts
     getUserReposts: async (
         user_id: number,
-        limit: number = REQUEST_CURSOR_LIMIT,
-        offset: number = REQUEST_OFFSET
     ): Promise<ResponseType> => {
-        const response = await apiClient.get(`/reposts/user/${user_id}`, { params: { user_id, limit, offset } });
+        const response = await apiClient.get(`/reposts/user/${user_id}`);
         return response.data;
     },
 
