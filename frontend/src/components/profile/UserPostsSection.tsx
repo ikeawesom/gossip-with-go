@@ -52,7 +52,7 @@ export default function UserPostsSection({
   return (
     <div className="flex items-center justify-center w-full flex-col gap-4 py-4">
       {postState === "loading" ? (
-        <SpinnerPrimary />
+        <SpinnerPrimary size={22} />
       ) : postState === "invalid" ? (
         <p>
           {username} has no {id ? "reposts" : "posts"} yet.

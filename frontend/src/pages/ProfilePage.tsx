@@ -122,7 +122,7 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
-      <div className="w-full flex items-center justify-around gap-4">
+      <div className="w-full flex items-center justify-around gap-4 mt-4">
         {pageToggles.map((page: PageToggleType, index: number) => {
           const { id, title, src, size } = page;
           return (
@@ -130,8 +130,9 @@ export default function ProfilePage() {
               onClick={() => setView(id)}
               key={index}
               className={twMerge(
-                "flex-1 flex items-center justify-center gap-1 py-2 mt-2 hover:bg-gray-dark/10 cursor-pointer rounded-md duration-150",
-                view === id && "from-white/50 to-white bg-linear-to-br"
+                "flex-1 flex items-center justify-center gap-1 py-2 hover:bg-gray-dark/10 cursor-pointer rounded-md duration-150",
+                view === id &&
+                  "from-white/50 to-white shadow-sm bg-linear-to-br"
               )}
             >
               <img
