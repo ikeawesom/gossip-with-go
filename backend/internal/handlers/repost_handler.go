@@ -19,7 +19,6 @@ func NewRepostHandler(repostService *services.RepostService) *RepostHandler {
 	}
 }
 
-// POST /api/reposts/toggle
 func (h *RepostHandler) ToggleRepost(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -54,7 +53,6 @@ func (h *RepostHandler) ToggleRepost(c *gin.Context) {
 	})
 }
 
-// GET /api/reposts/status
 func (h *RepostHandler) GetRepostStatus(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -85,7 +83,6 @@ func (h *RepostHandler) GetRepostStatus(c *gin.Context) {
 	})
 }
 
-// GET /api/reposts/reposters
 func (h *RepostHandler) GetReposters(c *gin.Context) {
 	postIDStr := c.Query("post_id")
 	limitStr := c.DefaultQuery("limit", utils.GetLimitStr())
@@ -104,12 +101,12 @@ func (h *RepostHandler) GetReposters(c *gin.Context) {
 
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil || limit < 1 || limit > 100 {
-		limit = 10
+		limit, err = strconv.Atoi(utils.GetLimitStr())
 	}
 
 	offset, err := strconv.Atoi(offsetStr)
 	if err != nil || offset < 0 {
-		offset = 0
+		offset, err = strconv.Atoi(utils.GetOffsetStr())
 	}
 
 	usernames, err := h.repostService.GetReposters(uint(postID), limit, offset)
@@ -133,7 +130,6 @@ func (h *RepostHandler) GetReposters(c *gin.Context) {
 	})
 }
 
-// GET /api/reposts/user/:user_id
 func (h *RepostHandler) GetUserReposts(c *gin.Context) {
 	userIDStr := c.Query("user_id")
 	if userIDStr == "" {
@@ -152,12 +148,12 @@ func (h *RepostHandler) GetUserReposts(c *gin.Context) {
 
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil || limit < 1 || limit > 100 {
-		limit = 10
+		limit, err = strconv.Atoi(utils.GetLimitStr())
 	}
 
 	offset, err := strconv.Atoi(offsetStr)
 	if err != nil || offset < 0 {
-		offset = 0
+		offset, err = strconv.Atoi(utils.GetOffsetStr())
 	}	
 
 	posts, err := h.repostService.GetUserReposts(uint(userID), limit, offset)
@@ -173,7 +169,6 @@ func (h *RepostHandler) GetUserReposts(c *gin.Context) {
 	})
 }
 
-// POST /api/reposts/visibility
 func (h *RepostHandler) UpdateRepostVisibility(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
