@@ -200,15 +200,13 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 		return
 	}
 
-	utils.DebugLog("Req:", req)
-
-	err := h.PostService.CreatePost(req.Username, req.Title, req.Content, uint(req.Topic))
+	postID, err := h.PostService.CreatePost(req.Username, req.Title, req.Content, uint(req.Topic))
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	utils.SuccessResponse(c, http.StatusCreated, "Post created successfully", nil)
+	utils.SuccessResponse(c, http.StatusCreated, "Post created successfully", gin.H{ "data" : postID })
 }
 
 func (h *PostHandler) EditPost(c *gin.Context) {
