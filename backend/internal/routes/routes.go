@@ -80,6 +80,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			// authenticated endpoints for likes
 			likes.GET("/status", middleware.AuthRequired(), likeHandler.GetLikeStatus)
 			likes.POST("/toggle", middleware.AuthRequired(), likeHandler.ToggleLike)
+			likes.POST("/by_type/:userID/:likeable_type", middleware.AuthRequired(), likeHandler.GetLikesByUserID)
 		}
 		
 		reposts := api.Group("/reposts")
