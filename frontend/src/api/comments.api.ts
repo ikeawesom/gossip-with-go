@@ -46,4 +46,10 @@ export const commentsApi = {
         const response = await apiClient.get(`/comments/toggle-pin/${comment_id}`);
         return response.data;
     },
+
+    // get all comments by a user
+    getCommentsByUser: async (id: number): Promise<ResponseType> => {
+        const response = await apiClient.get(`/comments/user/${id}`);
+        return response.data;
+    }
 }
