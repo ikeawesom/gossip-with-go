@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
 import ModalTitle from "../utils/ModalTitle";
+import { defaultError } from "../../lib/constants";
 
 export default function DeletePostForm({
   postID,
@@ -42,9 +43,7 @@ export default function DeletePostForm({
         });
         toast.error("Your session has ended. Please sign in again.");
       } else {
-        toast.error(
-          "An unexpected error has occurred. Please try again later."
-        );
+        toast.error(defaultError.message);
       }
     }
     setLoading(false);

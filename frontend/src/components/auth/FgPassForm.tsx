@@ -9,6 +9,9 @@ import { clearError, sendPasswordResetEmail } from "../../state/auth/authSlice";
 import type { ResponseType } from "../../types/res";
 import { toast } from "sonner";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
+import type { AxiosError } from "axios";
+import { defaultError } from "../../lib/constants";
+import type { ApiError } from "../../types/auth";
 
 export default function FgPassForm() {
   const [username, setUsername] = useState("");
@@ -18,13 +21,22 @@ export default function FgPassForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(clearError());
-    const { payload } = await dispatch(sendPasswordResetEmail({ username }));
-    const res = payload as ResponseType;
-    if (!res.error) {
-      setSuccess(true);
-    } else {
-      toast.error(res.error);
+    try {
+      dispatch(clearError());
+      const { payload } = await dispatch(sendPasswordResetEmail({ username }));
+      const res = payload as ResponseType;
+      if (!res.error) {
+        setSuccess(true);
+      } else {
+        throw new Error(res.error);
+      }
+    } catch (err) {
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[AUTH ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
     }
   };
 

@@ -7,6 +7,7 @@ import type { AxiosError } from "axios";
 import type { ApiError } from "../../types/auth";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { CommentTriggers } from "../../types/comments";
+import { defaultError } from "../../lib/constants";
 
 export default function CreateRootCommentForm({
   postID,
@@ -63,8 +64,11 @@ export default function CreateRootCommentForm({
           state: { prev_page: location.pathname },
         });
       } else {
-        console.log(axiosError.response);
-        toast.error("An unexpected error has occurred. Please try again later");
+        // get full axios error
+        console.log("[COMMENT ERROR]:", axiosError.response?.data);
+
+        // toast error or default error
+        toast.error(axiosError.response?.data?.message || defaultError.message);
       }
     } finally {
       setLoading(false);

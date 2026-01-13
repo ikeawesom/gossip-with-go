@@ -8,6 +8,7 @@ import AuthForm from "./AuthForm";
 import { clearError, loginUser } from "../../state/auth/authSlice";
 import useAuth from "../../hooks/useAuth";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
+import { defaultError } from "../../lib/constants";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
@@ -27,7 +28,14 @@ export default function LoginForm() {
     if (loginUser.fulfilled.match(result)) {
       navigate(prev_page, { replace: true });
     } else {
-      toast.error(error);
+      if (!error || error.includes("invalid")) {
+        toast.error("Invalid username or password. Please try again.");
+      } else if (error.includes("verified")) {
+        toast.info(error);
+      } else {
+        toast.error(defaultError.message);
+        console.log("[LOGIN ERROR]", error);
+      }
     }
   };
 

@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { repostsApi } from "../../api/reposts.api";
 import { twMerge } from "tailwind-merge";
+import type { AxiosError } from "axios";
+import type { ApiError } from "../../types/auth";
 
 interface RepostButtonProps {
   postID: number;
@@ -47,8 +49,15 @@ export default function RepostButton({
       const serverResposted = res.data.reposted;
       setReposted(serverResposted);
     } catch (err) {
-      console.log("failed to toggle repost:", err);
-      toast.error("Failed to repost. Please try again later.");
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[REPOST ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(
+        axiosError.response?.data?.message ||
+          "Failed to repost. Please try again later."
+      );
 
       setReposted(!newRepost);
       setRepostCount(repostCount);

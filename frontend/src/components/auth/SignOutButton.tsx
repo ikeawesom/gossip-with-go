@@ -5,6 +5,9 @@ import { checkAuth } from "../../state/auth/authSlice";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import { useEffect, useState } from "react";
+import type { AxiosError } from "axios";
+import { defaultError } from "../../lib/constants";
+import type { ApiError } from "../../types/auth";
 
 export default function SignOutButton() {
   const [loading, setLoading] = useState(false);
@@ -18,8 +21,12 @@ export default function SignOutButton() {
       toast.success("Signed out successfully");
       window.location.reload();
     } catch (err: any) {
-      console.log(err);
-      toast.error("Could not sign out. Please try again later.");
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[SIGN OUT ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
       setLoading(false);
     }
   };

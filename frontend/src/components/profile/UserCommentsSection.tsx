@@ -4,6 +4,9 @@ import { twMerge } from "tailwind-merge";
 import { commentsApi } from "../../api/comments.api";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
 import LikedCommentCard, { type CommentLikedType } from "./LikedCommentCard";
+import type { AxiosError } from "axios";
+import { defaultError } from "../../lib/constants";
+import type { ApiError } from "../../types/auth";
 
 export default function UserCommentsSection({ id }: { id: number }) {
   const [loading, setLoading] = useState(false);
@@ -15,8 +18,12 @@ export default function UserCommentsSection({ id }: { id: number }) {
       const res = await commentsApi.getCommentsByUser(id);
       setComments(res.data.comments);
     } catch (err) {
-      console.log(err);
-      toast.error("An unexpected error has occurred. Please try again later.");
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[COMMENTS ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,8 @@ import SpinnerPrimary from "../spinner/SpinnerPrimary";
 import { topicApi } from "../../api/topics.api";
 import { COLORS_ARR } from "../../lib/constants";
 import { trimString } from "../../lib/helpers";
+import type { AxiosError } from "axios";
+import type { ApiError } from "../../types/auth";
 
 export default function TopicsSection() {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -20,8 +22,15 @@ export default function TopicsSection() {
       const res = await topicApi.getTrendingTopics();
       setTopics(res.data.topics);
     } catch (err: any) {
-      toast.error("Could not fetch topics");
-      console.log(err);
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[EDIT PROFILE ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(
+        axiosError.response?.data?.message ||
+          "Could not fetch topics. Please try again later."
+      );
     } finally {
       setLoading(false);
     }

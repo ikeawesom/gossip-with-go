@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../state/store";
 import type { PostType } from "../../types/post";
+import { defaultError } from "../../lib/constants";
 
 export default function PostsFeed({ type }: { type: PaginationType }) {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -28,8 +29,8 @@ export default function PostsFeed({ type }: { type: PaginationType }) {
 
   useEffect(() => {
     if (error) {
-      console.log(error);
-      toast.error(error);
+      console.log("[PAGINATION ERROR]", error);
+      toast.error(defaultError.message);
     }
   }, [error]);
 

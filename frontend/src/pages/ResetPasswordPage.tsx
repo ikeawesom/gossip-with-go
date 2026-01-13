@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import AuthForm from "../components/auth/AuthForm";
 import PrimaryButton from "../components/utils/PrimaryButton";
 import SpinnerSecondary from "../components/spinner/SpinnerSecondary";
+import type { AxiosError } from "axios";
+import { defaultError } from "../lib/constants";
+import type { ApiError } from "../types/auth";
 
 export default function ResetPasswordPage() {
   const { token } = useParams<{ token: string }>();
@@ -48,7 +51,12 @@ export default function ResetPasswordPage() {
       toast.success("Password reset successful. You can now log in.");
       navigate("/auth/login");
     } catch (err: any) {
-      toast.error(err.message);
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[EDIT PROFILE ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
     }
     setLoading(false);
   };
