@@ -63,7 +63,7 @@ export default function LoginForm() {
           Forgot password?
         </Link>
       </div>
-      <p className="ml-1">
+      <p className="ml-1 custom text-sm">
         New to Gossip Go?{" "}
         <Link
           to="/auth/register"
