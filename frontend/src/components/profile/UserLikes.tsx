@@ -65,8 +65,8 @@ export default function UserLikes({ id }: { id: number }) {
       <ul
         style={{ scrollbarWidth: "none" }}
         className={twMerge(
-          "max-h-[50vh] overflow-y-scroll flex w-full flex-col items-start justify-start gap-4 pb-4",
-          likes.length > 0 && "min-h-[100px]",
+          "max-h-[50vh] overflow-y-scroll flex w-full flex-col items-start justify-start gap-4",
+          likes.length > 0 && "min-h-[100px] pb-4",
           loading &&
             "bg-white shadow-inner border border-gray-dark/20 rounded-md mt-3"
         )}
@@ -103,7 +103,7 @@ export default function UserLikes({ id }: { id: number }) {
             }
           })
         ) : (
-          <li className="text-sm md:text-base h-[100px] grid place-items-center text-fine-print text-center p-2 border-b border-gray-light">
+          <li className="text-sm md:text-base h-[100px] grid place-items-center rounded-md text-fine-print text-center p-2 border-b border-gray-light w-full bg-white">
             {likes.length > 0
               ? "Hmm, no results were found. Try another keyword."
               : "No likes here!"}
