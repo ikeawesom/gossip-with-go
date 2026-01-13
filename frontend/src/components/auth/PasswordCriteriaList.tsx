@@ -13,7 +13,7 @@ export default function PasswordCriteriaList({
         <li
           key={rule.label}
           className={twMerge(
-            "text-xs list-disc ml-6 mb-1",
+            "text-xs md:text-sm list-disc ml-6 mb-1",
             rule.valid ? "text-green" : "text-red"
           )}
         >

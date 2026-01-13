@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
           required
         />
         {password !== cfmPass && (
-          <p className="text-red custom text-xs ml-3 mt-1 mb-1">
+          <p className="text-red custom text-xs md:text-sm ml-3 mt-1 mb-1">
             Passwords do not match.
           </p>
         )}

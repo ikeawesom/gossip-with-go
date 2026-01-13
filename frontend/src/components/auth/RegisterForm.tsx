@@ -130,7 +130,7 @@ export default function RegisterForm() {
               required
             />
             {error?.type === "email" && (
-              <li className="text-xs list-disc ml-6 text-red">
+              <li className="text-xs md:text-sm list-disc ml-6 text-red">
                 {error.message}
               </li>
             )}
@@ -151,14 +151,14 @@ export default function RegisterForm() {
             {username.length > 0 && (
               <ul className="mt-1 mb-2">
                 {error?.type === "username" && (
-                  <li className="text-red text-xs ml-6 list-disc mb-1">
+                  <li className="text-red text-xs md:text-sm ml-6 list-disc mb-1">
                     {error.message}
                   </li>
                 )}
 
                 <li
                   className={twMerge(
-                    "text-xs list-disc ml-6",
+                    "text-xs md:text-sm list-disc ml-6",
                     valid_username ? "text-green" : "text-red"
                   )}
                 >
@@ -197,7 +197,9 @@ export default function RegisterForm() {
             required
           />
           {password_mismatch && (
-            <p className="ml-1 error">Passwords do not match.</p>
+            <p className="ml-1 custom text-red text-xs md:text-sm">
+              Passwords do not match.
+            </p>
           )}
           <p className="ml-1 custom text-sm mt-2">
             Already a Gossiper?{" "}
