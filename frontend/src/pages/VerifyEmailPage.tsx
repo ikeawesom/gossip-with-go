@@ -35,14 +35,12 @@ export default function VerifyEmailPage() {
       }
 
       try {
-        await authApi.verifyEmail({ token });
+        await authApi.verifyEmail(token);
         setStatus("success");
-        // Redirect to login after 3 seconds
+
+        // redirect to login after 3 seconds
         setTimeout(() => {
           navigate("/auth/login");
-          // toast.success(
-          //   "You may now sign in using your username and password."
-          // );
         }, 3000);
       } catch (error) {
         setStatus("error");
@@ -75,17 +73,18 @@ export default function VerifyEmailPage() {
 
   if (status === "success") {
     return (
-      <h4>
-        Email verified successfully! Redirecting you in{" "}
-        <span className="text-primary">{count}</span> seconds.
-      </h4>
+      <p className="custom text-center text-sm w-full">
+        Email verified successfully! You may now sign in with your username and
+        password. Redirecting you in{" "}
+        <span className="text-primary font-bold">{count}</span> seconds.
+      </p>
     );
   }
 
   if (status === "error") {
     return (
       <div className="flex flex-col items-center justify-center gap-1">
-        <p className="text-center">{errorMsg}</p>
+        <p className="text-center text-red custom text-base">{errorMsg}</p>
         <p>
           Back to{" "}
           <Link
