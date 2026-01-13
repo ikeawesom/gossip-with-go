@@ -11,6 +11,8 @@ import useAuth from "../../hooks/useAuth";
 import { twMerge } from "tailwind-merge";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
 import { defaultError } from "../../lib/constants";
+import useCheckPassword from "../../hooks/useCheckPassword";
+import PasswordCriteriaList from "./PasswordCriteriaList";
 
 export default function RegisterForm() {
   const [registerDetails, setRegisterDetails] = useState<SignupCredentials>({
@@ -26,9 +28,26 @@ export default function RegisterForm() {
   const dispatch = useDispatch<AppDispatch>();
   const { isLoading } = useAuth();
 
+  // username must be between 8 to 16 characters long
+  const valid_username =
+    registerDetails.username.length > 7 && registerDetails.username.length < 17;
+
+  const { valid_password } = useCheckPassword(password);
+
   const empty_password = password === "" && confirm_password === "";
   const password_mismatch = password !== confirm_password;
-  const disabled = isLoading || password_mismatch || empty_password;
+
+  const disabled =
+    !valid_username ||
+    !valid_password ||
+    isLoading ||
+    password_mismatch ||
+    empty_password;
+
+  const [error, setError] = useState<{
+    type: "username" | "email" | "password";
+    message: string;
+  }>();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,11 +72,15 @@ export default function RegisterForm() {
     } else {
       const error = result.payload as string;
       if (error.includes("registered")) {
-        toast.error(
-          "Email has already been registered. Try signing in instead!"
-        );
+        setError({
+          type: "email",
+          message: "Email has already been registered. Try signing in instead.",
+        });
       } else if (error.includes("username")) {
-        toast.error("Username has already been taken.");
+        setError({
+          type: "username",
+          message: "Username has already been taken.",
+        });
       } else {
         console.log("[SIGN UP ERROR]", error);
         toast.error(defaultError.message);
@@ -70,15 +93,13 @@ export default function RegisterForm() {
       {success ? (
         <>
           <div className="w-full">
-            <h3 className="text-xl text-center mb-2 smart-wrap custom">
+            <h3 className="text-base text-center mb-2 smart-wrap custom">
               Email verification link sent to{" "}
               <span className="text-primary font-bold">{email}</span>
             </h3>
-            <p className="text-center">
-              Please verify your email before creating an account.
-            </p>
-            <p className="text-center">
-              Didn't get your email?{" "}
+            <p className="text-center custom text-sm">
+              Please verify your email before creating an account. Didn't get
+              your email?{" "}
               <span
                 onClick={handleSubmit}
                 className={twMerge(
@@ -88,46 +109,81 @@ export default function RegisterForm() {
                     : "hover:opacity-70 cursor-pointer"
                 )}
               >
-                {isLoading ? "Sending..." : "Resend"}
+                {isLoading ? "Sending..." : "Resend."}
               </span>
             </p>
           </div>
         </>
       ) : (
         <>
-          <input
-            value={email}
-            onChange={(e) =>
-              setRegisterDetails({ ...registerDetails, email: e.target.value })
-            }
-            type="email"
-            placeholder="Enter your email"
-            required
-          />
-          <input
-            value={username}
-            onChange={(e) =>
-              setRegisterDetails({
-                ...registerDetails,
-                username: e.target.value,
-              })
-            }
-            type="text"
-            placeholder="Enter a username"
-            required
-          />
-          <input
-            value={password}
-            onChange={(e) =>
-              setRegisterDetails({
-                ...registerDetails,
-                password: e.target.value,
-              })
-            }
-            type="password"
-            placeholder="Enter a password"
-            required
-          />
+          <div className="w-full flex flex-col items-start justify-start gap-1">
+            <input
+              value={email}
+              onChange={(e) =>
+                setRegisterDetails({
+                  ...registerDetails,
+                  email: e.target.value,
+                })
+              }
+              type="email"
+              placeholder="Enter your email"
+              required
+            />
+            {error?.type === "email" && (
+              <li className="text-xs list-disc ml-6 text-red">
+                {error.message}
+              </li>
+            )}
+          </div>
+          <div className="w-full flex flex-col items-start justify-start gap-1">
+            <input
+              value={username}
+              onChange={(e) =>
+                setRegisterDetails({
+                  ...registerDetails,
+                  username: e.target.value,
+                })
+              }
+              type="text"
+              placeholder="Enter a username"
+              required
+            />
+            {username.length > 0 && (
+              <ul className="mt-1 mb-2">
+                {error?.type === "username" && (
+                  <li className="text-red text-xs ml-6 list-disc mb-1">
+                    {error.message}
+                  </li>
+                )}
+
+                <li
+                  className={twMerge(
+                    "text-xs list-disc ml-6",
+                    valid_username ? "text-green" : "text-red"
+                  )}
+                >
+                  Must be at 8 to 16 characters long.
+                </li>
+              </ul>
+            )}
+          </div>
+          <div className="w-full flex flex-col items-start justify-start gap-1">
+            <input
+              value={password}
+              onChange={(e) =>
+                setRegisterDetails({
+                  ...registerDetails,
+                  password: e.target.value,
+                })
+              }
+              type="password"
+              placeholder="Enter a password"
+              required
+            />
+            {password.length > 0 && (
+              <PasswordCriteriaList password={password} />
+            )}
+          </div>
           <input
             value={confirm_password}
             onChange={(e) =>
@@ -141,9 +197,9 @@ export default function RegisterForm() {
             required
           />
           {password_mismatch && (
-            <p className="ml-1 error">ERROR: Passwords do not match.</p>
+            <p className="ml-1 error">Passwords do not match.</p>
           )}
-          <p className="ml-1">
+          <p className="ml-1 custom text-sm mt-2">
             Already a Gossiper?{" "}
             <Link
               to="/auth/login"

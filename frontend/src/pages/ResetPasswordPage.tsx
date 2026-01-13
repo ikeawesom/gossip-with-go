@@ -8,6 +8,8 @@ import SpinnerSecondary from "../components/spinner/SpinnerSecondary";
 import type { AxiosError } from "axios";
 import { defaultError } from "../lib/constants";
 import type { ApiError } from "../types/auth";
+import useCheckPassword from "../hooks/useCheckPassword";
+import PasswordCriteriaList from "../components/auth/PasswordCriteriaList";
 
 export default function ResetPasswordPage() {
   const { token } = useParams<{ token: string }>();
@@ -15,7 +17,8 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [cfmPass, setCfmPass] = useState("");
   const [loading, setLoading] = useState(false);
-  const disable = loading || password !== cfmPass;
+  const { valid_password } = useCheckPassword(password);
+  const disable = loading || password !== cfmPass || !valid_password;
 
   useEffect(() => {
     const checkToken = async () => {
@@ -63,20 +66,30 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthForm onSubmit={handleSubmit}>
-      <input
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        type="password"
-        placeholder="Enter a new password"
-        required
-      />
-      <input
-        value={cfmPass}
-        onChange={(e) => setCfmPass(e.target.value)}
-        type="password"
-        placeholder="Confirm your password"
-        required
-      />
+      <div className="w-full flex flex-col items-start justify-start gap-1">
+        <input
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
+          placeholder="Enter a new password"
+          required
+        />
+        {password.length > 0 && <PasswordCriteriaList password={password} />}
+      </div>
+      <div className="w-full flex flex-col items-start justify-start gap-1">
+        <input
+          value={cfmPass}
+          onChange={(e) => setCfmPass(e.target.value)}
+          type="password"
+          placeholder="Confirm your password"
+          required
+        />
+        {password !== cfmPass && (
+          <p className="text-red custom text-xs ml-3 mt-1 mb-1">
+            Passwords do not match.
+          </p>
+        )}
+      </div>
       <PrimaryButton type="submit" className="w-full mt-3" disabled={disable}>
         {loading ? <SpinnerSecondary /> : "Reset Password"}
       </PrimaryButton>
