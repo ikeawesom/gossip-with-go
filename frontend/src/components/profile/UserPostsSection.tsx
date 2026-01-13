@@ -3,16 +3,32 @@ import type { PostType } from "../../types/post";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
 import PostCard from "../posts/PostCard";
 import { postApi } from "../../api/posts.api";
+import type { ResponseType } from "../../types/res";
+import { repostsApi } from "../../api/reposts.api";
+import type { ProfileToggleType } from "../../pages/ProfilePage";
 
-export default function UserPostsSection({ username }: { username: string }) {
+export default function UserPostsSection({
+  username,
+  id,
+  view,
+}: {
+  username: string;
+  id?: number;
+  view: ProfileToggleType;
+}) {
   const [postState, setPostState] = useState<"loading" | "success" | "invalid">(
     "loading"
   );
   const [userPosts, setUserPosts] = useState<PostType[]>([]);
 
-  const getUserPosts = async (username: string) => {
+  const getUserPosts = async () => {
     try {
-      const res = await postApi.getPostByUsername(username);
+      let res: ResponseType;
+      if (id) {
+        res = await repostsApi.getUserReposts(id);
+      } else {
+        res = await postApi.getPostByUsername(username);
+      }
       const posts = res.data.posts as PostType[];
       setUserPosts(posts);
       setPostState("success");
@@ -24,27 +40,43 @@ export default function UserPostsSection({ username }: { username: string }) {
   };
 
   useEffect(() => {
-    if (username) {
-      getUserPosts(username);
+    if (postState === "loading") {
+      getUserPosts();
     }
-  }, [username]);
+  }, [postState]);
+
+  useEffect(() => {
+    setPostState("loading");
+  }, [username, id, view]);
 
   return (
     <div className="flex items-center justify-center w-full flex-col gap-4 py-4">
       {postState === "loading" ? (
         <SpinnerPrimary />
       ) : postState === "invalid" ? (
-        <p>{username} has no posts yet.</p>
+        <p>
+          {username} has no {id ? "reposts" : "posts"} yet.
+        </p>
       ) : userPosts.length > 0 ? (
         <div className="w-full flex flex-col gap-4 items-center justify-center">
           {userPosts.map((post: PostType, index: number) => {
             return (
-              <PostCard username={username} post={post} key={index} showTopic />
+              <PostCard
+                post_id={post.post_id}
+                hideInteractions={id ? true : false}
+                hideArrow={id ? true : false}
+                username={username}
+                post={post}
+                key={index}
+                showTopic
+              />
             );
           })}
         </div>
       ) : (
-        <p>{username} has no posts yet.</p>
+        <p>
+          {username} has no {id ? "reposts" : "posts"} yet.
+        </p>
       )}
     </div>
   );
