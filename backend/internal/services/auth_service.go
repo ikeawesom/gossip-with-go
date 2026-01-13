@@ -48,28 +48,39 @@ func (s *AuthService) Signup(username, email, password string) (*models.User, er
 	// check if user already exists
 	var existingUser models.User
 	if err := s.DB.Where("email = ? OR username = ?", email, username).First(&existingUser).Error; err == nil {
-		if existingUser.Email == email {
-			// email exists, then send new verification email to user
-			// generate a new verification token
-			verificationToken := uuid.New().String()
-			verificationExpiry := time.Now().Add(24 * time.Hour)
+		utils.DebugLog("Email:", existingUser)
+		
+		// check if email already exists
+		if existingUser.Email == email { 
+			// email exists
+			if !existingUser.EmailVerified { // check if email is verified
+				// not verified: send new verification email to user
 
-			existingUser.VerificationToken = &verificationToken
-			existingUser.VerificationExpiry = &verificationExpiry
-			
-			if err := s.DB.Save(&existingUser).Error; err != nil {
-				return nil, err
+				// generate a new verification token
+				verificationToken := uuid.New().String()
+				verificationExpiry := time.Now().Add(24 * time.Hour)
+
+				user.VerificationToken = &verificationToken
+				user.VerificationExpiry = &verificationExpiry
+				
+				if err := s.DB.Save(&user).Error; err != nil {
+					return nil, err
+				}
+
+				cfg := config.AppConfig
+				go s.EmailService.SendVerificationEmail(
+					user.Email,
+					user.Username,
+					verificationToken,
+					cfg.FrontendVerifyEmailURL,
+				)
+				
+				return &user, nil
 			}
-
-			cfg := config.AppConfig
-			go s.EmailService.SendVerificationEmail(
-				existingUser.Email,
-				existingUser.Username,
-				verificationToken,
-				cfg.FrontendVerifyEmailURL,
-			)
-			return &existingUser, nil
+			// verified: throw error
+			return nil, errors.New("email already registered")
 		}
+		// email does not exist, but username is taken
 		return nil, errors.New("username already taken")
 	}
 
