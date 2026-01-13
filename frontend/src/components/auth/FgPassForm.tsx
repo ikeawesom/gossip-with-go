@@ -26,8 +26,10 @@ export default function FgPassForm() {
       const { payload } = await dispatch(sendPasswordResetEmail({ username }));
       const res = payload as ResponseType;
       if (!res.error) {
+        // regardless of whether user exists or not, show success
         setSuccess(true);
       } else {
+        // throw only if there is internal server error
         throw new Error(res.error);
       }
     } catch (err) {
