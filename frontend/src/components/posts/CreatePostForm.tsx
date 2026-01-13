@@ -8,10 +8,10 @@ import ModalTitle from "../utils/ModalTitle";
 import useQuery, { type QueryResult } from "../../hooks/useQuery";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
 import type { Topic } from "../../types/topics";
-import type { StateTriggerType } from "../../types/res";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
+import { useNavigate } from "react-router-dom";
 
-export interface CreatePostFormType extends StateTriggerType {
+export interface CreatePostFormType {
   toggleTopic?: () => void;
   username: string;
   curPost?: PostType;
@@ -20,8 +20,6 @@ export interface CreatePostFormType extends StateTriggerType {
   topicName?: string;
 }
 export default function CreatePostForm({
-  trigger,
-  triggerBool,
   username,
   curPost,
   close,
@@ -43,6 +41,8 @@ export default function CreatePostForm({
   const [showResults, setShowResults] = useState(false);
   const { loading, results } = useQuery(query, "topics");
 
+  const navigate = useNavigate();
+
   const disabled =
     postDetails.title === "" ||
     postDetails.content === "" ||
@@ -59,11 +59,10 @@ export default function CreatePostForm({
   const handleCreatePost = async () => {
     setPostLoad(true);
     try {
-      await postApi.createPost(postDetails);
-
+      const res = await postApi.createPost(postDetails);
       toast.success("Posted!");
-      trigger(!triggerBool);
       close();
+      navigate(`/${username}/posts/${res.data.data}`);
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -76,8 +75,8 @@ export default function CreatePostForm({
     try {
       if (!curPost) throw new Error("Invalid post");
       await postApi.editPostByID(postDetails, curPost.id);
-      trigger(!triggerBool);
-      toast.success("Changes have been saved");
+      toast.success("Changes have been saved.");
+      window.location.reload();
       close();
     } catch (err: any) {
       console.log(err);
