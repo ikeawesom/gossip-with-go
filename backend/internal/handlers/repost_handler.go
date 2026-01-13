@@ -131,7 +131,7 @@ func (h *RepostHandler) GetReposters(c *gin.Context) {
 }
 
 func (h *RepostHandler) GetUserReposts(c *gin.Context) {
-	userIDStr := c.Query("user_id")
+	userIDStr := c.Param("userID")
 	if userIDStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
 		return
@@ -143,30 +143,13 @@ func (h *RepostHandler) GetUserReposts(c *gin.Context) {
 		return
 	}
 
-	limitStr := c.DefaultQuery("limit", utils.GetLimitStr())
-	offsetStr := c.DefaultQuery("offset", utils.GetOffsetStr())
-
-	limit, err := strconv.Atoi(limitStr)
-	if err != nil || limit < 1 || limit > 100 {
-		limit, err = strconv.Atoi(utils.GetLimitStr())
-	}
-
-	offset, err := strconv.Atoi(offsetStr)
-	if err != nil || offset < 0 {
-		offset, err = strconv.Atoi(utils.GetOffsetStr())
-	}	
-
-	posts, err := h.repostService.GetUserReposts(uint(userID), limit, offset)
+	posts, err := h.repostService.GetUserReposts(uint(userID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"posts":  posts,
-		"limit":  limit,
-		"offset": offset,
-	})
+	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"posts": posts})
 }
 
 func (h *RepostHandler) UpdateRepostVisibility(c *gin.Context) {
