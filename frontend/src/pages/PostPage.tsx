@@ -145,8 +145,6 @@ export default function PostPage() {
           <CreatePostForm
             close={() => setIsEditing(false)}
             username={user_id ?? ""}
-            trigger={setUpdate}
-            triggerBool={update}
             curPost={postData}
             topic={postData ? postData.topic : -1}
           />

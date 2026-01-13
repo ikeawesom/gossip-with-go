@@ -164,8 +164,6 @@ export default function TopicPage() {
             <CreatePostForm
               topicName={topic.topic_name}
               close={() => setCreatePost(false)}
-              trigger={setUpdate}
-              triggerBool={update}
               topic={topic.id}
               username={user?.username ?? ""}
             />
