@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gossip-with-go/internal/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -14,6 +15,17 @@ type RepostService struct {
 
 func NewRepostService(db *gorm.DB) *RepostService {
 	return &RepostService{DB: db}
+}
+
+type RepostedPosts struct {
+	PostID      uint      `json:"post_id"`
+	Title       string    `json:"title"`
+	Content     string    `json:"content"`
+	TopicID     uint      `json:"topic_id"`
+	PosterID    uint      `json:"poster_id"`
+	Username    string    `json:"username"`
+	RepostedOn  time.Time `json:"reposted_on"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 func (s *RepostService) ToggleRepost(userID uint, postID uint, visibility string) (bool, error) {
@@ -116,20 +128,37 @@ func (s *RepostService) GetRepostCount(postID uint) (int64, error) {
 	return count, err
 }
 
-func (s *RepostService) GetUserReposts(userID uint, limit int, offset int) ([]models.Post, error) {
-	var posts []models.Post
+func (s *RepostService) GetUserReposts(userID uint, limit int, offset int) ([]RepostedPosts, error) {
+	var posts []RepostedPosts
 	
-	err := s.DB.Table("posts").
-		Select("posts.*").
-		Joins("JOIN reposts ON reposts.post_id = posts.id").
+	err := s.DB.
+		Table("reposts").
+		Select(`
+			DISTINCT ON (posts.id)
+			posts.id            AS post_id,
+			posts.title         AS title,
+			posts.content       AS content,
+			posts.topic         AS topic_id,
+			posts.user_id       AS poster_id,
+			poster.username     AS username,
+			posts.created_at    AS created_at,
+			reposts.created_at  AS reposted_on
+		`).
+		Joins("JOIN posts ON reposts.post_id = posts.id").
+		Joins("JOIN users AS poster ON posts.user_id = poster.id").
+		Joins("JOIN topics ON posts.topic = topics.id").
 		Where("reposts.user_id = ?", userID).
-		Order("reposts.created_at DESC").
-		Limit(limit).
-		Offset(offset).
+		Where("reposts.deleted_at IS NULL").
+		Where("posts.deleted_at IS NULL").
+		Order("posts.id, reposts.created_at DESC").
 		Find(&posts).
 		Error
-	
-	return posts, err
+
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }
 
 func (s *RepostService) UpdateRepostVisibility(userID uint, postID uint, visibility string) error {
