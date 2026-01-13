@@ -1,15 +1,16 @@
 import { useState } from "react";
-import Modal from "../components/utils/Modal";
-import CreatePostForm from "../components/posts/CreatePostForm";
-import PrimaryButton from "../components/utils/PrimaryButton";
-import SecondaryButton from "../components/utils/SecondaryButton";
-import CreateTopicForm from "../components/topics/CreateTopicForm";
+import Modal from "../utils/Modal";
+import CreatePostForm from "../posts/CreatePostForm";
+import PrimaryButton from "../utils/PrimaryButton";
+import SecondaryButton from "../utils/SecondaryButton";
+import CreateTopicForm from "../topics/CreateTopicForm";
 import { useSelector } from "react-redux";
-import type { RootState } from "../state/store";
+import type { RootState } from "../../state/store";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import ModalTitle from "../utils/ModalTitle";
 
-export default function CreatePostTopicSection() {
+export default function CreateGossipFloatingButton() {
   const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
@@ -46,8 +47,9 @@ export default function CreatePostTopicSection() {
         />
       </div>
       {show === "list" && (
-        <Modal close={handleClose} className="max-w-[250px]">
-          <div className="w-full flex items-center justify-center gap-4 flex-col">
+        <Modal close={handleClose} className="max-w-[300px]">
+          <ModalTitle>Start Gossipping</ModalTitle>
+          <div className="w-full flex items-center justify-center gap-3 flex-col mt-4">
             <PrimaryButton
               onClick={() => handleCreate("post")}
               className="w-full"
