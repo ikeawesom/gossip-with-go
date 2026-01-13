@@ -7,15 +7,36 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import SpinnerPrimary from "../components/spinner/SpinnerPrimary";
 import { userApi } from "../api/user.api";
-import { postApi } from "../api/posts.api";
-import type { PostType } from "../types/post";
-import PostCard from "../components/posts/PostCard";
 import FollowButton from "../components/profile/follow/FollowButton";
 import FollowerFollowingSection from "../components/profile/follow/FollowerFollowingSection";
-import CreatePostTopicSection from "./CreatePostTopicSection";
 import BuzzSection from "../components/profile/BuzzSection";
 import SettingsButton from "../components/profile/SettingsButton";
 import LongContent from "../components/posts/LongContent";
+import UserPostsSection from "../components/profile/UserPostsSection";
+import { twMerge } from "tailwind-merge";
+
+export type ProfileToggleType = "posts" | "reposts";
+
+interface PageToggleType {
+  id: ProfileToggleType;
+  title: string;
+  src: string;
+  size?: number;
+}
+
+const pageToggles = [
+  {
+    id: "posts",
+    title: "Gossips",
+    src: "icons/posts/icon_comment_primary.svg",
+  },
+  {
+    id: "reposts",
+    title: "Reposts",
+    src: "icons/posts/icon_reposted.svg",
+    size: 20,
+  },
+] as PageToggleType[];
 
 export default function ProfilePage() {
   const { user_id } = useParams<{ user_id: string }>();
@@ -24,13 +45,10 @@ export default function ProfilePage() {
   const [userState, setUserState] = useState<"loading" | "success" | "invalid">(
     "loading"
   );
-  const [postState, setPostState] = useState<"loading" | "success" | "invalid">(
-    "loading"
-  );
+  const [view, setView] = useState<"posts" | "reposts">("posts");
+
   const [update, setUpdate] = useState(false);
   const [visitingUser, setVisitingUser] = useState<User>();
-
-  const [userPosts, setUserPosts] = useState<PostType[]>([]);
 
   useEffect(() => {
     if (!user_id) return;
@@ -48,30 +66,11 @@ export default function ProfilePage() {
     getVisitingUser();
   }, [update, user_id]);
 
-  const getUserPosts = async (username: string) => {
-    try {
-      const res = await postApi.getPostByUsername(username);
-      const posts = res.data.posts as PostType[];
-      setUserPosts(posts);
-      setPostState("success");
-      if (res.data.posts) setPostState("success");
-    } catch (err: any) {
-      console.log(err);
-      setPostState("invalid");
-    }
-  };
-
-  useEffect(() => {
-    if (visitingUser) {
-      getUserPosts(visitingUser.username);
-    }
-  }, [visitingUser]);
-
   if (userState === "loading")
     return (
       <NavSection>
-        <p className="text-center mb-1">Loading user</p>
-        <SpinnerPrimary />
+        <p className="text-center mb-2 custom">Loading user...</p>
+        <SpinnerPrimary size={25} />
       </NavSection>
     );
 
@@ -123,35 +122,40 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
-      <div className="flex items-center justify-center w-full flex-col gap-4 py-4">
-        {isCurrentUser && (
-          <CreatePostTopicSection
-            trigger={setUpdate}
-            triggerBool={update}
-            username={username}
-          />
-        )}
-        {postState === "loading" ? (
-          <SpinnerPrimary />
-        ) : postState === "invalid" ? (
-          <p>{username} has no posts yet.</p>
-        ) : userPosts.length > 0 ? (
-          <div className="w-full flex flex-col gap-4 items-center justify-center">
-            {userPosts.map((post: PostType, index: number) => {
-              return (
-                <PostCard
-                  username={username}
-                  post={post}
-                  key={index}
-                  showTopic
-                />
-              );
-            })}
-          </div>
-        ) : (
-          <p>{username} has no posts yet.</p>
-        )}
+      <div className="w-full flex items-center justify-around gap-4 mt-4">
+        {pageToggles.map((page: PageToggleType, index: number) => {
+          const { id, title, src, size } = page;
+          return (
+            <div
+              onClick={() => setView(id)}
+              key={index}
+              className={twMerge(
+                "flex-1 flex items-center justify-center gap-1 py-2 hover:bg-gray-dark/10 cursor-pointer rounded-md duration-150",
+                view === id &&
+                  "from-white/50 to-white shadow-sm bg-linear-to-br"
+              )}
+            >
+              <img
+                src={`/${src}`}
+                alt={title}
+                width={size ?? 25}
+                height={size ?? 25}
+              />
+              <h4 className="custom font-normal">{title}</h4>
+            </div>
+          );
+        })}
       </div>
+      {visitingUser &&
+        (view === "posts" ? (
+          <UserPostsSection view={view} username={visitingUser.username} />
+        ) : (
+          <UserPostsSection
+            view={view}
+            id={visitingUser.id}
+            username={visitingUser.username}
+          />
+        ))}
     </NavSection>
   );
 }

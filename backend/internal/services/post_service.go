@@ -142,11 +142,11 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 	return &(post_array[0]), nil
 }
 
-func (s *PostService) CreatePost(username, title, content string, topic uint) error {
+func (s *PostService) CreatePost(username, title, content string, topic uint) (uint, error) {
 	// get userID of username
 	var user models.User
 	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
-		return err
+		return 0, err
 	}
 
 	topicID := uint(topic);
@@ -162,8 +162,7 @@ func (s *PostService) CreatePost(username, title, content string, topic uint) er
 	utils.DebugLog("new post:", newPost)
 
 	if err := s.DB.Create(&newPost).Error; err != nil {
-		utils.DebugLog("error:", err)
-		return err
+		return 0, err
 	}
 
 	// increment post count on topic
@@ -173,10 +172,10 @@ func (s *PostService) CreatePost(username, title, content string, topic uint) er
 			Update("post_count", gorm.Expr("post_count + ?", 1)).
 			Error; err != nil {
 				utils.DebugLog("error:", err)
-				return err
+				return 0, err
 			}
 
-	return nil
+	return newPost.ID, nil
 }
 
 func (s *PostService) EditPost(postID uint, username, title, content string, topic uint) error {

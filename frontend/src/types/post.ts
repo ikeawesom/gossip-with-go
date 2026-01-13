@@ -1,5 +1,6 @@
 export interface PostType {
     id: number;
+    post_id?: number; // for reposted backend
     user_id: number;
 
     topic: number;

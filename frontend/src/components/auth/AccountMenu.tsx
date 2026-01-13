@@ -30,9 +30,9 @@ export default function AccountMenu({
     <>
       <div
         onClick={() => setShowMenu(true)}
-        className="hover:brightness-110 duration-150 cursor-pointer bg-white/60 flex items-center justify-center gap-1 backdrop-blur-md border border-white/20 rounded-full shadow-sm p-2"
+        className="hover:brightness-110 duration-150 cursor-pointer bg-white/60 flex items-center justify-center gap-1 backdrop-blur-md border border-white/20 rounded-full shadow-sm p-3"
       >
-        <img alt="Menu" src="/icons/icon_menu.svg" width={24} height={24} />
+        <img alt="Menu" src="/icons/icon_menu.svg" width={30} height={30} />
       </div>
       {showMenu && (
         <Modal

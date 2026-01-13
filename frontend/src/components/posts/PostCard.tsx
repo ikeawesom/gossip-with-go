@@ -14,6 +14,7 @@ export default function PostCard({
   username,
   hideInteractions,
   className,
+  post_id,
 }: {
   post: PostType;
   hideArrow?: boolean;
@@ -21,6 +22,7 @@ export default function PostCard({
   username?: string;
   hideInteractions?: boolean;
   className?: string;
+  post_id?: number;
 }) {
   const {
     content,
@@ -36,7 +38,7 @@ export default function PostCard({
 
   const user = fetched_username ?? username;
 
-  const url = `/${user}/posts/${id}`;
+  const url = `/${user}/posts/${post_id ?? id}`;
 
   return (
     <div className="w-full">

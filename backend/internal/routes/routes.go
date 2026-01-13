@@ -86,7 +86,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		reposts := api.Group("/reposts")
 		{
 			reposts.GET("/reposters", repostHandler.GetReposters)
-			reposts.GET("/user/:username", repostHandler.GetUserReposts)
+			reposts.GET("/user/:userID", repostHandler.GetUserReposts)
 			
 			// authenticted endpoints for reposts
 			reposts.POST("/toggle", middleware.AuthRequired(),repostHandler.ToggleRepost)
