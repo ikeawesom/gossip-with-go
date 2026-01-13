@@ -1,9 +1,4 @@
-import {
-  Link,
-  useLocation,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import type { Comment, CommentTriggers } from "../../types/comments";
 import LongContent from "./LongContent";
 import { formatDate } from "../../lib/helpers";
@@ -28,7 +23,7 @@ export default function IndividualComment({
   const { user } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
   const postOwner = location.pathname.split("/")[1];
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _] = useSearchParams();
   const highlighted =
     parseInt(searchParams.get("highlight_comment") ?? "0") === comment.id;
 
