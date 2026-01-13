@@ -227,7 +227,7 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	}
 
 	if err := h.AuthService.ForgotPassword(req.Username); err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, "s", nil)
+		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
