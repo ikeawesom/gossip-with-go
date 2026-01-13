@@ -13,6 +13,30 @@ import BuzzSection from "../components/profile/BuzzSection";
 import SettingsButton from "../components/profile/SettingsButton";
 import LongContent from "../components/posts/LongContent";
 import UserPostsSection from "../components/profile/UserPostsSection";
+import { twMerge } from "tailwind-merge";
+
+export type ProfileToggleType = "posts" | "reposts";
+
+interface PageToggleType {
+  id: ProfileToggleType;
+  title: string;
+  src: string;
+  size?: number;
+}
+
+const pageToggles = [
+  {
+    id: "posts",
+    title: "Gossips",
+    src: "icons/posts/icon_comment_primary.svg",
+  },
+  {
+    id: "reposts",
+    title: "Reposts",
+    src: "icons/posts/icon_reposted.svg",
+    size: 20,
+  },
+] as PageToggleType[];
 
 export default function ProfilePage() {
   const { user_id } = useParams<{ user_id: string }>();
@@ -21,6 +45,7 @@ export default function ProfilePage() {
   const [userState, setUserState] = useState<"loading" | "success" | "invalid">(
     "loading"
   );
+  const [view, setView] = useState<"posts" | "reposts">("posts");
 
   const [update, setUpdate] = useState(false);
   const [visitingUser, setVisitingUser] = useState<User>();
@@ -97,7 +122,39 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
-      {visitingUser && <UserPostsSection username={visitingUser.username} />}
+      <div className="w-full flex items-center justify-around gap-4">
+        {pageToggles.map((page: PageToggleType, index: number) => {
+          const { id, title, src, size } = page;
+          return (
+            <div
+              onClick={() => setView(id)}
+              key={index}
+              className={twMerge(
+                "flex-1 flex items-center justify-center gap-1 py-2 mt-2 hover:bg-gray-dark/10 cursor-pointer rounded-md duration-150",
+                view === id && "from-white/50 to-white bg-linear-to-br"
+              )}
+            >
+              <img
+                src={`/${src}`}
+                alt={title}
+                width={size ?? 25}
+                height={size ?? 25}
+              />
+              <h4 className="custom font-normal">{title}</h4>
+            </div>
+          );
+        })}
+      </div>
+      {visitingUser &&
+        (view === "posts" ? (
+          <UserPostsSection view={view} username={visitingUser.username} />
+        ) : (
+          <UserPostsSection
+            view={view}
+            id={visitingUser.id}
+            username={visitingUser.username}
+          />
+        ))}
     </NavSection>
   );
 }
