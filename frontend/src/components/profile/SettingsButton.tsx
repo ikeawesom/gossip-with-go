@@ -6,6 +6,7 @@ import Modal from "../utils/Modal";
 import ModalTitle from "../utils/ModalTitle";
 import { toast } from "sonner";
 import EditProfileForm from "./EditProfileForm";
+import UserLikes from "./UserLikes";
 
 export interface SettingsInterface extends StateTriggerType {
   user: User;
@@ -66,11 +67,11 @@ export default function SettingsButton({
                 </span>
               </ModalTitle>
               <button
-                // onClick={viewProfile}
+                onClick={() => setShow("likes")}
                 className="flex items-center justify-start gap-4 w-full rounded-md hover:bg-primary/10 duration-150 p-2 text-start cursor-pointer"
               >
                 <img
-                  src="/icons/posts/icon_unliked_primary.svg"
+                  src="/icons/posts/icon_liked_primary.svg"
                   width={20}
                   height={20}
                   className="-ml-1"
@@ -120,6 +121,22 @@ export default function SettingsButton({
                 </div>
                 <EditProfileForm close={handleClose} user={user} />
               </div>
+            </>
+          )}
+          {show === "likes" && (
+            <>
+              <ModalTitle>
+                <span className="flex items-center justify-start gap-2">
+                  <img
+                    src="/icons/posts/icon_liked_primary.svg"
+                    alt=""
+                    width={20}
+                    height={20}
+                  />
+                  Likes
+                </span>
+              </ModalTitle>
+              <UserLikes id={user.id} />
             </>
           )}
         </Modal>
