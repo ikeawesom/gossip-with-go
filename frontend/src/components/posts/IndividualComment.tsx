@@ -1,4 +1,9 @@
-import { Link, useLocation } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import type { Comment, CommentTriggers } from "../../types/comments";
 import LongContent from "./LongContent";
 import { formatDate } from "../../lib/helpers";
@@ -23,6 +28,9 @@ export default function IndividualComment({
   const { user } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
   const postOwner = location.pathname.split("/")[1];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const highlighted =
+    parseInt(searchParams.get("highlight_comment") ?? "0") === comment.id;
 
   const {
     replies,
@@ -53,7 +61,12 @@ export default function IndividualComment({
   ).time.toLowerCase();
 
   return (
-    <div className="w-full flex flex-col items-end justify-start gap-2">
+    <div
+      className={twMerge(
+        "w-full flex flex-col items-end justify-start gap-2",
+        highlighted && "highlight-subtle rounded-md"
+      )}
+    >
       <div className="w-full flex flex-col gap-1 items-start justify-start p-2 hover:bg-gray-dark/5 rounded-md duration-150 relative">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center justify-start gap-1">
