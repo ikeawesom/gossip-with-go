@@ -5,7 +5,6 @@ import type {
     SignupCredentials,
     ForgotPasswordRequest,
     ResetPasswordRequest,
-    VerifyEmailRequest,
     User,
 } from '../types/auth';
 

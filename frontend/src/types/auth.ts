@@ -43,10 +43,6 @@ export interface ResetPasswordRequest {
     confirm_password: string;
 }
 
-export interface VerifyEmailRequest {
-    token: string;
-}
-
 export interface ApiError {
     message: string;
     errors?: Record<string, string[]>;
