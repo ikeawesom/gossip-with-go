@@ -25,15 +25,6 @@ func NewAuthService(db *gorm.DB, emailService *EmailService) *AuthService {
 }
 
 func (s *AuthService) Signup(username, email, password string) (*models.User, error) {
-	// check if user already exists
-	var existingUser models.User
-	if err := s.DB.Where("email = ? OR username = ?", email, username).First(&existingUser).Error; err == nil {
-		if existingUser.Email == email {
-			return nil, errors.New("email already registered")
-		}
-		return nil, errors.New("username already taken")
-	}
-
 	// hash password
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
@@ -54,6 +45,34 @@ func (s *AuthService) Signup(username, email, password string) (*models.User, er
 		VerificationExpiry: &verificationExpiry,
 	}
 
+	// check if user already exists
+	var existingUser models.User
+	if err := s.DB.Where("email = ? OR username = ?", email, username).First(&existingUser).Error; err == nil {
+		if existingUser.Email == email {
+			// email exists, then send new verification email to user
+			// generate a new verification token
+			verificationToken := uuid.New().String()
+			verificationExpiry := time.Now().Add(24 * time.Hour)
+
+			existingUser.VerificationToken = &verificationToken
+			existingUser.VerificationExpiry = &verificationExpiry
+			
+			if err := s.DB.Save(&existingUser).Error; err != nil {
+				return nil, err
+			}
+
+			cfg := config.AppConfig
+			go s.EmailService.SendVerificationEmail(
+				existingUser.Email,
+				existingUser.Username,
+				verificationToken,
+				cfg.FrontendVerifyEmailURL,
+			)
+			return &existingUser, nil
+		}
+		return nil, errors.New("username already taken")
+	}
+
 	if err := s.DB.Create(&user).Error; err != nil {
 		return nil, err
 	}
@@ -72,11 +91,35 @@ func (s *AuthService) Signup(username, email, password string) (*models.User, er
 
 func (s *AuthService) Login(username, password string) (*models.User, error) {
 	var user models.User
-	if err := s.DB.Where("username = ? AND email_verified = ?", username, true).First(&user).Error; err != nil {
+	if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("Invalid username or password.")
+		} else {
+			return nil, err
 		}
-		return nil, err
+	}
+
+	if !user.EmailVerified {
+		// generate a new verification token
+		verificationToken := uuid.New().String()
+		verificationExpiry := time.Now().Add(24 * time.Hour)
+		
+		user.VerificationToken = &verificationToken
+		user.VerificationExpiry = &verificationExpiry
+
+		if err := s.DB.Save(&user).Error; err != nil {
+			return nil, err
+		}
+
+		// send verification email
+		cfg := config.AppConfig
+		go s.EmailService.SendVerificationEmail(
+			user.Email,
+			user.Username,
+			verificationToken,
+			cfg.FrontendVerifyEmailURL)
+
+		return nil, errors.New("You have not verified your email. A new verification email has been sent.")
 	}
 
 	// check password
