@@ -46,11 +46,11 @@ export default function FgPassForm() {
     <AuthForm onSubmit={handleSubmit}>
       {success ? (
         <>
-          <h1 className="text-center">
-            If <span className="text-primary">{username}</span> exists, an email
-            has been sent.
-          </h1>
-          <p className="text-center w-full">
+          <h3 className="text-center custom text-base smart-wrap w-full">
+            If <span className="text-primary font-bold">{username}</span>{" "}
+            exists, an email has been sent.
+          </h3>
+          <p className="text-center w-full custom text-sm">
             Didn't get your email?{" "}
             <span
               onClick={handleSubmit}
@@ -61,7 +61,7 @@ export default function FgPassForm() {
                   : "hover:opacity-70 cursor-pointer"
               )}
             >
-              {isLoading ? "Sending..." : "Resend"}
+              {isLoading ? "Sending..." : "Resend."}
             </span>
           </p>
         </>
@@ -74,7 +74,7 @@ export default function FgPassForm() {
               placeholder="Enter your username"
               required
             />
-            <p className="ml-1">
+            <p className="ml-1 custom text-sm">
               Got your password?{" "}
               <Link
                 to="/auth/login"
