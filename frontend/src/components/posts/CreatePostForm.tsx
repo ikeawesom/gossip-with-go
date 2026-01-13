@@ -10,6 +10,9 @@ import SpinnerPrimary from "../spinner/SpinnerPrimary";
 import type { Topic } from "../../types/topics";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
 import { useNavigate } from "react-router-dom";
+import type { AxiosError } from "axios";
+import type { ApiError } from "../../types/auth";
+import { defaultError } from "../../lib/constants";
 
 export interface CreatePostFormType {
   toggleTopic?: () => void;
@@ -64,7 +67,12 @@ export default function CreatePostForm({
       close();
       navigate(`/${username}/posts/${res.data.data}`);
     } catch (err: any) {
-      console.error(err);
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[POST ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
     } finally {
       setPostLoad(false);
     }
@@ -79,7 +87,12 @@ export default function CreatePostForm({
       window.location.reload();
       close();
     } catch (err: any) {
-      console.log(err);
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[POST ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
     } finally {
       setPostLoad(false);
     }

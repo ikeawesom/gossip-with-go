@@ -10,6 +10,7 @@ import { clearError, signupUser } from "../../state/auth/authSlice";
 import useAuth from "../../hooks/useAuth";
 import { twMerge } from "tailwind-merge";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
+import { defaultError } from "../../lib/constants";
 
 export default function RegisterForm() {
   const [registerDetails, setRegisterDetails] = useState<SignupCredentials>({
@@ -23,7 +24,7 @@ export default function RegisterForm() {
   const [sent, setSent] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
-  const { error, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   const empty_password = password === "" && confirm_password === "";
   const password_mismatch = password !== confirm_password;
@@ -50,7 +51,17 @@ export default function RegisterForm() {
       setSent(true);
       toast.success("Verification email sent!");
     } else {
-      toast.error(error);
+      const error = result.payload as string;
+      if (error.includes("registered")) {
+        toast.error(
+          "Email has already been registered. Try signing in instead!"
+        );
+      } else if (error.includes("username")) {
+        toast.error("Username has already been taken.");
+      } else {
+        console.log("[SIGN UP ERROR]", error);
+        toast.error(defaultError.message);
+      }
     }
   };
 

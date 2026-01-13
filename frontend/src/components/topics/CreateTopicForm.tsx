@@ -7,6 +7,8 @@ import PrimaryButton from "../utils/PrimaryButton";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
 import { topicApi } from "../../api/topics.api";
 import { useNavigate } from "react-router-dom";
+import type { AxiosError } from "axios";
+import type { ApiError } from "../../types/auth";
 
 export interface CreateTopicType {
   title: string;
@@ -35,8 +37,15 @@ export default function CreateTopicForm() {
       const res = await topicApi.createTopic(topicDetails);
       navigate(`/topics/${res.data.topic.id}`);
     } catch (err) {
-      console.log(err);
-      toast.error("An unexpected error has occurred. Please try again later.");
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[TOPIC ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(
+        axiosError.response?.data?.message ||
+          "Failed to create topic. Please try again later."
+      );
     } finally {
       setLoading(false);
     }

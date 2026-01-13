@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
-import type { User } from "../../types/auth";
+import type { ApiError, User } from "../../types/auth";
 import PrimaryButton from "../utils/PrimaryButton";
 import SpinnerSecondary from "../spinner/SpinnerSecondary";
 import { userApi } from "../../api/user.api";
 import { useNavigate } from "react-router-dom";
+import { defaultError } from "../../lib/constants";
+import type { AxiosError } from "axios";
 
 export default function EditProfileForm({
   user,
@@ -33,8 +35,12 @@ export default function EditProfileForm({
       navigate(`/${details.username}`, { replace: true });
       window.location.reload();
     } catch (err) {
-      console.log(err);
-      toast.error("An unexpected error has occurred. Please try again later.");
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[EDIT PROFILE ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
     } finally {
       setLoading(false);
     }

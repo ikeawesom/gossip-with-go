@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import type { User } from "../../../types/auth";
+import type { ApiError, User } from "../../../types/auth";
 import Modal from "../../utils/Modal";
 import { toast } from "sonner";
 import SpinnerPrimary from "../../spinner/SpinnerPrimary";
 import { userApi } from "../../../api/user.api";
 import { useNavigate } from "react-router-dom";
 import ModalTitle from "../../utils/ModalTitle";
+import type { AxiosError } from "axios";
+import { defaultError } from "../../../lib/constants";
 
 interface FollowResponse {
   id: number;
@@ -36,8 +38,12 @@ export default function FollowerFollowingSection({
       const followers = res.data.user;
       setList(followers);
     } catch (err) {
-      console.log(err);
-      toast.error("An unexpected error has occurred. Please try again later.");
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[FOLLOWERS ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
       setShowFollows(false);
     } finally {
       setLoading(false);
@@ -51,8 +57,12 @@ export default function FollowerFollowingSection({
       const followings = res.data.user;
       setList(followings);
     } catch (err) {
-      console.log(err);
-      toast.error("An unexpected error has occurred. Please try again later.");
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[FOLLOWINGS ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(axiosError.response?.data?.message || defaultError.message);
       setShowFollows(false);
     } finally {
       setLoading(false);

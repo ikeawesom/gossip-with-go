@@ -1,5 +1,5 @@
 import PrimaryButton from "../../utils/PrimaryButton";
-import type { User } from "../../../types/auth";
+import type { ApiError, User } from "../../../types/auth";
 import { followApi } from "../../../api/follow.api";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { StateTriggerType } from "../../../types/res";
 import type { Topic } from "../../../types/topics";
 import SecondaryButton from "../../utils/SecondaryButton";
+import type { AxiosError } from "axios";
 
 interface FollowTrigger extends StateTriggerType {
   visitingEntity: User | Topic;
@@ -48,16 +49,25 @@ export default function FollowButton({
         state: { prev_page: location.pathname },
       });
     }
+
     if (!visitingEntity) return;
     setLoading(true);
+
     try {
       console.log(visitingEntity.id);
       await followApi.toggleFollow(visitingEntity.id, followType);
       setIsFollowing(!following);
       trigger(!triggerBool);
     } catch (err) {
-      console.log(err);
-      toast.error("Could not follow. Please try again later.");
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[FOLLOW ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(
+        axiosError.response?.data?.message ||
+          "Failed to follow. Please try again later."
+      );
     } finally {
       setLoading(false);
     }

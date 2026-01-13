@@ -5,7 +5,6 @@ import type {
     SignupCredentials,
     ForgotPasswordRequest,
     ResetPasswordRequest,
-    VerifyEmailRequest,
     User,
 } from '../types/auth';
 
@@ -42,8 +41,8 @@ export const authApi = {
     },
 
     // verify email after registration
-    verifyEmail: async (data: VerifyEmailRequest): Promise<{ message: string }> => {
-        const response = await apiClient.post<{ message: string }>('/auth/verify-email', data);
+    verifyEmail: async (token: string): Promise<{ message: string }> => {
+        const response = await apiClient.post<{ message: string }>('/auth/verify-email', { token });
         return response.data;
     },
 

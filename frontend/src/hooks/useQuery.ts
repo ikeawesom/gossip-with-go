@@ -5,6 +5,8 @@ import { queryApi } from "../api/query.api";
 import type { QueryType } from "../components/nav/SearchBar";
 import { toast } from "sonner";
 import type { Topic } from "../types/topics";
+import type { AxiosError } from "axios";
+import type { ApiError } from "../types/auth";
 
 export type QueryResult = Topic | UserSearchResult | PostType
 export type QueryResults = Topic[] | UserSearchResult[] | PostType[]
@@ -45,8 +47,12 @@ export default function useQuery(searchQuery: string, queryType: QueryType) {
                     throw new Error("invalid")
                 }
             } catch (err: any) {
-                toast.error("Search error.")
-                console.log(err);
+                // get full axios error
+                const axiosError = err as AxiosError<ApiError>;
+                console.log("[EDIT PROFILE ERROR]:", axiosError.response?.data);
+
+                // toast error or default error
+                toast.error(axiosError.response?.data?.message || "A search error has occurred. Please try again later.");
                 setResults([]);
             } finally {
                 setLoading(false);

@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../state/store";
 import { useLocation, useNavigate } from "react-router-dom";
+import type { AxiosError } from "axios";
+import type { ApiError } from "../../types/auth";
 
 interface LikeButtonProps {
   targetId: number;
@@ -57,9 +59,16 @@ export default function LikeButton({
 
       const serverLiked = res.data.liked;
       setLiked(serverLiked);
-    } catch (error) {
-      console.error("failed to toggle like:", error);
-      toast.error("Failed to like. Please try again later.");
+    } catch (err) {
+      // get full axios error
+      const axiosError = err as AxiosError<ApiError>;
+      console.log("[LIKE ERROR]:", axiosError.response?.data);
+
+      // toast error or default error
+      toast.error(
+        axiosError.response?.data?.message ||
+          "Failed to like. Please try again later."
+      );
 
       setLiked(!newLiked);
       setLikeCount(likeCount);
