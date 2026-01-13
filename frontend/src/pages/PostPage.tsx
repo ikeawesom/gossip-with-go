@@ -36,8 +36,6 @@ export default function PostPage() {
   const [isDelete, setIsDelete] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  const [update, setUpdate] = useState(false);
-
   const isCurrentUser = user?.username === user_id;
 
   const fetchPost = async (username: string, post_id: string) => {
@@ -56,7 +54,7 @@ export default function PostPage() {
     if (user_id && post_id) {
       fetchPost(user_id, post_id);
     }
-  }, [user_id, post_id, update]);
+  }, [user_id, post_id]);
 
   return (
     <NavSection>
