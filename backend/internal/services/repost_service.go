@@ -21,9 +21,14 @@ type RepostedPosts struct {
 	PostID      uint      `json:"post_id"`
 	Title       string    `json:"title"`
 	Content     string    `json:"content"`
-	TopicID     uint      `json:"topic_id"`
+	
 	PosterID    uint      `json:"poster_id"`
 	Username    string    `json:"username"`
+
+	TopicID     uint      `json:"topic_id"`
+	TopicName   string    `json:"topic_name"`
+	TopicClass  string    `json:"topic_class"`
+
 	RepostedOn  time.Time `json:"reposted_on"`
 	CreatedAt   time.Time `json:"created_at"`
 }
@@ -128,21 +133,23 @@ func (s *RepostService) GetRepostCount(postID uint) (int64, error) {
 	return count, err
 }
 
-func (s *RepostService) GetUserReposts(userID uint, limit int, offset int) ([]RepostedPosts, error) {
+func (s *RepostService) GetUserReposts(userID uint) ([]RepostedPosts, error) {
 	var posts []RepostedPosts
 	
 	err := s.DB.
 		Table("reposts").
 		Select(`
 			DISTINCT ON (posts.id)
-			posts.id            AS post_id,
-			posts.title         AS title,
-			posts.content       AS content,
-			posts.topic         AS topic_id,
-			posts.user_id       AS poster_id,
-			poster.username     AS username,
-			posts.created_at    AS created_at,
-			reposts.created_at  AS reposted_on
+			posts.id            as post_id,
+			posts.title         as title,
+			posts.content       as content,
+			posts.topic         as topic_id,
+			posts.user_id       as poster_id,
+			poster.username     as username,
+			posts.created_at    as created_at,
+			reposts.created_at  as reposted_on,
+			topics.topic_name,
+			topics.topic_class
 		`).
 		Joins("JOIN posts ON reposts.post_id = posts.id").
 		Joins("JOIN users AS poster ON posts.user_id = poster.id").
