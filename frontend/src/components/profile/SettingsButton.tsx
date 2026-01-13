@@ -18,7 +18,7 @@ export default function SettingsButton({
   triggerBool,
 }: SettingsInterface) {
   const [show, setShow] = useState<
-    "none" | "settings" | "edit" | "likes" | "comments" | "reposts"
+    "none" | "settings" | "edit" | "likes" | "comments"
   >("none");
 
   const handleClose = () => {
@@ -89,18 +89,6 @@ export default function SettingsButton({
                   className="-ml-1"
                 />
                 Comments
-              </button>
-              <button
-                // onClick={viewProfile}
-                className="flex items-center justify-start gap-4 w-full rounded-md hover:bg-primary/10 duration-150 p-2 text-start cursor-pointer"
-              >
-                <img
-                  src="/icons/posts/icon_reposted.svg"
-                  width={20}
-                  height={20}
-                  className="-ml-1"
-                />
-                Reposts
               </button>
             </>
           )}
