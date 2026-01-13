@@ -1,4 +1,5 @@
 import type { JSX } from "react/jsx-dev-runtime";
+import { DEV_MODE } from "./constants";
 
 export type HTMLProps<T extends keyof JSX.IntrinsicElements> =
   React.ComponentPropsWithoutRef<T>;
@@ -26,15 +27,22 @@ export function formatDate(timestamp: number, includeTime?: boolean): { date: bo
 
   if (includeTime) {
     const tempDate = new Date();
-    // tempDate.setHours(tempDate.getHours() + 8); // adjust to SGT
+
+    // added timezone management for dev
+    if (DEV_MODE) {
+      tempDate.setHours(tempDate.getHours() + 8); // adjust to SGT
+    }
+
     const now = tempDate.getTime();
     const diffMs = now - timestamp;
     const diffSecs = Math.floor(diffMs / 1000);
     const diffMins = Math.floor(diffSecs / 60);
     const diffHours = Math.floor(diffMins / 60);
 
-    if (diffSecs < 60) {
-      return { date: false, time: `${diffSecs} sec${diffSecs !== 1 ? 's' : ''} ago` };
+    const safeDiffSecs = Math.max(0, diffSecs);
+
+    if (safeDiffSecs < 60) {
+      return { date: false, time: `${safeDiffSecs} sec${safeDiffSecs !== 1 ? 's' : ''} ago` };
     } else if (diffMins < 60) {
       return { date: false, time: `${diffMins} min${diffMins !== 1 ? 's' : ''} ago` };
     } else if (diffHours < 24) {
