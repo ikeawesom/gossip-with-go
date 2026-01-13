@@ -7,14 +7,12 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import SpinnerPrimary from "../components/spinner/SpinnerPrimary";
 import { userApi } from "../api/user.api";
-import { postApi } from "../api/posts.api";
-import type { PostType } from "../types/post";
-import PostCard from "../components/posts/PostCard";
 import FollowButton from "../components/profile/follow/FollowButton";
 import FollowerFollowingSection from "../components/profile/follow/FollowerFollowingSection";
 import BuzzSection from "../components/profile/BuzzSection";
 import SettingsButton from "../components/profile/SettingsButton";
 import LongContent from "../components/posts/LongContent";
+import UserPostsSection from "../components/profile/UserPostsSection";
 
 export default function ProfilePage() {
   const { user_id } = useParams<{ user_id: string }>();
@@ -23,13 +21,9 @@ export default function ProfilePage() {
   const [userState, setUserState] = useState<"loading" | "success" | "invalid">(
     "loading"
   );
-  const [postState, setPostState] = useState<"loading" | "success" | "invalid">(
-    "loading"
-  );
+
   const [update, setUpdate] = useState(false);
   const [visitingUser, setVisitingUser] = useState<User>();
-
-  const [userPosts, setUserPosts] = useState<PostType[]>([]);
 
   useEffect(() => {
     if (!user_id) return;
@@ -47,30 +41,11 @@ export default function ProfilePage() {
     getVisitingUser();
   }, [update, user_id]);
 
-  const getUserPosts = async (username: string) => {
-    try {
-      const res = await postApi.getPostByUsername(username);
-      const posts = res.data.posts as PostType[];
-      setUserPosts(posts);
-      setPostState("success");
-      if (res.data.posts) setPostState("success");
-    } catch (err: any) {
-      console.log(err);
-      setPostState("invalid");
-    }
-  };
-
-  useEffect(() => {
-    if (visitingUser) {
-      getUserPosts(visitingUser.username);
-    }
-  }, [visitingUser]);
-
   if (userState === "loading")
     return (
       <NavSection>
-        <p className="text-center mb-1">Loading user</p>
-        <SpinnerPrimary />
+        <p className="text-center mb-2 custom">Loading user...</p>
+        <SpinnerPrimary size={25} />
       </NavSection>
     );
 
@@ -122,28 +97,7 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
-      <div className="flex items-center justify-center w-full flex-col gap-4 py-4">
-        {postState === "loading" ? (
-          <SpinnerPrimary />
-        ) : postState === "invalid" ? (
-          <p>{username} has no posts yet.</p>
-        ) : userPosts.length > 0 ? (
-          <div className="w-full flex flex-col gap-4 items-center justify-center">
-            {userPosts.map((post: PostType, index: number) => {
-              return (
-                <PostCard
-                  username={username}
-                  post={post}
-                  key={index}
-                  showTopic
-                />
-              );
-            })}
-          </div>
-        ) : (
-          <p>{username} has no posts yet.</p>
-        )}
-      </div>
+      {visitingUser && <UserPostsSection username={visitingUser.username} />}
     </NavSection>
   );
 }
