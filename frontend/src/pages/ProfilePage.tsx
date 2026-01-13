@@ -12,7 +12,6 @@ import type { PostType } from "../types/post";
 import PostCard from "../components/posts/PostCard";
 import FollowButton from "../components/profile/follow/FollowButton";
 import FollowerFollowingSection from "../components/profile/follow/FollowerFollowingSection";
-import CreatePostTopicSection from "./CreatePostTopicSection";
 import BuzzSection from "../components/profile/BuzzSection";
 import SettingsButton from "../components/profile/SettingsButton";
 import LongContent from "../components/posts/LongContent";
@@ -124,13 +123,6 @@ export default function ProfilePage() {
         </div>
       )}
       <div className="flex items-center justify-center w-full flex-col gap-4 py-4">
-        {isCurrentUser && (
-          <CreatePostTopicSection
-            trigger={setUpdate}
-            triggerBool={update}
-            username={username}
-          />
-        )}
         {postState === "loading" ? (
           <SpinnerPrimary />
         ) : postState === "invalid" ? (
