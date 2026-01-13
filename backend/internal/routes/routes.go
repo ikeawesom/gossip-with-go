@@ -102,6 +102,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			comments.GET("/:id/replies", middleware.AuthOptional(), commentHandler.GetReplies)
 			
 			// authenticted endpoints for comments
+			comments.GET("/user/:userID", middleware.AuthRequired(), commentHandler.GetCommentsByUserID)
 			comments.POST("/root", middleware.AuthRequired(), commentHandler.CreateRootComment)      
 			comments.POST("/reply", middleware.AuthRequired(), commentHandler.CreateReply)           
 			comments.GET("/toggle-pin/:id", middleware.AuthRequired(), commentHandler.PinComment)           
