@@ -19,7 +19,6 @@ func NewLikeHandler(likeService *services.LikeService) *LikeHandler {
 	}
 }
 
-// POST /api/likes/toggle
 func (h *LikeHandler) ToggleLike(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -54,7 +53,6 @@ func (h *LikeHandler) ToggleLike(c *gin.Context) {
 	})
 }
 
-// GET /api/likes/status
 func (h *LikeHandler) GetLikeStatus(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -134,4 +132,57 @@ func (h *LikeHandler) GetLikers(c *gin.Context) {
 		"limit":  limit,
 		"offset": offset,
 	})
+}
+
+func (h *LikeHandler) GetLikesByUserID(c *gin.Context) {
+	currentUser, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	};
+
+	currentUserID := currentUser.(uint)
+
+	targetIDStr := c.Param("userID");
+	
+	targetID_temp, err := strconv.ParseUint(targetIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	targetID := uint(targetID_temp)
+	
+	// only target user can check their own likes
+	if targetID != currentUserID {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	//  get like type and validate
+	likeable_type := c.Param("likeable_type")
+	if likeable_type != "comments" && likeable_type != "posts" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "likeable type is either posts or comments"})
+		return
+	}
+	
+	if likeable_type == "posts" {
+		// get likes on posts
+		posts, err := h.likeService.GetPostLikesByUserID(targetID)
+		
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{ "data": posts })
+	} else {
+		// get likes on comments
+		comments, err := h.likeService.GetCommentsLikedByUserID(targetID)
+		
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{ "data": comments })
+	}
 }

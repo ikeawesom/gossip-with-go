@@ -56,6 +56,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			users.GET("/:username", middleware.AuthOptional(), userHandler.GetUserByUsername)
 			users.GET("/:username/followers", userHandler.GetFollowersByUsername)
 			users.GET("/:username/followings", userHandler.GetFollowingsByUsername)
+			users.POST("/edit-profile", middleware.AuthRequired(), userHandler.EditProfile)
 		}
 
 		// post routes
@@ -79,6 +80,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			// authenticated endpoints for likes
 			likes.GET("/status", middleware.AuthRequired(), likeHandler.GetLikeStatus)
 			likes.POST("/toggle", middleware.AuthRequired(), likeHandler.ToggleLike)
+			likes.POST("/by_type/:userID/:likeable_type", middleware.AuthRequired(), likeHandler.GetLikesByUserID)
 		}
 		
 		reposts := api.Group("/reposts")

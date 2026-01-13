@@ -5,17 +5,22 @@ import type { PostType } from "../../types/post";
 import { Link } from "react-router-dom";
 import TopicTag from "../topics/TopicTag";
 import PostInteractionSection from "./PostInteractionSection";
+import { twMerge } from "tailwind-merge";
 
 export default function PostCard({
   post,
   hideArrow,
   showTopic,
   username,
+  hideInteractions,
+  className,
 }: {
   post: PostType;
   hideArrow?: boolean;
   showTopic?: boolean;
   username?: string;
+  hideInteractions?: boolean;
+  className?: string;
 }) {
   const {
     content,
@@ -36,7 +41,12 @@ export default function PostCard({
   return (
     <div className="w-full">
       <Link to={url} className="w-full">
-        <Card className="flex items-center justify-between gap-6 group hover:brightness-110 duration-150 smart-wrap">
+        <Card
+          className={twMerge(
+            "flex items-center justify-between gap-6 group hover:brightness-110 duration-150 smart-wrap",
+            className
+          )}
+        >
           <div className="w-full flex flex-col items-start justify-start gap-2">
             <div className="flex items-center justify-start gap-2">
               {showTopic && (
@@ -62,7 +72,7 @@ export default function PostCard({
           )}
         </Card>
       </Link>
-      <PostInteractionSection post={post} url={url} />
+      {!hideInteractions && <PostInteractionSection post={post} url={url} />}
     </div>
   );
 }

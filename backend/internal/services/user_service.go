@@ -46,6 +46,23 @@ type FollowersListType struct {
 	Username string `json:"username"`
 }
 
+func (s *UserService) EditProfile(userID uint, username, bio string) error {
+    var user models.User
+    if err := s.DB.Where("id = ?", userID).First(&user).Error; err != nil {
+        return errors.New("user not found")
+    }
+
+   // update user details
+    user.Username = username
+    user.Bio = bio
+
+    if err := s.DB.Save(&user).Error; err != nil {
+        return err
+    }
+	
+	return nil
+}
+
 func (s *UserService) GetUserByUsername(params GetUserByUsernameParams) (*UserWithBuzz, error) {
 	var user UserWithBuzz
 	if err := s.DB.Where("username = ?", params.Username).First(&user).Error; err != nil {

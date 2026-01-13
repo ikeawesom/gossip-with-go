@@ -26,4 +26,11 @@ export const likesApi = {
         const response = await apiClient.get(`/likes/likers`, { params: { type, id, limit, offset } });
         return response.data;
     },
+
+    // get the likes from user ID
+    getLikesByType: async (id: number, likeable_type: "posts" | "comments"): Promise<ResponseType> => {
+        const response = await apiClient.post(`/likes/by_type/${id}/${likeable_type}`);
+        console.log("API RESPONSE:", response)
+        return response as any as ResponseType;
+    },
 }

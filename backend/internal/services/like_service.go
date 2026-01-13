@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gossip-with-go/internal/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -14,6 +15,66 @@ type LikeService struct {
 
 func NewLikeService(db *gorm.DB) *LikeService {
 	return &LikeService{DB: db}
+}
+
+type LikedComments struct {
+	CommentID         uint      `json:"comment_id"`
+	Content           string    `json:"content"`
+	CommenterUsername string    `json:"commenter_username"`
+	PostID            uint      `json:"post_id"`
+	PosterUsername    string    `json:"poster_username"`
+	CommentCreatedAt  time.Time `json:"comment_created_at"`
+	LikedAt           time.Time `json:"liked_at"`
+}
+
+func (s *LikeService) GetCommentsLikedByUserID(userID uint) ([]LikedComments, error) {
+	var comments []LikedComments
+
+	err := s.DB.
+		Table("likes").
+		Select(`DISTINCT ON (comments.id)
+				comments.id as comment_id,
+				comments.content as content,
+				commenter.username as commenter_username,
+				comments.post_id,
+				poster.username as poster_username,
+				comments.created_at as comment_created_at,
+				likes.created_at as liked_at`).
+		Joins("JOIN comments ON likes.likeable_id = comments.id").
+		Joins("JOIN users as commenter ON comments.user_id = commenter.id").
+		Joins("JOIN posts ON comments.post_id = posts.id").
+		Joins("JOIN users as poster ON posts.user_id = poster.id").
+		Where("likes.user_id = ? AND likes.likeable_type = ?", userID, "comment").
+		Where("likes.deleted_at IS NULL AND comments.deleted_at IS NULL AND posts.deleted_at IS NULL").
+		Order("comments.id, likes.created_at DESC").
+		Find(&comments).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return comments, nil
+}
+
+func (s *LikeService) GetPostLikesByUserID(userID uint) ([]PostWithUsername, error) {
+	var posts []PostWithUsername
+
+	err := s.DB.
+			Table("likes").
+			Select("posts.*, users.username").
+			Joins("JOIN posts ON likes.likeable_id = posts.id").
+			Joins("JOIN users ON posts.user_id = users.id").
+			Where("likes.user_id = ? AND likeable_type = ?", userID, "post").
+			Where("posts.deleted_at IS NULL").
+			Find(&posts).
+			Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }
 
 func (s *LikeService) ToggleLike(userID uint, likeableType string, likeableID uint) (bool, error) {

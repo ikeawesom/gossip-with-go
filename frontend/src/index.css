@@ -99,6 +99,19 @@ button:disabled {
   }
 }
 
+@keyframes highlightSubtle {
+  from {
+    background-color: #574fe848;
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.highlight-subtle {
+  animation: highlightSubtle 1.5s ease-out forwards;
+}
+
 .fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
