@@ -50,10 +50,10 @@ export default function UserLikes({ id }: { id: number }) {
             <h4
               onClick={() => setLikeType(item.id)}
               className={twMerge(
-                "cursor-pointer hover:opacity-70 duration-150",
+                "cursor-pointer hover:opacity-70 duration-150 custom",
                 likeType === item.id
-                  ? "text-primary"
-                  : "text-primary/80 font-normal"
+                  ? "text-primary font-medium"
+                  : "text-primary/40"
               )}
               key={index}
             >
