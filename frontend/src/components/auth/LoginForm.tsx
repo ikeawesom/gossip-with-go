@@ -28,9 +28,9 @@ export default function LoginForm() {
     if (loginUser.fulfilled.match(result)) {
       navigate(prev_page, { replace: true });
     } else {
-      if (!error || error.includes("invalid")) {
+      if (!error || error.toLowerCase().includes("invalid")) {
         toast.error("Invalid username or password. Please try again.");
-      } else if (error.includes("verified")) {
+      } else if (error.toLowerCase().includes("verified")) {
         toast.info(error);
       } else {
         toast.error(defaultError.message);
