@@ -19,7 +19,6 @@ func NewCommentHandler(commentService *services.CommentService) *CommentHandler 
 	}
 }
 
-// POST /api/comments/root
 func (h *CommentHandler) CreateRootComment(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -49,7 +48,6 @@ func (h *CommentHandler) CreateRootComment(c *gin.Context) {
 	})
 }
 
-// POST /api/comments/reply
 func (h *CommentHandler) CreateReply(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -79,7 +77,37 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 	})
 }
 
-// GET /api/posts/:id/comments
+func (h *CommentHandler) GetCommentsByUserID(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	targetIDstr := c.Param("userID")
+	targetIDtemp, err := strconv.ParseUint(targetIDstr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	targetID := uint(targetIDtemp)
+
+	// user can only see their own comments
+	if targetID != userID.(uint) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	comments, err := h.commentService.GetCommentsByUserID(targetID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"comments": comments})
+}
+
 func (h *CommentHandler) GetRootComments(c *gin.Context) {
 	var userID uint = 0
 
@@ -147,7 +175,6 @@ func (h *CommentHandler) GetRootComments(c *gin.Context) {
 	})
 }
 
-// GET /api/comments/:id/replies
 func (h *CommentHandler) GetReplies(c *gin.Context) {
 	var userID uint = 0
 
@@ -228,7 +255,6 @@ func (h *CommentHandler) PinComment(c *gin.Context) {
 	})
 }
 
-// DELETE /api/comments/:id
 func (h *CommentHandler) DeleteComment(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {

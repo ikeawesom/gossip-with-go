@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gossip-with-go/internal/models"
 	"gossip-with-go/internal/utils"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -22,6 +23,19 @@ type CommentWithUsername struct {
 	Username string `json:"username"`
 
 	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
+}
+
+type UserComments struct {
+	CommentID         uint      `json:"comment_id"`
+	Content           string    `json:"content"`
+
+	CommenterUsername string    `json:"commenter_username"`
+
+	PostID            uint      `json:"post_id"`
+	PosterUsername    string    `json:"poster_username"`
+	PostTitle         string    `json:"post_title"`
+	
+	CommentCreatedAt  time.Time `json:"comment_created_at"`
 }
 
 // creates a comment directly on a post
@@ -97,6 +111,40 @@ func (s *CommentService) incrementPostCommentCount(postID uint) error {
 		Update("comment_count", gorm.Expr("comment_count + ?", 1)).
 		Error
 }
+
+// retrieves all comments made by user
+func (s *CommentService) GetCommentsByUserID(userID uint) ([]UserComments, error) {
+	var comments []UserComments
+
+	err := s.DB.
+		Table("comments").
+		Select(`
+			DISTINCT ON (comments.id)
+			comments.id        as comment_id,
+			comments.content   as content,
+			commenter.username as commenter_username,
+			comments.post_id,
+			poster.username    as poster_username,
+			posts.title        as post_title,
+			comments.created_at as comment_created_at
+		`).
+		Joins("JOIN users as commenter ON comments.user_id = commenter.id").
+		Joins("JOIN posts ON comments.post_id = posts.id").
+		Joins("JOIN users as poster ON posts.user_id = poster.id").
+		Where("comments.user_id = ?", userID).
+		Where("comments.deleted_at IS NULL").
+		Where("posts.deleted_at IS NULL").
+		Order("comments.id, comments.created_at DESC").
+		Find(&comments).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return comments, nil
+}
+
 
 // retrieves all root comments for a post (paginated)
 func (s *CommentService) GetRootCommentsByPostID(postID uint, limit int, offset int, currentUser uint) ([]CommentWithUsername, error) {
