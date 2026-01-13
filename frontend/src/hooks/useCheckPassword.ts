@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function useCheckPassword(password: string) {
     const password_length = password.length > 8;
     const password_number = /[0-9]/.test(password);
