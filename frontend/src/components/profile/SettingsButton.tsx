@@ -7,6 +7,7 @@ import ModalTitle from "../utils/ModalTitle";
 import { toast } from "sonner";
 import EditProfileForm from "./EditProfileForm";
 import UserLikes from "./UserLikes";
+import UserCommentsSection from "./UserCommentsSection";
 
 export interface SettingsInterface extends StateTriggerType {
   user: User;
@@ -55,7 +56,7 @@ export default function SettingsButton({
                 <img src="/icons/icon_pencil.svg" width={15} height={15} />
                 Edit Profile
               </button>
-              <ModalTitle className="custom text-sm mt-3 mb-1">
+              <ModalTitle className="custom text-sm mt-3">
                 <span className="flex items-center justify-start gap-2">
                   <img
                     src="/icons/icon_chart.svg"
@@ -68,7 +69,7 @@ export default function SettingsButton({
               </ModalTitle>
               <button
                 onClick={() => setShow("likes")}
-                className="flex items-center justify-start gap-4 w-full rounded-md hover:bg-primary/10 duration-150 p-2 text-start cursor-pointer"
+                className="flex items-center justify-start gap-4 w-full rounded-md hover:bg-primary/10 duration-150 p-2 text-start cursor-pointer mt-2"
               >
                 <img
                   src="/icons/posts/icon_liked_primary.svg"
@@ -79,7 +80,7 @@ export default function SettingsButton({
                 Likes
               </button>
               <button
-                // onClick={viewProfile}
+                onClick={() => setShow("comments")}
                 className="flex items-center justify-start gap-4 w-full rounded-md hover:bg-primary/10 duration-150 p-2 text-start cursor-pointer"
               >
                 <img
@@ -94,7 +95,9 @@ export default function SettingsButton({
           )}
           {show === "edit" && (
             <>
-              <ModalTitle>Edit Profile</ModalTitle>
+              <ModalTitle back={() => setShow("settings")}>
+                Edit Profile
+              </ModalTitle>
               <div className="flex w-full flex-col items-start justify-start gap-2 mt-2">
                 <div className="w-full flex items-center justify-between">
                   <p className="custom text-sm">Email Address</p>
@@ -113,18 +116,22 @@ export default function SettingsButton({
           )}
           {show === "likes" && (
             <>
-              <ModalTitle>
+              <ModalTitle back={() => setShow("settings")}>
                 <span className="flex items-center justify-start gap-2">
-                  <img
-                    src="/icons/posts/icon_liked_primary.svg"
-                    alt=""
-                    width={20}
-                    height={20}
-                  />
                   Likes
                 </span>
               </ModalTitle>
               <UserLikes id={user.id} />
+            </>
+          )}
+          {show === "comments" && (
+            <>
+              <ModalTitle back={() => setShow("settings")}>
+                <span className="flex items-center justify-start gap-2">
+                  Comments
+                </span>
+              </ModalTitle>
+              <UserCommentsSection id={user.id} />
             </>
           )}
         </Modal>
