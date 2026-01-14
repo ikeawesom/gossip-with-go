@@ -20,7 +20,9 @@ func NewLikeService(db *gorm.DB) *LikeService {
 type LikedComments struct {
 	CommentID         uint      `json:"comment_id"`
 	Content           string    `json:"content"`
+
 	CommenterUsername string    `json:"commenter_username"`
+	CommenterPfp      string    `json:"commenter_pfp"`
 	PostID            uint      `json:"post_id"`
 	PosterUsername    string    `json:"poster_username"`
 	CommentCreatedAt  time.Time `json:"comment_created_at"`
@@ -36,6 +38,7 @@ func (s *LikeService) GetCommentsLikedByUserID(userID uint) ([]LikedComments, er
 				comments.id as comment_id,
 				comments.content as content,
 				commenter.username as commenter_username,
+				commenter.pfp as commenter_pfp,
 				comments.post_id,
 				poster.username as poster_username,
 				comments.created_at as comment_created_at,

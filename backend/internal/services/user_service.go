@@ -49,6 +49,7 @@ type GetUserByUsernameParams struct {
 type FollowersListType struct {
 	UserID uint `json:"id"`
 	Username string `json:"username"`
+	Pfp   string `json:"pfp"`
 }
 
 func (s *UserService) EditProfile(userID uint, username, bio string, avatarURL *string) error {
@@ -171,7 +172,7 @@ func (s* UserService) GetUserFollowers(username string) ([]FollowersListType, er
 	var followers []FollowersListType
 	if err := s.DB.
 				Table("users").
-				Select("follows.following_id, users.username").
+				Select("follows.following_id, users.username, users.pfp").
 				Joins("JOIN follows ON follows.follower_id = users.id").
 				Where("following_id = ? AND follow_type = ?", user.ID, "user").
 				Find(&followers).Error; err != nil {
@@ -194,7 +195,7 @@ func (s* UserService) GetUserFollowings(username string) ([]FollowersListType, e
 	var followers []FollowersListType
 	if err := s.DB.
 				Table("users").
-				Select("follows.following_id, users.username").
+				Select("follows.following_id, users.username, users.pfp").
 				Joins("JOIN follows ON follows.following_id = users.id").
 				Where("follower_id = ? AND follow_type = ?", user.ID, "user").
 				Find(&followers).Error; err != nil {
