@@ -124,7 +124,7 @@ func (s *CommentService) GetCommentsByUserID(userID uint) ([]UserComments, error
 			comments.id        as comment_id,
 			comments.content   as content,
 			commenter.username as commenter_username,
-			commenter.pfp 	   as commenter_pfp
+			commenter.pfp 	   as commenter_pfp,
 			comments.post_id,
 			poster.username    as poster_username,
 			posts.title        as post_title,
