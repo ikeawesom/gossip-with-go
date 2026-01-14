@@ -6,6 +6,7 @@ export interface Comment {
     parent_comment_id?: number;
     user_id: number;
     username?: string;
+    pfp?: string;
     content: string;
 
     like_count: number;

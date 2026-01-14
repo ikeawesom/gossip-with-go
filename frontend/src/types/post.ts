@@ -10,6 +10,7 @@ export interface PostType {
     title: string;
     content: string;
     username?: string;
+    pfp?: string;
 
     created_at: string;
     updated_at: string;
