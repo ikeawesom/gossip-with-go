@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import TopicTag from "../topics/TopicTag";
 import PostInteractionSection from "./PostInteractionSection";
 import { twMerge } from "tailwind-merge";
+import FollowingRepostsSection from "./FollowingRepostsSection";
 
 export default function PostCard({
   post,
@@ -32,6 +33,7 @@ export default function PostCard({
     id,
     topic_name,
     topic_class,
+    reposters,
   } = post;
 
   const newDateStr = formatDate(new Date(created_at).getTime(), true);
@@ -42,6 +44,9 @@ export default function PostCard({
 
   return (
     <div className="w-full">
+      {reposters && reposters.length > 0 && (
+        <FollowingRepostsSection reposters={reposters} />
+      )}
       <Link to={url} className="w-full">
         <Card
           className={twMerge(
