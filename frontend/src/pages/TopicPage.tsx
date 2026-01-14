@@ -103,7 +103,7 @@ export default function TopicPage() {
                       FREE TOPICS
                     </p>
                   ) : (
-                    <p className="custom text-fine-print text-sm mt-2">
+                    <p className="custom text-fine-print text-xs mt-2">
                       Created by{" "}
                       <Link
                         className="text-primary hover:opacity-70 duration-150 cursor-pointer"
@@ -114,7 +114,7 @@ export default function TopicPage() {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center md:justify-end gap-3 md:w-fit w-full justify-center md:mb-0 mb-3">
+                <div className="flex items-center md:justify-end gap-3 md:w-fit w-full justify-center md:mb-0 mb-2">
                   <FollowButton
                     trigger={setUpdate}
                     triggerBool={update}
@@ -132,7 +132,9 @@ export default function TopicPage() {
                   )}
                 </div>
               </div>
-              <p className="custom text-sm my-2">{topic?.description}</p>
+              {topic.description && (
+                <p className="custom text-sm md:mt-1">{topic.description}</p>
+              )}
               <div className="flex items-center justify-start gap-2">
                 <p className="custom text-gray-dark text-sm">
                   {topic?.post_count}{" "}

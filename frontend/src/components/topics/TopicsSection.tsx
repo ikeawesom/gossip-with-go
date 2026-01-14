@@ -70,10 +70,10 @@ export default function TopicsSection() {
               to={`/topics/${id}`}
               className="min-w-[150px] flex"
             >
-              <Card className="hover:brightness-110 flex flex-col justify-between items-start duration-150 ease-in-out py-3 px-4 gap-1">
+              <Card className="hover:brightness-110 flex flex-col justify-between items-start duration-150 ease-in-out md:py-2 md:pb-4 pt-2 pb-3 gap-1">
                 <div className="flex items-center justify-start gap-6">
                   <h4 className={COLORS_ARR[topic_class].text}>
-                    {trimString(topic_name, 25)}
+                    {trimString(topic_name, 15)}
                   </h4>
                   <div className="flex items-center justify-start gap-2">
                     <span className="flex items-center justify-start gap-1">
