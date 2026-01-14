@@ -14,6 +14,7 @@ import SettingsButton from "../components/profile/SettingsButton";
 import LongContent from "../components/posts/LongContent";
 import UserPostsSection from "../components/profile/UserPostsSection";
 import { twMerge } from "tailwind-merge";
+import PfpModal from "../components/profile/PfpModal";
 
 export type ProfileToggleType = "posts" | "reposts";
 
@@ -88,16 +89,7 @@ export default function ProfilePage() {
           <div className="w-full">
             <div className="flex md:flex-row flex-col items-start md:items-center md:justify-between justify-start gap-2 md:gap-4 w-full">
               <div className="flex items-center justify-start gap-4">
-                <label
-                  htmlFor="pfp-upload"
-                  className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-gray-light shadow-sm grid place-items-center"
-                >
-                  <img
-                    src={pfp || "/utils/icon_avatar.svg"}
-                    alt="Profile Picture"
-                    className="h-full w-full object-cover"
-                  />
-                </label>
+                <PfpModal pfp={pfp} />
                 <div>
                   <h1>{username}</h1>
                   {bio && <LongContent className="mt-1" content={bio} />}
