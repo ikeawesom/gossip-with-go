@@ -23,7 +23,6 @@ export interface PostType {
     user_has_liked: boolean;
     user_has_reposted: boolean;
     reposters: string[];
-    likers: string[];
 }
 
 export interface CreatePostRequest {
