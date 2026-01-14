@@ -12,6 +12,7 @@ type User struct {
 	Bio       string		 `json:"bio"`
 	Email     string         `gorm:"size:320;uniqueIndex;not null" json:"email"`
 	Password  string         `gorm:"not null" json:"-"`
+	Pfp       string        `gorm:"default:null" json:"pfp"`
 
 	FollowerCount    int            `gorm:"default:0;not null" json:"follower_count"`
 	FollowingCount    int            `gorm:"default:0;not null" json:"following_count"`

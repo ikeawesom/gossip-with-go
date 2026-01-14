@@ -26,8 +26,8 @@ export default function CommentSettingsSection({
           close={() => setShowSettings(false)}
           className="max-w-[300px] p-4"
         >
-          <ModalTitle className="mb-3">Comment Settings</ModalTitle>{" "}
-          <div className="w-full flex flex-col items-center justify-center gap-2">
+          <ModalTitle>Comment Settings</ModalTitle>{" "}
+          <div className="w-full flex flex-col items-center justify-center gap-2 mt-3">
             {isPostOwner && (
               <PinCommentButton
                 isPinned={isPinned}

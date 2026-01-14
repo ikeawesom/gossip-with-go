@@ -13,6 +13,9 @@ type Config struct {
 	GinMode string
 
 	DatabaseURL string
+	CloudName   string
+	CloudKey    string
+	CloudSecret string
 
 	JWTSecret              string
 	JWTAccessTokenExpiry   time.Duration
@@ -57,6 +60,9 @@ func LoadConfig() *Config {
 		GinMode: getEnv("GIN_MODE", "debug"),
 
 		DatabaseURL: getEnv("DATABASE_URL", ""),
+		CloudName: getEnv("CLOUDINARY_CLOUD_NAME", ""),
+		CloudKey: getEnv("CLOUDINARY_API_KEY", ""),
+		CloudSecret: getEnv("CLOUDINARY_API_SECRET", ""),
 
 		JWTSecret:             getEnv("JWT_SECRET", ""),
 		JWTAccessTokenExpiry:  accessTokenExpiry,
@@ -84,6 +90,11 @@ func LoadConfig() *Config {
 	if AppConfig.DatabaseURL == "" {
 		log.Fatal("DATABASE_URL is required")
 	}
+	
+	if AppConfig.CloudKey == "" || AppConfig.CloudName == "" || AppConfig.CloudSecret == "" {
+		log.Fatal("CLOUD details are required")
+	}
+
 	if AppConfig.JWTSecret == "" {
 		log.Fatal("JWT_SECRET is required")
 	}

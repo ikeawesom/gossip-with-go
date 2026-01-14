@@ -74,7 +74,7 @@ export default function ProfilePage() {
       </NavSection>
     );
 
-  const { created_at, bio, username, buzz } = visitingUser as User;
+  const { created_at, bio, username, buzz, pfp } = visitingUser as User;
   const createdDate = formatDate(new Date(created_at).getTime());
 
   const isCurrentUser = user?.username === username;
@@ -87,9 +87,21 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between gap-4 border-b border-gray-dark/20 pb-3 w-full">
           <div className="w-full">
             <div className="flex md:flex-row flex-col items-start md:items-center md:justify-between justify-start gap-2 md:gap-4 w-full">
-              <div>
-                <h1>{username}</h1>
-                {bio && <LongContent className="mt-1" content={bio} />}
+              <div className="flex items-center justify-start gap-4">
+                <label
+                  htmlFor="pfp-upload"
+                  className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-gray-light shadow-sm grid place-items-center"
+                >
+                  <img
+                    src={pfp || "/utils/icon_avatar.svg"}
+                    alt="Profile Picture"
+                    className="h-full w-full object-cover"
+                  />
+                </label>
+                <div>
+                  <h1>{username}</h1>
+                  {bio && <LongContent className="mt-1" content={bio} />}
+                </div>
               </div>
               <div className="w-full flex items-center justify-end gap-2">
                 {!isCurrentUser && visitingUser && (

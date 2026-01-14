@@ -163,13 +163,13 @@ export default function PostPage() {
           close={() => setShowSettings(false)}
           className="max-w-[300px] p-4"
         >
-          <ModalTitle className="mb-3">Post Settings</ModalTitle>
+          <ModalTitle>Post Settings</ModalTitle>
           <SecondaryButton
             onClick={() => {
               setShowSettings(false);
               setIsEditing(true);
             }}
-            className="text-xs flex items-center justify-center gap-2 px-3 w-full mb-3"
+            className="text-xs flex items-center justify-center gap-2 px-3 w-full mb-2 mt-3"
           >
             Edit
             <img

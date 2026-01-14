@@ -4,6 +4,7 @@ export interface User {
     username: string;
     email: string;
     email_verified: boolean;
+    pfp?: string;
 
     follower_count: number;
     following_count: number;

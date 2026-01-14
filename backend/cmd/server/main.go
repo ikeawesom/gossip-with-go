@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"gossip-with-go/internal/cloudinary"
 	"gossip-with-go/internal/config"
 	"gossip-with-go/internal/database"
 	"gossip-with-go/internal/handlers"
@@ -19,6 +20,11 @@ func main() {
 	// connect to DB
 	if err := database.ConnectDatabase(cfg.DatabaseURL); err != nil {
 		log.Fatal("Failed to connect to database:", err)
+	}
+
+	// connect to cloudinary
+	if err := cloudinary.InitCloudinary(cfg.CloudName, cfg.CloudKey, cfg.CloudSecret); err != nil {
+		log.Fatal("Failed to connect to cloudinary:", err)
 	}
 
 	// init services
