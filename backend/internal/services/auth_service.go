@@ -48,8 +48,6 @@ func (s *AuthService) Signup(username, email, password string) (*models.User, er
 	// check if user already exists
 	var existingUser models.User
 	if err := s.DB.Where("email = ? OR username = ?", email, username).First(&existingUser).Error; err == nil {
-		utils.DebugLog("Email:", existingUser)
-		
 		// check if email already exists
 		if existingUser.Email == email { 
 			// email exists

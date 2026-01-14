@@ -100,8 +100,6 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 		return
 	}
 
-	utils.DebugLog("post", post)
-
 	utils.SuccessResponse(c, http.StatusOK, "Post retrieved successfully", gin.H{"post": post})
 }
 

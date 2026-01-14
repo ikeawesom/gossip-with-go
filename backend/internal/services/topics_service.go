@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"gossip-with-go/internal/models"
-	"gossip-with-go/internal/utils"
 	"sort"
 	"time"
 
@@ -73,8 +72,6 @@ func (s *TopicsService) CreateTopic(currentUser uint, topicTitle, topicDesc, top
 	if err := s.DB.Create(&newTopic).Error; err != nil {
 		return nil, err
 	}
-
-	utils.DebugLog("new topic:", newTopic)
 
 	return &newTopic, nil
 }

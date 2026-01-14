@@ -66,8 +66,6 @@ func (h* TopicHandler) CreateTopic(c *gin.Context) {
 		return
 	}
 
-	utils.DebugLog("[HANLDER]:", topic)
-
 	utils.SuccessResponse(c, http.StatusOK, "Topic created successfully", gin.H{"topic": topic})
 }
 

@@ -209,8 +209,6 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 		return
 	}
 
-	utils.DebugLog("Replies: ",replies)
-
 	// get total reply count
 	totalCount, err := h.commentService.GetReplyCount(uint(commentID))
 	if err != nil {
