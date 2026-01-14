@@ -24,6 +24,7 @@ type RepostedPosts struct {
 	
 	PosterID    uint      `json:"poster_id"`
 	Username    string    `json:"username"`
+	Pfp         string    `json:"pfp"`
 
 	TopicID     uint      `json:"topic_id"`
 	TopicName   string    `json:"topic_name"`
@@ -146,6 +147,7 @@ func (s *RepostService) GetUserReposts(userID uint) ([]RepostedPosts, error) {
 			posts.topic         as topic_id,
 			posts.user_id       as poster_id,
 			poster.username     as username,
+			poster.pfp			as pfp,
 			posts.created_at    as created_at,
 			reposts.created_at  as reposted_on,
 			topics.topic_name,

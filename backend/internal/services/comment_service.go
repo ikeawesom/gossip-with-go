@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"gossip-with-go/internal/models"
-	"gossip-with-go/internal/utils"
 	"time"
 
 	"gorm.io/gorm"
@@ -21,6 +20,7 @@ func NewCommentService(db *gorm.DB) *CommentService {
 type CommentWithUsername struct {
 	models.Comment
 	Username string `json:"username"`
+	Pfp string 		`json:"pfp"`
 
 	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
 }
@@ -30,6 +30,7 @@ type UserComments struct {
 	Content           string    `json:"content"`
 
 	CommenterUsername string    `json:"commenter_username"`
+	CommenterPfp      string    `json:"commenter_pfp"`
 
 	PostID            uint      `json:"post_id"`
 	PosterUsername    string    `json:"poster_username"`
@@ -123,6 +124,7 @@ func (s *CommentService) GetCommentsByUserID(userID uint) ([]UserComments, error
 			comments.id        as comment_id,
 			comments.content   as content,
 			commenter.username as commenter_username,
+			commenter.pfp 	   as commenter_pfp
 			comments.post_id,
 			poster.username    as poster_username,
 			posts.title        as post_title,
@@ -152,7 +154,7 @@ func (s *CommentService) GetRootCommentsByPostID(postID uint, limit int, offset 
 	
 	err := s.DB.
 		Table("comments").
-		Select("comments.*, users.username").
+		Select("comments.*, users.username, users.pfp").
 		Joins("JOIN users ON users.id = comments.user_id").
 		Where("post_id = ? AND parent_comment_id IS NULL", postID).
 		Order("is_pinned DESC").
@@ -166,7 +168,6 @@ func (s *CommentService) GetRootCommentsByPostID(postID uint, limit int, offset 
 		return nil, err
 	}
 	
-	utils.DebugLog("comments:", comments);
 	return comments, err
 }
 
@@ -200,8 +201,6 @@ func (s *CommentService) encrichWithInteractionData(comments []CommentWithUserna
 		comments[i].UserHasLiked = userLikesMap[commentID] // set to user liked
 	}
 
-	utils.DebugLog("final comments:", comments)
-
 	return nil
 }
 
@@ -211,7 +210,7 @@ func (s *CommentService) GetRepliesByCommentID(commentID uint, limit int, offset
 
 	err := s.DB.
 		Table("comments").
-		Select("comments.*, users.username").
+		Select("comments.*, users.username, users.pfp").
 		Joins("JOIN users ON users.id = comments.user_id").
 		Where("parent_comment_id = ?", commentID).
 		Order("created_at ASC").

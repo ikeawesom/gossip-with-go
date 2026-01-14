@@ -62,7 +62,7 @@ func (s *LikeService) GetPostLikesByUserID(userID uint) ([]PostWithUsername, err
 
 	err := s.DB.
 			Table("likes").
-			Select("posts.*, users.username").
+			Select("posts.*, users.username, users.pfp").
 			Joins("JOIN posts ON likes.likeable_id = posts.id").
 			Joins("JOIN users ON posts.user_id = users.id").
 			Where("likes.user_id = ? AND likeable_type = ?", userID, "post").
@@ -178,7 +178,7 @@ func (s *LikeService) GetLikers(likeableType string, likeableID uint, limit int,
 	var usernames []string
 	
 	err := s.DB.Table("likes").
-		Select("users.username").
+		Select("users.username, users.pfp").
 		Joins("JOIN users ON users.id = likes.user_id").
 		Where("likes.likeable_type = ? AND likes.likeable_id = ?", likeableType, likeableID).
 		Order("likes.created_at DESC").

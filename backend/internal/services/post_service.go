@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"gossip-with-go/internal/models"
-	"gossip-with-go/internal/utils"
 	"sort"
 
 	"gorm.io/gorm"
@@ -26,15 +25,10 @@ type PaginationParams struct {
 	UserID uint
 }
 
-type PaginatedPostsResponse struct {
-	Posts      []PostWithTopic `json:"posts"`
-	NextCursor *uint         `json:"next_cursor"`
-	HasMore    bool          `json:"has_more"`
-}
-
 type PostWithUsername struct {
 	models.Post
 	Username string `json:"username"`
+	Pfp		 string `json:"pfp"`
 	
 	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
 	UserHasReposted bool  `gorm:"-" json:"user_has_reposted"` 
@@ -46,6 +40,12 @@ type PostWithTopic struct {
 
 	TopicName  string  `json:"topic_name"`
 	TopicClass string  `json:"topic_class"`
+}
+
+type PaginatedPostsResponse struct {
+	Posts      []PostWithTopic `json:"posts"`
+	NextCursor *uint         `json:"next_cursor"`
+	HasMore    bool          `json:"has_more"`
 }
 
 func NewPostService(db *gorm.DB) *PostService {
@@ -66,7 +66,7 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 	var posts []PostWithTopic
 	if err := s.DB.
 				Table("posts").
-				Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+				Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
 				Joins("JOIN topics ON posts.topic = topics.id").
 				Joins("JOIN users ON users.id = posts.user_id").
 				Where("posts.user_id = ?", author.ID).
@@ -89,7 +89,7 @@ func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]PostWithT
 	var posts []PostWithTopic
 	if err := s.DB.
 				Table("posts").
-				Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+				Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
 				Joins("JOIN topics ON posts.topic = topics.id").
 				Joins("JOIN users ON users.id = posts.user_id").
 				Where("topics.id = ?", topicID).
@@ -120,7 +120,7 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 	var post PostWithTopic
 	if err := s.DB.
 			Table("posts").
-			Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+			Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
 			Joins("JOIN topics ON posts.topic = topics.id").
 			Joins("JOIN users ON users.id = posts.user_id").
 			Where("posts.id = ? AND posts.user_id = ?", postID, author.ID).Order("created_at DESC").First(&post).Error; err != nil {
@@ -137,7 +137,6 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 		return nil, err
 	}
 
-	// utils.DebugLog("post:", post_array)
 	return &(post_array[0]), nil
 }
 
@@ -158,8 +157,6 @@ func (s *PostService) CreatePost(username, title, content string, topic uint) (u
 		Content: content,
 	}
 
-	utils.DebugLog("new post:", newPost)
-
 	if err := s.DB.Create(&newPost).Error; err != nil {
 		return 0, err
 	}
@@ -170,7 +167,6 @@ func (s *PostService) CreatePost(username, title, content string, topic uint) (u
 			Where("id = ?", topicID).
 			Update("post_count", gorm.Expr("post_count + ?", 1)).
 			Error; err != nil {
-				utils.DebugLog("error:", err)
 				return 0, err
 			}
 
@@ -251,7 +247,7 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 
 	query := s.DB.
 		Table("posts").
-		Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+		Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
 		Joins("JOIN topics ON posts.topic = topics.id").
 		Joins("JOIN users ON users.id = posts.user_id")
 
@@ -310,7 +306,7 @@ func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPost
 
 	query := s.DB.
 		Table("posts").
-		Select("posts.*, users.username, topics.id as topic_id, topics.topic_name, topics.topic_class").
+		Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
 		Joins("JOIN topics ON posts.topic = topics.id").
 		Joins("JOIN users ON users.id = posts.user_id").
 		Joins(`LEFT JOIN follows AS user_follows ON 
@@ -411,11 +407,14 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentU
 	// get user's following reposters for all posts
 	var repostResults []InteractionResult
 	s.DB.Table("reposts").
-		Select("reposts.post_id, users.username").
+		Select(`DISTINCT ON (reposts.post_id, reposts.user_id)
+				reposts.post_id, 
+				users.username`).
 		Joins("JOIN users ON users.id = reposts.user_id").
 		Joins("JOIN follows ON follows.following_id = reposts.user_id AND follows.follower_id = ?", currentUserID).
 		Where("reposts.post_id IN ?", postIDs).
-		Order("reposts.created_at DESC").
+		Where("reposts.user_id <> ?", currentUserID).
+		Order("reposts.post_id, reposts.user_id, reposts.created_at DESC").
 		Find(&repostResults)
 
 	// group reposters by post ID
@@ -443,7 +442,6 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentU
 		}
 	}
 
-	// utils.DebugLog("final posts:", posts)
 	return nil
 }
 

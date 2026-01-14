@@ -3,7 +3,6 @@ package services
 import (
 	"errors"
 	"gossip-with-go/internal/models"
-	"gossip-with-go/internal/utils"
 
 	"gorm.io/gorm"
 )
@@ -25,6 +24,7 @@ type Query struct {
 type QueryUserResponse struct {
 	UserID uint `json:"id"`
 	Username string `json:"username"`
+	Pfp      string `json:"pfp"`
 }
 
 type QueryTopicResponse struct {
@@ -33,7 +33,10 @@ type QueryTopicResponse struct {
 }
 type QueryPostResponse struct {
 	models.Post
+	TopicName string `json:"topic_name"`
+	TopicClass string `json:"topic_class"`
 	Username string `json:"username"`
+	Pfp      string `json:"pfp"`
 }
 
 func (s *QueryService) QueryUsers(searchQuery string) ([]QueryUserResponse, error) {
@@ -41,7 +44,7 @@ func (s *QueryService) QueryUsers(searchQuery string) ([]QueryUserResponse, erro
 	updatedSearch := "%" + searchQuery + "%"
 	if err := s.DB.
 		Table("users").
-		Select("users.id, users.username").
+		Select("users.id, users.username, users.pfp").
 		Where("username ILIKE ?", updatedSearch).Find(&users).Error;
 		
 		err != nil {
@@ -71,7 +74,6 @@ func (s *QueryService) QueryTopics(searchQuery string) ([]TopicsWithUsername, er
 				return nil, err
 			}
 
-	utils.DebugLog("Topics Result:", topics)
 	return topics, nil
 }
 
@@ -81,7 +83,8 @@ func (s *QueryService) QueryPosts(searchQuery string) ([]QueryPostResponse, erro
 
 	if err := s.DB.
 		Table("posts").
-		Select("posts.*, users.username").
+		Select("posts.*, users.username, users.pfp, topics.topic_name, topics.topic_class").
+		Joins("JOIN topics ON posts.topic = topics.id").
 		Joins("JOIN users ON users.id = posts.user_id").
 		Where("title ILIKE ? OR content ILIKE ? OR users.username ILIKE ?", updatedSearch, updatedSearch, updatedSearch).
 		Order("like_count DESC").
@@ -93,5 +96,6 @@ func (s *QueryService) QueryPosts(searchQuery string) ([]QueryPostResponse, erro
 		}
 		return nil, err
 	}
+
 	return posts, nil
 }
