@@ -1,9 +1,14 @@
 package services
 
 import (
+	"context"
 	"errors"
+	"gossip-with-go/internal/cloudinary"
 	"gossip-with-go/internal/models"
+	"gossip-with-go/internal/utils"
+	"log"
 
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"gorm.io/gorm"
 )
 
@@ -46,7 +51,7 @@ type FollowersListType struct {
 	Username string `json:"username"`
 }
 
-func (s *UserService) EditProfile(userID uint, username, bio string) error {
+func (s *UserService) EditProfile(userID uint, username, bio string, avatarURL *string) error {
     var user models.User
     if err := s.DB.Where("id = ?", userID).First(&user).Error; err != nil {
         return errors.New("user not found")
@@ -56,11 +61,27 @@ func (s *UserService) EditProfile(userID uint, username, bio string) error {
     user.Username = username
     user.Bio = bio
 
-    if err := s.DB.Save(&user).Error; err != nil {
-        return err
+	if avatarURL != nil {
+		// delete current pfp from cloudinary to save storage
+		if user.Pfp != "" {
+			log.Printf("Current pfp: %s", user.Pfp)
+			publicID := utils.ExtractPublicID(user.Pfp)
+
+			_, err := cloudinary.Cloudinary.Upload.Destroy(
+				context.Background(),
+				uploader.DestroyParams{
+					PublicID: publicID,
+				},
+			)
+
+			if err != nil {
+				return err;
+			}
+		}
+        user.Pfp = *avatarURL
     }
-	
-	return nil
+
+    return s.DB.Save(&user).Error
 }
 
 func (s *UserService) GetUserByUsername(params GetUserByUsernameParams) (*UserWithBuzz, error) {
