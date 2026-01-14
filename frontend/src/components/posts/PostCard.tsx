@@ -7,6 +7,7 @@ import TopicTag from "../topics/TopicTag";
 import PostInteractionSection from "./PostInteractionSection";
 import { twMerge } from "tailwind-merge";
 import FollowingRepostsSection from "./FollowingRepostsSection";
+import PfpImg from "../profile/PfpImg";
 
 export default function PostCard({
   post,
@@ -34,6 +35,7 @@ export default function PostCard({
     topic_name,
     topic_class,
     reposters,
+    pfp,
   } = post;
 
   const newDateStr = formatDate(new Date(created_at).getTime(), true);
@@ -50,12 +52,17 @@ export default function PostCard({
       <Link to={url} className="w-full">
         <Card
           className={twMerge(
-            "flex items-center justify-between gap-6 group hover:brightness-110 duration-150 smart-wrap",
+            "w-full flex flex-col items-start justify-start gap-2 group hover:brightness-105 duration-150 smart-wrap",
             className
           )}
         >
-          <div className="w-full flex flex-col items-start justify-start gap-2">
-            <div className="flex items-center justify-start gap-2">
+          <div className="flex items-center justify-start gap-2 mb-1 border-b border-gray-dark/20 w-full pb-2">
+            <PfpImg icon pfp={pfp} />
+            <p className="custom text-primary text-sm">{user}</p>{" "}
+          </div>
+
+          <div className="w-full flex items-center justify-between gap-4">
+            <div className="w-full flex flex-col items-start justify-start gap-2">
               {showTopic && (
                 <TopicTag
                   trim
@@ -63,20 +70,21 @@ export default function PostCard({
                   topic_name={topic_name}
                 />
               )}
-              <p className="custom text-primary text-sm">{user}</p>{" "}
+              <h4 className="custom font-bold line-clamp-2 text-black">
+                {title}
+              </h4>
+              <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
+              <p className="fine-print">
+                Posted {newDateStr.date ? "on" : ""} {newDateStr.time}
+              </p>
             </div>
-            <h4 className="custom font-bold line-clamp-2">{title}</h4>
-            <p className="whitespace-pre-wrap line-clamp-3">{content}</p>
-            <p className="fine-print">
-              Posted {newDateStr.date ? "on" : ""} {newDateStr.time}
-            </p>
+            {!hideArrow && (
+              <ArrowRight
+                className="group-hover:translate-x-1 duration-150"
+                size={30}
+              />
+            )}{" "}
           </div>
-          {!hideArrow && (
-            <ArrowRight
-              className="group-hover:translate-x-1 duration-150"
-              size={30}
-            />
-          )}
         </Card>
       </Link>
       {!hideInteractions && <PostInteractionSection post={post} url={url} />}

@@ -10,6 +10,7 @@ import useShowReplies from "../../hooks/useShowReplies";
 import { twMerge } from "tailwind-merge";
 import CommentSettingsSection from "./comments/CommentSettingsSection";
 import SpinnerPrimary from "../spinner/SpinnerPrimary";
+import PfpImg from "../profile/PfpImg";
 
 export interface IndivComment extends CommentTriggers {
   comment: Comment;
@@ -45,6 +46,7 @@ export default function IndividualComment({
     user_id,
     user_has_liked,
     is_pinned,
+    pfp,
   } = comment;
 
   const isPostOwner = user?.username === postOwner;
@@ -66,13 +68,14 @@ export default function IndividualComment({
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center justify-start gap-1">
             <Link
-              className="font-bold text-sm text-primary hover:opacity-70 duration-150"
+              className="font-bold text-sm text-primary hover:opacity-70 duration-150 flex items-center justify-start gap-2"
               to={`/${username}`}
             >
+              <PfpImg pfp={pfp} icon />
               {username}
             </Link>
             <p>•</p>
-            <p className="fine-print">{newDate}</p>
+            <p className="fine-print custom text-sm">{newDate}</p>
           </div>
           <div className="flex items-center justify-end">
             {is_pinned && (
@@ -145,6 +148,7 @@ export default function IndividualComment({
               user_has_liked,
               like_count,
               user_id: reply_user_id,
+              pfp,
             } = reply;
             const replyDate = formatDate(
               new Date(created_at).getTime(),
@@ -165,9 +169,10 @@ export default function IndividualComment({
                   <div className="w-full flex items-center justify-between gap-2">
                     <div className="flex items-center justify-start gap-1">
                       <Link
-                        className="font-bold text-sm text-primary hover:opacity-70 duration-150"
+                        className="font-bold flex items-center justify-start gap-2 text-sm text-primary hover:opacity-70 duration-150"
                         to={`/${username}`}
                       >
+                        <PfpImg icon pfp={pfp} />
                         {username}
                       </Link>
                       <p>•</p>

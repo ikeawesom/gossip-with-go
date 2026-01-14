@@ -19,6 +19,7 @@ import LongContent from "../components/posts/LongContent";
 import PostInteractionSection from "../components/posts/PostInteractionSection";
 import CommentSection from "../components/posts/CommentSection";
 import ModalTitle from "../components/utils/ModalTitle";
+import PfpImg from "../components/profile/PfpImg";
 
 type PostPageParams = {
   user_id: string;
@@ -74,6 +75,7 @@ export default function PostPage() {
             topic_class,
             content,
             updated_at,
+            pfp,
           } = postData;
           const isDate = formatDate(new Date(created_at).getTime(), true).date;
           const newDate = formatDate(new Date(created_at).getTime(), true).time;
@@ -91,16 +93,22 @@ export default function PostPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex flex-col items-start justify-center gap-2 flex-1">
                     <h1 className="text-3xl font-semibold">{title}</h1>
-                    <p className="text-gray-dark">
-                      <Link
-                        className="text-sm text-primary hover:opacity-70 duration-150"
-                        to={`/${username}`}
-                      >
-                        {username}
-                      </Link>{" "}
-                      •{" Posted "}
-                      {isDate ? "on" : ""} {newDate}
-                    </p>
+                    <div className="flex items-center justify-start gap-1 mb-1">
+                      <p className="text-gray-dark">
+                        <Link
+                          className="text-sm text-primary hover:opacity-70 duration-150 flex items-center justify-start gap-1"
+                          to={`/${username}`}
+                        >
+                          <PfpImg icon pfp={pfp} />
+                          {username}
+                        </Link>
+                      </p>
+                      <p>•</p>
+                      <p>
+                        {"Posted "}
+                        {isDate ? "on" : ""} {newDate}
+                      </p>
+                    </div>
                     <Link
                       to={`/topics/${topic}`}
                       className="hover:brightness-125 duration-150"

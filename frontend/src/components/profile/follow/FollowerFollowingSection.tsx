@@ -8,11 +8,14 @@ import { useNavigate } from "react-router-dom";
 import ModalTitle from "../../utils/ModalTitle";
 import type { AxiosError } from "axios";
 import { defaultError } from "../../../lib/constants";
+import PfpImg from "../PfpImg";
 
 interface FollowResponse {
   id: number;
   username: string;
+  pfp: string;
 }
+
 export default function FollowerFollowingSection({
   visitingUser,
 }: {
@@ -99,10 +102,10 @@ export default function FollowerFollowingSection({
       </div>
       {showFollows && (
         <Modal close={() => setShowFollows(false)}>
-          <ModalTitle className="mb-3">
+          <ModalTitle>
             <span className="font-bold text-primary">{username}</span> Followers
           </ModalTitle>
-          <div className="w-full bg-white rounded-md min-h-[200px] overflow-y-scroll">
+          <div className="mt-3 w-full bg-white rounded-md min-h-[200px] overflow-y-scroll">
             {loading ? (
               <div className="w-full h-[200px] grid place-items-center">
                 <SpinnerPrimary />
@@ -112,9 +115,10 @@ export default function FollowerFollowingSection({
                 {list.map((user: FollowResponse, index: number) => (
                   <li
                     onClick={() => handleClick(user.username)}
-                    className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
+                    className="py-3 px-2 flex items-center justify-start gap-1 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                     key={index}
                   >
+                    <PfpImg icon pfp={user.pfp} />
                     {user.username}
                   </li>
                 ))}
@@ -129,11 +133,11 @@ export default function FollowerFollowingSection({
       )}
       {showFollowings && (
         <Modal close={() => setShowFollowings(false)}>
-          <ModalTitle className="mb-3">
+          <ModalTitle>
             <span className="font-bold text-primary">{username}</span>{" "}
             Followings
           </ModalTitle>
-          <div className="w-full bg-white rounded-md min-h-[200px] overflow-y-scroll overflow-x-hidden hover:bg-gray">
+          <div className="mt-3 w-full bg-white rounded-md min-h-[200px] overflow-y-scroll overflow-x-hidden hover:bg-gray">
             {loading ? (
               <div className="w-full h-[200px] grid place-items-center">
                 <SpinnerPrimary />
@@ -143,9 +147,10 @@ export default function FollowerFollowingSection({
                 {list.map((user: FollowResponse, index: number) => (
                   <li
                     onClick={() => handleClick(user.username)}
-                    className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
+                    className="py-3 px-2 flex items-center justify-start gap-1 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                     key={index}
                   >
+                    <PfpImg icon pfp={user.pfp} />
                     {user.username}
                   </li>
                 ))}
