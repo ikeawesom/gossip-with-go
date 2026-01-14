@@ -38,7 +38,6 @@ type PostWithUsername struct {
 	
 	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
 	UserHasReposted bool  `gorm:"-" json:"user_has_reposted"` 
-	Likers       []string `gorm:"-" json:"likers"`
 	Reposters    []string `gorm:"-" json:"reposters"`
 }
 
@@ -385,8 +384,6 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentU
 			Find(&userLikes)
 	}
 
-	// utils.DebugLog("User likes:", userLikes)
-
 	// get current user's reposts
 	var userReposts []models.Repost
 	if currentUserID > 0 {
@@ -406,30 +403,17 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentU
 		userRepostsMap[repost.PostID] = true
 	}
 
-	// get top likers for all posts
 	type InteractionResult struct {
 		PostID   uint   `json:"post_id"`
 		Username string `json:"username"`
 	}
 	
-	var likeResults []InteractionResult
-	s.DB.Table("likes").
-		Select("likes.likeable_id as post_id, users.username").
-		Joins("JOIN users ON users.id = likes.user_id").
-		Where("likes.likeable_type = ? AND likes.likeable_id IN ?", "post", postIDs).
-		Order("likes.created_at DESC").
-		Find(&likeResults)
-
-	// group likers by post ID
-	likersMap := make(map[uint][]string)
-	for _, result := range likeResults {
-		likersMap[result.PostID] = append(likersMap[result.PostID], result.Username)
-	}
-
+	// get user's following reposters for all posts
 	var repostResults []InteractionResult
 	s.DB.Table("reposts").
 		Select("reposts.post_id, users.username").
 		Joins("JOIN users ON users.id = reposts.user_id").
+		Joins("JOIN follows ON follows.following_id = reposts.user_id AND follows.follower_id = ?", currentUserID).
 		Where("reposts.post_id IN ?", postIDs).
 		Order("reposts.created_at DESC").
 		Find(&repostResults)
@@ -446,19 +430,8 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentU
 		
 		posts[i].UserHasLiked = userLikesMap[postID] // set to user liked
 		posts[i].UserHasReposted = userRepostsMap[postID] // set to user reposted
-		
-		// set top likers (limit to first 3 for preview)
-		if likers, ok := likersMap[postID]; ok {
-			if len(likers) > 3 {
-				posts[i].Likers = likers[:3]
-			} else {
-				posts[i].Likers = likers
-			}
-		} else {
-			posts[i].Likers = []string{}
-		}
 
-		// set top reposters (limit to first 3 for preview)
+		// set top mutual reposters (limit to first 3 for preview)
 		if reposters, ok := repostersMap[postID]; ok {
 			if len(reposters) > 3 {
 				posts[i].Reposters = reposters[:3]
@@ -471,7 +444,6 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentU
 	}
 
 	// utils.DebugLog("final posts:", posts)
-
 	return nil
 }
 
