@@ -4,7 +4,6 @@ import type { StateTriggerType } from "../../types/res";
 import SecondaryButton from "../utils/SecondaryButton";
 import Modal from "../utils/Modal";
 import ModalTitle from "../utils/ModalTitle";
-import { toast } from "sonner";
 import EditProfileForm from "./EditProfileForm";
 import UserLikes from "./UserLikes";
 import UserCommentsSection from "./UserCommentsSection";
@@ -98,20 +97,7 @@ export default function SettingsButton({
               <ModalTitle back={() => setShow("settings")}>
                 Edit Profile
               </ModalTitle>
-              <div className="flex w-full flex-col items-start justify-start gap-2 mt-2">
-                <div className="w-full flex items-center justify-between">
-                  <p className="custom text-sm">Email Address</p>
-                  <p
-                    onClick={() =>
-                      toast.error("Your email address cannot be changed!")
-                    }
-                    className="custom text-sm font-bold cursor-not-allowed"
-                  >
-                    {user.email}
-                  </p>
-                </div>
-                <EditProfileForm close={handleClose} user={user} />
-              </div>
+              <EditProfileForm close={handleClose} user={user} />
             </>
           )}
           {show === "likes" && (
