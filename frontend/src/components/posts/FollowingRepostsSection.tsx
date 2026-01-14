@@ -15,7 +15,7 @@ export default function FollowingRepostsSection({
         className="opacity-70"
       />
       <span>
-        Reposted by{" "}
+        Also reposted by{" "}
         {reposters.slice(0, 3).map((username: string, index: number) => {
           return (
             <span key={index}>
