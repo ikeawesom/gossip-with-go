@@ -23,8 +23,12 @@ export const userApi = {
     },
 
     // edit profile
-    editProfile: async (id: number, username: string, bio: string): Promise<ResponseType> => {
-        const response = await apiClient.post(`/users/edit-profile`, { id, username, bio })
+    editProfile: async (formData: FormData): Promise<ResponseType> => {
+        const response = await apiClient.post(
+            "/users/edit-profile",
+            formData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+        )
         console.log("API RESPONSE:", response.data);
         return response.data
     }
