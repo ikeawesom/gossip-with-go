@@ -9,6 +9,7 @@ import { formatDate } from "../../lib/helpers";
 import Modal from "../utils/Modal";
 import Logo from "../utils/Logo";
 import type { Topic } from "../../types/topics";
+import PfpImg from "../profile/PfpImg";
 
 const queryTypes = ["users", "posts", "topics"] as QueryType[];
 export type QueryType = "users" | "posts" | "topics";
@@ -107,8 +108,9 @@ export default function SearchBar({ hideLogo }: { hideLogo?: boolean }) {
                       <li
                         onClick={() => handleNavigate(url)}
                         key={index}
-                        className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
+                        className="text-sm flex items-center justify-start gap-2 px-3 py-4 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                       >
+                        <PfpImg icon pfp={user.pfp} />
                         {user.username}
                       </li>
                     );
@@ -121,14 +123,25 @@ export default function SearchBar({ hideLogo }: { hideLogo?: boolean }) {
                         key={index}
                         className="p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                       >
-                        <div>
-                          <div className="flex items-center justify-start gap-2">
-                            <h4 className="custom font-bold">{post.title}</h4> •{" "}
-                            <p>{post.username}</p>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <p className="line-clamp-3">{post.content}...</p>
-                            <p className="fine-print">{post.like_count} ❤︎</p>
+                        <div className="w-full flex flex-col items-start justify-start gap-1">
+                          <p className="flex items-center justify-start gap-1">
+                            <PfpImg icon pfp={post.pfp} />
+                            {post.username}
+                          </p>
+                          <h4 className="custom font-bold">{post.title}</h4>
+                          <div className="flex items-start justify-between w-full gap-2">
+                            <p className="line-clamp-3 flex-1">
+                              {post.content}
+                            </p>
+                            <p className="custom text-sm flex items-center justify-end gap-1">
+                              {post.like_count}{" "}
+                              <img
+                                src="/icons/posts/icon_liked_primary.svg"
+                                alt="Likes"
+                                width={15}
+                                height={15}
+                              />
+                            </p>
                           </div>
                           <p className="fine-print custom text-xs">
                             {
@@ -141,7 +154,7 @@ export default function SearchBar({ hideLogo }: { hideLogo?: boolean }) {
                     );
                   } else {
                     const topic = item as Topic;
-                    const { id, topic_name, username } = topic;
+                    const { id, topic_name, username, follower_count } = topic;
                     url = `/topics/${id}`;
                     return (
                       <li
@@ -149,7 +162,20 @@ export default function SearchBar({ hideLogo }: { hideLogo?: boolean }) {
                         key={index}
                         className="text-sm p-2 border-b border-gray-light hover:bg-fine-print/25 cursor-pointer text-gray-dark"
                       >
-                        {topic_name}
+                        <span className="flex items-start justify-between gap-4">
+                          <h4 className="custom font-bold line-clamp-2 flex-1">
+                            {topic_name}
+                          </h4>
+                          <p className="custom flex text-sm items-center justify-end gap-1">
+                            {follower_count}
+                            <img
+                              src="/icons/icon_user.svg"
+                              alt="Followers"
+                              width={10}
+                              height={10}
+                            />
+                          </p>
+                        </span>
                         <p className="fine-print custom text-xs">
                           {topic.username === "admin"
                             ? "FREE TOPICS"
