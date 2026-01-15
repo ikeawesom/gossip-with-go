@@ -24,6 +24,8 @@ export interface PostType {
     user_has_liked: boolean;
     user_has_reposted: boolean;
     reposters: string[];
+
+    images: string[]
 }
 
 export interface CreatePostRequest {
@@ -32,6 +34,8 @@ export interface CreatePostRequest {
     content: string;
     topic: number;
     topicName: string
+    imagesPreview: string[];
+    imagesFiles: File[];
 }
 
 export interface TrendingPostsResponse {
