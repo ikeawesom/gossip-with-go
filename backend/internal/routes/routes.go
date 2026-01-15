@@ -68,7 +68,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			posts.GET("/trending", middleware.AuthOptional(), postHandler.GetTrendingPosts)
 			posts.GET("/following", middleware.AuthOptional(), postHandler.GetFollowingPosts)
 			posts.POST("/create", middleware.AuthRequired(), postHandler.CreatePost)
-			posts.POST("/edit/:postID", middleware.AuthRequired(), postHandler.EditPost)
+			posts.POST("/edit", middleware.AuthRequired(), postHandler.EditPost)
 			posts.POST("/delete/:postID", middleware.AuthRequired(), postHandler.DeletePost)
 		}
 
