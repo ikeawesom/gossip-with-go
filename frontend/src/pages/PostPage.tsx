@@ -13,7 +13,7 @@ import type { RootState } from "../state/store";
 import SecondaryButton from "../components/utils/SecondaryButton";
 import PrimaryButton from "../components/utils/PrimaryButton";
 import Modal from "../components/utils/Modal";
-import CreatePostForm from "../components/posts/CreatePostForm";
+import CreatePostForm from "../components/posts/form/CreatePostForm";
 import DeletePostForm from "../components/posts/DeletePostForm";
 import LongContent from "../components/posts/LongContent";
 import PostInteractionSection from "../components/posts/PostInteractionSection";

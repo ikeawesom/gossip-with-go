@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Modal from "../utils/Modal";
-import CreatePostForm from "../posts/CreatePostForm";
 import PrimaryButton from "../utils/PrimaryButton";
 import SecondaryButton from "../utils/SecondaryButton";
 import CreateTopicForm from "../topics/CreateTopicForm";
@@ -9,6 +8,7 @@ import type { RootState } from "../../state/store";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import ModalTitle from "../utils/ModalTitle";
+import CreatePostForm from "../posts/form/CreatePostForm";
 
 export default function CreateGossipFloatingButton() {
   const { user } = useSelector((state: RootState) => state.auth);
