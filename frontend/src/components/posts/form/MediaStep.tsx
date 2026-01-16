@@ -56,10 +56,10 @@ export default function MediaStep() {
       <label
         htmlFor="pfp-upload"
         className={twMerge(
-          "cursor-pointer transition flex items-center",
+          "cursor-pointer duration-150 flex items-center rounded-md",
           gotPictures
             ? "gap-1 px-3 py-2 rounded-md duration-150"
-            : "flex-col justify-center h-80",
+            : "flex-col justify-center h-80 w-full",
           maxPictures
             ? "opacity-50 cursor-not-allowed"
             : "hover:bg-gray-dark/10"
