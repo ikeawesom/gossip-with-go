@@ -63,8 +63,6 @@ export default function UserPostsSection({
             return (
               <PostCard
                 post_id={post.post_id}
-                hideInteractions={id ? true : false}
-                hideArrow={id ? true : false}
                 username={username}
                 post={post}
                 key={index}
