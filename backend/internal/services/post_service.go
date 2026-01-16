@@ -34,25 +34,8 @@ type PaginationParams struct {
 	UserID uint
 }
 
-type PostWithUsername struct {
-	models.Post
-	Username string `json:"username"`
-	Pfp		 string `json:"pfp"`
-	
-	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
-	UserHasReposted bool  `gorm:"-" json:"user_has_reposted"` 
-	Reposters    []string `gorm:"-" json:"reposters"`
-}
-
-type PostWithTopic struct {
-	PostWithUsername
-
-	TopicName  string  `json:"topic_name"`
-	TopicClass string  `json:"topic_class"`
-}
-
 type PaginatedPostsResponse struct {
-	Posts      []PostWithTopic `json:"posts"`
+	Posts      []models.Post `json:"posts"`
 	NextCursor *uint         `json:"next_cursor"`
 	HasMore    bool          `json:"has_more"`
 }
@@ -63,7 +46,7 @@ func NewPostService(db *gorm.DB) *PostService {
 	}
 }
 
-func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint) ([]PostWithTopic, error) {
+func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint) ([]models.Post, error) {
 	var author models.User
 	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -72,7 +55,7 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 		return nil, err
 	}
 
-	var posts []PostWithTopic
+	var posts []models.Post
 	if err := s.DB.
 				Table("posts").
 				Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
@@ -91,11 +74,16 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 		return nil, err
 	}	
 
+	// enrich with media on posts
+	if err := s.enrichWithMedia(posts); err != nil {
+		return nil, err
+	}
+
 	return posts, nil
 }
 
-func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]PostWithTopic, error) {
-	var posts []PostWithTopic
+func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]models.Post, error) {
+	var posts []models.Post
 	if err := s.DB.
 				Table("posts").
 				Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
@@ -114,10 +102,15 @@ func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]PostWithT
 		return nil, err
 	}
 
+	// enrich with media on posts
+	if err := s.enrichWithMedia(posts); err != nil {
+		return nil, err
+	}
+
 	return posts, nil
 }
 
-func (s *PostService) GetUserPostByID(authorUsername string, postID uint, currentUser uint) (*PostWithTopic, error) {
+func (s *PostService) GetUserPostByID(authorUsername string, postID uint, currentUser uint) (*models.Post, error) {
 	var author models.User
 	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -126,7 +119,7 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 		return nil, err
 	}
 
-	var post PostWithTopic
+	var post models.Post
 	if err := s.DB.
 			Table("posts").
 			Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
@@ -140,9 +133,14 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 			}
 	post.Username = authorUsername
 
-	var post_array = []PostWithTopic{post}
+	var post_array = []models.Post{post}
 
 	if err := s.encrichWithInteractionData(post_array, currentUser); err != nil {
+		return nil, err
+	}
+
+	// enrich with media on posts
+	if err := s.enrichWithMedia(post_array); err != nil {
 		return nil, err
 	}
 
@@ -182,7 +180,7 @@ func (s *PostService) CreatePost(username, title, content string, topic uint, im
 
 	const maxImgSize = 5 << 20 // 5MB
 
-	for _, file := range imgFiles {
+	for i, file := range imgFiles {
 		log.Printf("Checking %s", file.Filename)
 		var imgURL *string = nil
 
@@ -213,7 +211,7 @@ func (s *PostService) CreatePost(username, title, content string, topic uint, im
 		userIDstr := strconv.FormatUint(uint64(user.ID), 10)
 		folder := "posts/" + userIDstr + "/" + postIDstr
 
-		log.Printf("Check success. Uploading '%s' to cloudinary", file.Filename)
+		log.Printf("Check success. Uploading '%s' to cloudinary...", file.Filename)
 		// upload to cloudinary
 		upload, err := cloudinary.Cloudinary.Upload.Upload(
 			context.Background(),
@@ -228,15 +226,22 @@ func (s *PostService) CreatePost(username, title, content string, topic uint, im
 			return 0, errors.New("Failed to upload " + file.Filename)
 		}
 
+		log.Printf("Uploaded success. Uploaded %s to cloudinary.", file.Filename)
+		
 		// get image URL
 		imgURL = &upload.SecureURL
 
+		log.Printf("Media URL for %s: %s", file.Filename, *imgURL)
+
 		// upload image to DB
 		newImage := models.Media{
-			Url: *imgURL,
+			MediaURL: *imgURL,
 			PostID: newPost.ID,
 			UserID: user.ID,
+			MediaOrder: i,			
 		}
+
+		utils.DebugLog("Record:", newImage)
 
 		if err := s.DB.Create(&newImage).Error; err != nil {
 			log.Printf("Failed to add to DB: %s", file.Filename)
@@ -282,7 +287,7 @@ func (s *PostService) DeletePost(postID uint, username string) error {
     if err := s.DB.Where("username = ?", username).First(&user).Error; err != nil {
         return errors.New("user not found")
     }
-    var post PostWithTopic
+    var post models.Post
     if err := s.DB.First(&post, postID).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
             return errors.New("post not found")
@@ -312,7 +317,7 @@ func (s *PostService) DeletePost(postID uint, username string) error {
 				}
 
 				// delete media from cloudinary
-				publicID := utils.ExtractPublicID(m.Url)
+				publicID := utils.ExtractPublicID(m.MediaURL)
 
 				_, err := cloudinary.Cloudinary.Upload.Destroy(
 					context.Background(),
@@ -355,7 +360,7 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		query = query.Where("posts.id < ?", params.Cursor)
 	}
 
-	var posts []PostWithTopic
+	var posts []models.Post
 	if err := query.
 		Order("posts.created_at DESC").
 		Limit(params.Limit + 1). // fetch +1 to check if there are more posts
@@ -378,6 +383,11 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		if err := s.encrichWithInteractionData(posts, params.UserID); err != nil {
 			return nil, err
 		}
+	}
+
+	// enrich with media on posts
+	if err := s.enrichWithMedia(posts); err != nil {
+		return nil, err
 	}
 
 	// determine next cursor
@@ -423,7 +433,7 @@ func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPost
 		query = query.Where("posts.id < ?", params.Cursor)
 	}
 
-	var posts []PostWithTopic
+	var posts []models.Post
 	if err := query.
 		Order("posts.created_at DESC").
 		Limit(params.Limit + 1). // fetch +1 to check if there are more posts
@@ -448,6 +458,11 @@ func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPost
 		}
 	}
 
+	// enrich with media on posts
+	if err := s.enrichWithMedia(posts); err != nil {
+		return nil, err
+	}
+
 	// Determine next cursor
 	var nextCursor *uint
 	if hasMore && len(posts) > 0 {
@@ -462,7 +477,7 @@ func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPost
 	}, nil
 }
 
-func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentUserID uint) error {
+func (s *PostService) encrichWithInteractionData(posts []models.Post, currentUserID uint) error {
 	if len(posts) == 0 {
 		return nil
 	}
@@ -545,7 +560,44 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentU
 	return nil
 }
 
-func sortPostsByScore(posts []PostWithTopic) {
+func (s *PostService) enrichWithMedia(posts []models.Post) error {
+	if len(posts) == 0 {
+		return nil
+	}
+
+	postIDs := make([]uint, len(posts))
+	for i, post := range posts {
+		postIDs[i] = post.ID
+	}
+
+	type MediaPerPost struct {
+		models.Media
+		PostID  uint   			  `json:"post_id"`
+	}
+
+	var media []MediaPerPost
+	s.DB.Table("media").
+		Select("media.*, posts.id as post_id").
+		Joins("JOIN posts ON posts.id = media.post_id").
+		Where("media.post_id IN ?", postIDs).
+		Order("media.media_order ASC").
+		Find(&media)
+
+	// group media by post ID
+	mediaMap := make(map[uint][]string)
+	for _, result := range media {
+		mediaMap[result.PostID] = append(mediaMap[result.PostID], result.MediaURL)
+	}
+
+	for i := range posts {
+		postID := posts[i].ID
+		posts[i].MediaURLs = mediaMap[postID]
+	}
+
+	return nil
+}
+
+func sortPostsByScore(posts []models.Post) {
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].Score > posts[j].Score
 	})
