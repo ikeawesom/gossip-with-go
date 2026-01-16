@@ -16,6 +16,7 @@ import ModalTitle from "../../utils/ModalTitle";
 import PrimaryButton from "../../utils/PrimaryButton";
 import SpinnerSecondary from "../../spinner/SpinnerSecondary";
 import SecondaryButton from "../../utils/SecondaryButton";
+import { twMerge } from "tailwind-merge";
 
 export interface CreatePostFormProps {
   toggleTopic?: () => void;
@@ -171,7 +172,12 @@ function CreatePostFormContent({
 
       <div className="flex items-center justify-between w-full gap-3">
         {postStep !== "content" && (
-          <SecondaryButton type="button" onClick={handleBack}>
+          <SecondaryButton
+            type="button"
+            className={twMerge((!canProceed || postLoad) && "opacity-70")}
+            onClick={handleBack}
+            disabled={!canProceed || postLoad}
+          >
             Back
           </SecondaryButton>
         )}
@@ -184,12 +190,15 @@ function CreatePostFormContent({
           </PrimaryButton>
         ) : (
           <PrimaryButton
-            disabled={!canProceed}
+            className={twMerge((!canProceed || postLoad) && "opacity-70")}
+            disabled={!canProceed || postLoad}
             type="button"
             onClick={handleNext}
           >
             {postLoad ? (
-              <SpinnerSecondary />
+              <span className="flex items-center justify-center gap-2">
+                Posting <SpinnerSecondary />
+              </span>
             ) : postStep === "summary" ? (
               "Create Post"
             ) : (
