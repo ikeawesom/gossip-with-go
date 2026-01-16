@@ -131,6 +131,12 @@ func (h *RepostHandler) GetReposters(c *gin.Context) {
 }
 
 func (h *RepostHandler) GetUserReposts(c *gin.Context) {
+	var currentUserID uint = 0
+
+	if v, exists := c.Get("userID"); exists {
+		currentUserID = v.(uint)
+	}
+
 	userIDStr := c.Param("userID")
 	if userIDStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
@@ -143,7 +149,7 @@ func (h *RepostHandler) GetUserReposts(c *gin.Context) {
 		return
 	}
 
-	posts, err := h.repostService.GetUserReposts(uint(userID))
+	posts, err := h.repostService.GetUserReposts(uint(userID), uint(currentUserID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
