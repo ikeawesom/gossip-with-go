@@ -3,18 +3,21 @@ export interface PostType {
     post_id?: number; // for reposted backend
     user_id: number;
 
-    topic: number;
-    topic_name: string;
-    topic_class: string;
-
     title: string;
     content: string;
     username?: string;
     pfp?: string;
 
+    // additional post details
+    topic: number;
+    topic_name: string;
+    topic_class: string;
+    media_urls: string[];
+
     created_at: string;
     updated_at: string;
 
+    // scoring metrics
     like_count: number;
     comment_count: number;
     repost_count: number;
@@ -24,8 +27,7 @@ export interface PostType {
     user_has_liked: boolean;
     user_has_reposted: boolean;
     reposters: string[];
-
-    images: string[]
+    repost_created_at?: string; // timestamp for reposts only
 }
 
 export interface CreatePostRequest {
