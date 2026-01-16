@@ -46,7 +46,7 @@ func main() {
 
 	postService := services.NewPostService(db)
 	likeService := services.NewLikeService(db)
-	repostService := services.NewRepostService(db)
+	repostService := services.NewRepostService(db, postService)
 	commentService := services.NewCommentService(db)
 	
 	queryService := services.NewQueryService(db)
