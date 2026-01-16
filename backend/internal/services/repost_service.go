@@ -42,7 +42,7 @@ type RepostedPosts struct {
 }
 
 type PostWithRepostedTime struct {
-	models.Post
+	PostWithTopic
 	RepostCreatedAt time.Time `json:"repost_created_at"`
 }
 
@@ -147,7 +147,7 @@ func (s *RepostService) GetRepostCount(postID uint) (int64, error) {
 }
 
 func (s *RepostService) GetUserReposts(userID uint, currentUser uint) ([]PostWithRepostedTime, error) {
-var posts []models.Post
+var posts []PostWithTopic
 
 	// get all valid reposts
 	var reposts []models.Repost
@@ -200,7 +200,7 @@ var posts []models.Post
 	postsWithTime := make([]PostWithRepostedTime, len(posts))
 	for i, post := range posts {
 		postsWithTime[i] = PostWithRepostedTime{
-			Post:            post,
+			PostWithTopic: post,
 			RepostCreatedAt: repostTimeMap[post.ID],
 		}
 	}

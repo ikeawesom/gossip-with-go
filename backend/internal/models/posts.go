@@ -12,11 +12,7 @@ type Post struct {
 	Topic     uint   `gorm:"not null;index" json:"topic"`
 	Title	  string `gorm:"type:text;not null" json:"title"`
 	Content   string `gorm:"type:text;not null" json:"content"`
-
-	// additional post details
-	TopicName  string  `json:"topic_name"`
-	TopicClass string  `json:"topic_class"`
-	MediaURLs  []string `gorm:"-" json:"media_urls"`
+	MediaURLs []string `gorm:"-" json:"media_urls"`
 
 	// engagement metrics for scoring
 	LikeCount    int            `gorm:"default:0;not null" json:"like_count"`
@@ -24,14 +20,6 @@ type Post struct {
 	ViewCount    int            `gorm:"default:0;not null" json:"view_count"`
 	RepostCount  int            `gorm:"default:0;not null" json:"repost_count"`
 	Score        float64        `gorm:"-" json:"score,omitempty"` // don't need to store in DB (calculated value)
-
-	// user metrics for frontend
-	Username 	string 		`json:"username"`
-	Pfp		 	string 		`json:"pfp"`
-	
-	UserHasLiked 	bool     `json:"user_has_liked"`
-	UserHasReposted bool  	 `json:"user_has_reposted"` 
-	Reposters    	[]string `gorm:"-" json:"reposters"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

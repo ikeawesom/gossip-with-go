@@ -1,7 +1,6 @@
 package services
 
 import (
-	"gossip-with-go/internal/models"
 	"math"
 	"time"
 )
@@ -20,7 +19,7 @@ const (
 	GRAVITY        = 1.8  // controls how fast old posts decay
 )
 
-func CalculatePostScore(post *models.Post) float64 {
+func CalculatePostScore(post *PostWithTopic) float64 {
 	// calculate engagement score
 	engagementScore := float64(post.LikeCount)* LIKE_WEIGHT +
 		float64(post.CommentCount)*COMMENT_WEIGHT +
@@ -51,7 +50,7 @@ func CalculatePostScore(post *models.Post) float64 {
 	return score
 }
 
-func CalculatePostScores(posts []models.Post) []models.Post {
+func CalculatePostScores(posts []PostWithTopic) []PostWithTopic {
 	for i := range posts {
 		posts[i].Score = CalculatePostScore(&posts[i])
 	}

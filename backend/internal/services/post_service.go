@@ -28,16 +28,33 @@ type NewPost struct {
 	Content  string
 }
 
+type PostWithUsername struct {
+	models.Post
+	Username string `json:"username"`
+	Pfp		 string `json:"pfp"`
+	
+	UserHasLiked bool     `gorm:"-" json:"user_has_liked"`
+	UserHasReposted bool  `gorm:"-" json:"user_has_reposted"` 
+	Reposters    []string `gorm:"-" json:"reposters"`
+}
+
+type PostWithTopic struct {
+	PostWithUsername
+
+	TopicName  string  `json:"topic_name"`
+	TopicClass string  `json:"topic_class"`
+}
+
+type PaginatedPostsResponse struct {
+	Posts      []PostWithTopic `json:"posts"`
+	NextCursor *uint         `json:"next_cursor"`
+	HasMore    bool          `json:"has_more"`
+}
+
 type PaginationParams struct {
 	Limit  int  
 	Cursor uint
 	UserID uint
-}
-
-type PaginatedPostsResponse struct {
-	Posts      []models.Post `json:"posts"`
-	NextCursor *uint         `json:"next_cursor"`
-	HasMore    bool          `json:"has_more"`
 }
 
 func NewPostService(db *gorm.DB) *PostService {
@@ -46,7 +63,7 @@ func NewPostService(db *gorm.DB) *PostService {
 	}
 }
 
-func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint) ([]models.Post, error) {
+func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint) ([]PostWithTopic, error) {
 	var author models.User
 	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -55,7 +72,7 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 		return nil, err
 	}
 
-	var posts []models.Post
+	var posts []PostWithTopic
 	if err := s.DB.
 				Table("posts").
 				Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
@@ -79,11 +96,12 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 		return nil, err
 	}
 
+	utils.DebugLog("Posts:", posts)
 	return posts, nil
 }
 
-func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]models.Post, error) {
-	var posts []models.Post
+func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]PostWithTopic, error) {
+	var posts []PostWithTopic
 	if err := s.DB.
 				Table("posts").
 				Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
@@ -110,7 +128,7 @@ func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]models.Po
 	return posts, nil
 }
 
-func (s *PostService) GetUserPostByID(authorUsername string, postID uint, currentUser uint) (*models.Post, error) {
+func (s *PostService) GetUserPostByID(authorUsername string, postID uint, currentUser uint) (*PostWithTopic, error) {
 	var author models.User
 	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -119,7 +137,7 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 		return nil, err
 	}
 
-	var post models.Post
+	var post PostWithTopic
 	if err := s.DB.
 			Table("posts").
 			Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
@@ -133,7 +151,7 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 			}
 	post.Username = authorUsername
 
-	var post_array = []models.Post{post}
+	var post_array = []PostWithTopic{post}
 
 	if err := s.encrichWithInteractionData(post_array, currentUser); err != nil {
 		return nil, err
@@ -167,6 +185,8 @@ func (s *PostService) CreatePost(username, title, content string, topic uint, im
 		return 0, err
 	}
 	
+	log.Println("[SERVICE] Added post")
+
 	// increment post count on topic
 	if err := s.DB.
 	Table("topics").
@@ -176,7 +196,7 @@ func (s *PostService) CreatePost(username, title, content string, topic uint, im
 		return 0, err
 			}
 			
-	log.Println("[SERVICE] Added post")
+	log.Println("[SERVICE] Incremented topic")	
 
 	const maxImgSize = 5 << 20 // 5MB
 
@@ -341,7 +361,6 @@ func (s *PostService) DeletePost(postID uint, username string) error {
 }
 
 func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPostsResponse, error) {
-
 	// validate parameters
 	if params.Limit <= 0 {
 		params.Limit = 10 // default to 10 posts per page
@@ -360,7 +379,7 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		query = query.Where("posts.id < ?", params.Cursor)
 	}
 
-	var posts []models.Post
+	var posts []PostWithTopic
 	if err := query.
 		Order("posts.created_at DESC").
 		Limit(params.Limit + 1). // fetch +1 to check if there are more posts
@@ -396,6 +415,8 @@ func (s *PostService) GetTrendingPosts(params PaginationParams) (*PaginatedPosts
 		lastPostID := posts[len(posts)-1].ID
 		nextCursor = &lastPostID
 	}
+
+	utils.DebugLog("Posts:", posts)
 
 	return &PaginatedPostsResponse{
 		Posts:      posts,
@@ -433,7 +454,7 @@ func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPost
 		query = query.Where("posts.id < ?", params.Cursor)
 	}
 
-	var posts []models.Post
+	var posts []PostWithTopic
 	if err := query.
 		Order("posts.created_at DESC").
 		Limit(params.Limit + 1). // fetch +1 to check if there are more posts
@@ -477,7 +498,7 @@ func (s *PostService) GetFollowingPosts(params PaginationParams) (*PaginatedPost
 	}, nil
 }
 
-func (s *PostService) encrichWithInteractionData(posts []models.Post, currentUserID uint) error {
+func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentUserID uint) error {
 	if len(posts) == 0 {
 		return nil
 	}
@@ -560,7 +581,7 @@ func (s *PostService) encrichWithInteractionData(posts []models.Post, currentUse
 	return nil
 }
 
-func (s *PostService) enrichWithMedia(posts []models.Post) error {
+func (s *PostService) enrichWithMedia(posts []PostWithTopic) error {
 	if len(posts) == 0 {
 		return nil
 	}
@@ -597,7 +618,7 @@ func (s *PostService) enrichWithMedia(posts []models.Post) error {
 	return nil
 }
 
-func sortPostsByScore(posts []models.Post) {
+func sortPostsByScore(posts []PostWithTopic) {
 	sort.Slice(posts, func(i, j int) bool {
 		return posts[i].Score > posts[j].Score
 	})
