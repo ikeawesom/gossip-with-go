@@ -60,8 +60,8 @@ func (s *LikeService) GetCommentsLikedByUserID(userID uint) ([]LikedComments, er
 	return comments, nil
 }
 
-func (s *LikeService) GetPostLikesByUserID(userID uint) ([]PostWithUsername, error) {
-	var posts []PostWithUsername
+func (s *LikeService) GetPostLikesByUserID(userID uint) ([]PostWithTopic, error) {
+	var posts []PostWithTopic
 
 	err := s.DB.
 			Table("likes").

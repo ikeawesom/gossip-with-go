@@ -3,6 +3,7 @@ package handlers
 import (
 	"gossip-with-go/internal/services"
 	"gossip-with-go/internal/utils"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -192,34 +193,50 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
         return
     }
 
-	var req CreatePostRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.ValidationErrorResponse(c, err.Error())
-		return
+	// read normal for fields
+	title := c.PostForm("title")
+	content := c.PostForm("content")
+	username := c.PostForm("username")
+	topicStr := c.PostForm("topic")
+	imgNoStr := c.PostForm("image_no")
+
+	if title == "" || username == "" || content == "" || topicStr == "" || imgNoStr == "" {
+        utils.ErrorResponse(c, http.StatusBadRequest, "title, username, content, image_no and topic are required", nil)
+        return
+    }
+
+	topic, _ := strconv.ParseUint(topicStr, 10, 64)
+	imgNo, _:= strconv.ParseUint(imgNoStr, 10, 64)
+	var imgFiles []*multipart.FileHeader = make([]*multipart.FileHeader, imgNo)
+
+	for i := range imgNo {
+		i_str := strconv.FormatUint(i, 10)
+		imageName := "image_" + i_str
+		
+		file, imgErr := c.FormFile(imageName)
+		if imgErr == nil {
+			imgFiles[i] = file
+		}
 	}
 
-	postID, err := h.PostService.CreatePost(req.Username, req.Title, req.Content, uint(req.Topic))
+	utils.DebugLog("images:", imgFiles)
+
+	postID, err := h.PostService.CreatePost(username, title, content, uint(topic), imgFiles)
 	if err != nil {
 		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	utils.SuccessResponse(c, http.StatusCreated, "Post created successfully", gin.H{ "data" : postID })
+	utils.SuccessResponse(c, http.StatusCreated, "Post created successfully", gin.H{"data":postID})
 }
 
 func (h *PostHandler) EditPost(c *gin.Context) {
-    postIDStr := c.Param("postID")
+    postIDStr := c.PostForm("postID")
     postID, err := strconv.ParseUint(postIDStr, 10, 32)
     if err != nil {
         utils.ErrorResponse(c, http.StatusBadRequest, "Invalid post ID", nil)
         return
-    }
-
-    var req EditPostRequest
-    if err := c.ShouldBindJSON(&req); err != nil {
-        utils.ValidationErrorResponse(c, err.Error())
-        return
-    }
+    }    
 
     username, exists := c.Get("username")
     if !exists {
@@ -227,7 +244,11 @@ func (h *PostHandler) EditPost(c *gin.Context) {
         return
     }
 
-    err = h.PostService.EditPost(uint(postID), username.(string), req.Title, req.Content, req.Topic)
+	// read normal for fields
+	title := c.PostForm("title")
+	content := c.PostForm("content")
+
+    err = h.PostService.EditPost(uint(postID), username.(string), title, content)
     if err != nil {
         if err.Error() == "post not found" {
             utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)

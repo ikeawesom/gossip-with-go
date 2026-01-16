@@ -92,7 +92,7 @@ export default function DeletePostForm({
       <PrimaryButton
         disabled={!enabled}
         type="submit"
-        className="self-end bg-red flex items-center justify-center border-none gap-2 shrink-0"
+        className="self-end from-red/60 hover:from-red/50 to-red flex items-center justify-center border-none gap-2 shrink-0"
       >
         {loading ? (
           <SpinnerSecondary />

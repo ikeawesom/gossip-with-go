@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"gossip-with-go/internal/models"
+	"gossip-with-go/internal/utils"
+	"sort"
 	"time"
 
 	"gorm.io/gorm"
@@ -11,16 +13,21 @@ import (
 
 type RepostService struct {
 	DB *gorm.DB
+	PostService *PostService
 }
 
-func NewRepostService(db *gorm.DB) *RepostService {
-	return &RepostService{DB: db}
+func NewRepostService(db *gorm.DB, postService *PostService) *RepostService {
+	return &RepostService{
+		DB: db,
+		PostService: postService,
+	}
 }
 
 type RepostedPosts struct {
 	PostID      uint      `json:"post_id"`
 	Title       string    `json:"title"`
 	Content     string    `json:"content"`
+	MediaURLs   []string  `gorm:"-" json:"media_urls"`
 	
 	PosterID    uint      `json:"poster_id"`
 	Username    string    `json:"username"`
@@ -32,6 +39,11 @@ type RepostedPosts struct {
 
 	RepostedOn  time.Time `json:"reposted_on"`
 	CreatedAt   time.Time `json:"created_at"`
+}
+
+type PostWithRepostedTime struct {
+	PostWithTopic
+	RepostCreatedAt time.Time `json:"repost_created_at"`
 }
 
 func (s *RepostService) ToggleRepost(userID uint, postID uint, visibility string) (bool, error) {
@@ -134,41 +146,75 @@ func (s *RepostService) GetRepostCount(postID uint) (int64, error) {
 	return count, err
 }
 
-func (s *RepostService) GetUserReposts(userID uint) ([]RepostedPosts, error) {
-	var posts []RepostedPosts
-	
-	err := s.DB.
-		Table("reposts").
-		Select(`
-			DISTINCT ON (posts.id)
-			posts.id            as post_id,
-			posts.title         as title,
-			posts.content       as content,
-			posts.topic         as topic_id,
-			posts.user_id       as poster_id,
-			poster.username     as username,
-			poster.pfp			as pfp,
-			posts.created_at    as created_at,
-			reposts.created_at  as reposted_on,
-			topics.topic_name,
-			topics.topic_class
-		`).
-		Joins("JOIN posts ON reposts.post_id = posts.id").
-		Joins("JOIN users AS poster ON posts.user_id = poster.id").
-		Joins("JOIN topics ON posts.topic = topics.id").
-		Where("reposts.user_id = ?", userID).
-		Where("reposts.deleted_at IS NULL").
-		Where("posts.deleted_at IS NULL").
-		Order("posts.id, reposts.created_at DESC").
-		Find(&posts).
-		Error
+func (s *RepostService) GetUserReposts(userID uint, currentUser uint) ([]PostWithRepostedTime, error) {
+var posts []PostWithTopic
 
+	// get all valid reposts
+	var reposts []models.Repost
+	if err := s.DB.Where("user_id = ?", userID).
+		Order("created_at DESC").
+		Find(&reposts).Error; err != nil {
+		return nil, err
+	}
+	
+	// extract post IDs from reposts
+	if len(reposts) == 0 {
+		return []PostWithRepostedTime{}, nil
+	}
+	
+	postIDs := make([]uint, len(reposts))
+	for i, repost := range reposts {
+		postIDs[i] = repost.PostID
+	}
+	
+	// fetch the posts with all necessary joins
+	err := s.DB.Table("posts").
+		Select("posts.*, users.username, users.pfp, topics.topic_name as topic_name, topics.topic_class as topic_class").
+		Joins("LEFT JOIN users ON users.id = posts.user_id").
+		Joins("LEFT JOIN topics ON topics.id = posts.topic").
+		Where("posts.id IN ?", postIDs).
+		Find(&posts).Error
+	
 	if err != nil {
 		return nil, err
 	}
 
-	return posts, nil
+	// only enrich if user is authenticated - HERE]
+	if (currentUser > 0) {
+		if err := s.PostService.encrichWithInteractionData(posts, currentUser); err != nil {
+			return nil, err
+		}
+	}
+
+	// enrich with media on posts
+	if err := s.PostService.enrichWithMedia(posts); err != nil {
+		return nil, err
+	}
+
+	repostTimeMap := make(map[uint]time.Time)
+	for _, repost := range reposts {
+		repostTimeMap[repost.PostID] = repost.CreatedAt
+	}
+
+	// add repost timestamp to each post
+	postsWithTime := make([]PostWithRepostedTime, len(posts))
+	for i, post := range posts {
+		postsWithTime[i] = PostWithRepostedTime{
+			PostWithTopic: post,
+			RepostCreatedAt: repostTimeMap[post.ID],
+		}
+	}
+
+	// sort by the repost creation time
+	sort.Slice(postsWithTime, func(i, j int) bool {
+		return postsWithTime[i].RepostCreatedAt.After(postsWithTime[j].RepostCreatedAt)
+	})
+
+	utils.DebugLog("Reposted:", postsWithTime)
+	
+	return postsWithTime, nil
 }
+
 
 func (s *RepostService) UpdateRepostVisibility(userID uint, postID uint, visibility string) error {
 	// validate visibility

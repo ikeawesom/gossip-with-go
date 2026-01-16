@@ -11,7 +11,7 @@ import { topicApi } from "../api/topics.api";
 import FollowButton from "../components/profile/follow/FollowButton";
 import { useSelector } from "react-redux";
 import type { RootState } from "../state/store";
-import CreatePostForm from "../components/posts/CreatePostForm";
+import CreatePostForm from "../components/posts/form/CreatePostForm";
 import PrimaryButton from "../components/utils/PrimaryButton";
 import Modal from "../components/utils/Modal";
 

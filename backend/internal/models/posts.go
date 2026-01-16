@@ -12,6 +12,7 @@ type Post struct {
 	Topic     uint   `gorm:"not null;index" json:"topic"`
 	Title	  string `gorm:"type:text;not null" json:"title"`
 	Content   string `gorm:"type:text;not null" json:"content"`
+	MediaURLs []string `gorm:"-" json:"media_urls"`
 
 	// engagement metrics for scoring
 	LikeCount    int            `gorm:"default:0;not null" json:"like_count"`

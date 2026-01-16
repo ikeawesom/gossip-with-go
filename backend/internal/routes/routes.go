@@ -68,7 +68,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 			posts.GET("/trending", middleware.AuthOptional(), postHandler.GetTrendingPosts)
 			posts.GET("/following", middleware.AuthOptional(), postHandler.GetFollowingPosts)
 			posts.POST("/create", middleware.AuthRequired(), postHandler.CreatePost)
-			posts.POST("/edit/:postID", middleware.AuthRequired(), postHandler.EditPost)
+			posts.POST("/edit", middleware.AuthRequired(), postHandler.EditPost)
 			posts.POST("/delete/:postID", middleware.AuthRequired(), postHandler.DeletePost)
 		}
 
@@ -86,7 +86,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		reposts := api.Group("/reposts")
 		{
 			reposts.GET("/reposters", repostHandler.GetReposters)
-			reposts.GET("/user/:userID", repostHandler.GetUserReposts)
+			reposts.GET("/user/:userID", middleware.AuthOptional(), repostHandler.GetUserReposts)
 			
 			// authenticted endpoints for reposts
 			reposts.POST("/toggle", middleware.AuthRequired(),repostHandler.ToggleRepost)

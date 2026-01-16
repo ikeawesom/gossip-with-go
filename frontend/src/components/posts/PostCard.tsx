@@ -8,6 +8,7 @@ import PostInteractionSection from "./PostInteractionSection";
 import { twMerge } from "tailwind-merge";
 import FollowingRepostsSection from "./FollowingRepostsSection";
 import PfpImg from "../profile/PfpImg";
+import HoriScrollSection from "../utils/HoriScrollSection";
 
 export default function PostCard({
   post,
@@ -36,9 +37,16 @@ export default function PostCard({
     topic_class,
     reposters,
     pfp,
+    media_urls,
+    repost_created_at,
   } = post;
 
   const newDateStr = formatDate(new Date(created_at).getTime(), true);
+
+  const repostedDate = formatDate(
+    new Date(repost_created_at ?? "").getTime(),
+    true
+  );
 
   const user = fetched_username ?? username;
 
@@ -46,22 +54,62 @@ export default function PostCard({
 
   return (
     <div className="w-full">
-      {reposters && reposters.length > 0 && (
-        <FollowingRepostsSection reposters={reposters} />
-      )}
-      <Link to={url} className="w-full">
-        <Card
-          className={twMerge(
-            "w-full flex flex-col items-start justify-start gap-2 group hover:brightness-105 duration-150 smart-wrap",
-            className
-          )}
-        >
-          <div className="flex items-center justify-start gap-2 mb-1 border-b border-gray-dark/20 w-full pb-2">
-            <PfpImg icon pfp={pfp} />
-            <p className="custom text-primary text-sm">{user}</p>{" "}
+      {repost_created_at ? (
+        <>
+          <div className="mb-2 flex items-center gap-1 text-xs text-gray-600">
+            <img
+              src="/icons/posts/icon_reposted.svg"
+              alt="Repost"
+              width={16}
+              height={16}
+              className="opacity-70"
+            />
+            Reposted {repostedDate.date ? "on" : ""} {repostedDate.time}
           </div>
+        </>
+      ) : (
+        <>
+          {reposters && reposters.length > 0 && (
+            <FollowingRepostsSection reposters={reposters} />
+          )}
+        </>
+      )}
 
-          <div className="w-full flex items-center justify-between gap-4">
+      <Card
+        className={twMerge(
+          "w-full flex flex-col items-start justify-start hover:brightness-105 duration-150 smart-wrap p-0 md:p-0",
+          className
+        )}
+      >
+        <div className="flex items-center justify-start gap-2 border-b border-gray-dark/20 w-full p-3">
+          <PfpImg icon pfp={pfp} />
+          <Link
+            to={`/${user}`}
+            className="custom text-primary text-sm cursor-pointer hover:opacity-70 duration-150"
+          >
+            {user}
+          </Link>{" "}
+        </div>
+
+        {media_urls && (
+          <HoriScrollSection gap="gap-0" floatingArrows>
+            {media_urls.map((url, index) => (
+              <div
+                key={index}
+                className="relative aspect-square w-lvw max-w-152 overflow-hidden"
+              >
+                <img
+                  src={url}
+                  alt={`image_${index + 1}`}
+                  className=" w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </HoriScrollSection>
+        )}
+
+        <Link to={url} className="w-full">
+          <div className="w-full flex items-center justify-between gap-4 p-3 group">
             <div className="w-full flex flex-col items-start justify-start gap-2">
               {showTopic && (
                 <TopicTag
@@ -85,8 +133,8 @@ export default function PostCard({
               />
             )}{" "}
           </div>
-        </Card>
-      </Link>
+        </Link>
+      </Card>
       {!hideInteractions && <PostInteractionSection post={post} url={url} />}
     </div>
   );

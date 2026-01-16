@@ -1,5 +1,5 @@
 import type { PaginationType } from "../hooks/usePagination";
-import type { CreatePostRequest, PaginationParams } from "../types/post";
+import type { PaginationParams } from "../types/post";
 import type { ResponseType } from "../types/res";
 import apiClient from "./axios.config";
 
@@ -17,13 +17,13 @@ export const postApi = {
     },
 
     // create new post
-    createPost: async (postData: CreatePostRequest): Promise<ResponseType> => {
-        const response = await apiClient.post(`/posts/create`, {
-            username: postData.username,
-            title: postData.title,
-            content: postData.content,
-            topic: Number(postData.topic),
-        });
+    createPost: async (postData: FormData): Promise<ResponseType> => {
+        const response = await apiClient.post(
+            `/posts/create`,
+            postData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+        )
+
         return response.data;
     },
 
@@ -34,8 +34,13 @@ export const postApi = {
     },
 
     // edit post by postID
-    editPostByID: async (postData: CreatePostRequest, postID: number): Promise<ResponseType> => {
-        const response = await apiClient.post(`/posts/edit/${postID}`, postData);
+    editPostByID: async (postData: FormData): Promise<ResponseType> => {
+        const response = await apiClient.post(
+            `/posts/edit`,
+            postData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
         console.log("API RESPONSE:", response.data)
         return response.data
     },
