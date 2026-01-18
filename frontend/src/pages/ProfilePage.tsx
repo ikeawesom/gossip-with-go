@@ -87,8 +87,8 @@ export default function ProfilePage() {
       ) : (
         <div className="flex items-center justify-between gap-4 border-b border-gray-dark/20 pb-3 w-full">
           <div className="w-full">
-            <div className="flex md:flex-row flex-col items-start md:items-center md:justify-between justify-start gap-2 md:gap-4 w-full">
-              <div className="flex items-center justify-start gap-4">
+            <div className="flex md:flex-row flex-col items-start md:items-center justify-start gap-2 md:gap-4 w-full">
+              <div className="flex items-center justify-start gap-4 w-full">
                 <PfpModal pfp={pfp} />
                 <div>
                   <h1>{username}</h1>
@@ -97,7 +97,7 @@ export default function ProfilePage() {
               </div>
               <div className="w-full flex items-center justify-end gap-2">
                 {!isCurrentUser && visitingUser && (
-                  <div className="md:mb-0 mb-4 md:w-fit w-full">
+                  <div className="md:w-fit w-full">
                     <FollowButton
                       followType="user"
                       trigger={setUpdate}
@@ -108,7 +108,7 @@ export default function ProfilePage() {
                   </div>
                 )}
                 {isCurrentUser && visitingUser && (
-                  <div className="md:mb-0 mb-4 md:w-fit w-full">
+                  <div className="md:w-fit w-full">
                     <SettingsButton
                       user={visitingUser}
                       trigger={setUpdate}
