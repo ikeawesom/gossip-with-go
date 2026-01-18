@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler, queryHandler *handlers.QueryHandler, followHandler *handlers.FollowHandler, topicHandler *handlers.TopicHandler) {
+func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *handlers.UserHandler, postHandler *handlers.PostHandler, likeHandler *handlers.LikeHandler, repostHandler *handlers.RepostHandler, commentHandler *handlers.CommentHandler, queryHandler *handlers.QueryHandler, followHandler *handlers.FollowHandler, topicHandler *handlers.TopicHandler, notificationHandler *handlers.NotificationHandler) {
 	// CORS configuration
 	cfg := config.AppConfig
 	r.Use(cors.New(cors.Config{
@@ -123,6 +123,12 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		follow := api.Group("/follow") 
 		{
 			follow.POST("/toggle", middleware.AuthRequired(), followHandler.ToggleFollow)
+		}
+
+		notifications := api.Group("/notifications")
+		{
+			notifications.GET("/me", middleware.AuthRequired(), notificationHandler.GetUserNotifications)
+			notifications.POST("/toggle-view/:notif_id", middleware.AuthRequired(), notificationHandler.ToggleViewed)
 		}
 
 		// private API routes example

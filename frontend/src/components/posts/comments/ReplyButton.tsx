@@ -78,7 +78,7 @@ export default function RepyButton({
           close={() => setShowForm(false)}
           className="w-full flex-col flex items-center justify-center gap-4"
         >
-          <ModalTitle>
+          <ModalTitle className="w-full">
             <div className="bg-white shadow-xs border border-gray-dark/10 rounded-md p-4 flex flex-col w-full gap-1 items-start justify-start mb-2">
               <div className="flex items-center justify-start gap-1 pb-1">
                 <Link
@@ -98,6 +98,7 @@ export default function RepyButton({
               </div>
             </div>
           </ModalTitle>
+
           <form
             onSubmit={handleCreateReply}
             className="w-full flex flex-col items-start justify-start gap-4"
