@@ -15,7 +15,6 @@ export interface NotificationsRes {
 
 export default function useNotifications() {
     const [notifs, setNotifs] = useState<NotificationType[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const toggleView = async (index: number) => {
         // optimistic update
@@ -79,7 +78,6 @@ export default function useNotifications() {
     }
 
     const fetchNotifs = async () => {
-        setLoading(true);
         try {
             const res = await notificationApi.getNotifications();
             setNotifs(res.data.notifications);
@@ -90,8 +88,6 @@ export default function useNotifications() {
 
             // toast error or default error
             toast.error(axiosError.response?.data?.message || defaultError.message);
-        } finally {
-            setLoading(false);
         }
     };
 
