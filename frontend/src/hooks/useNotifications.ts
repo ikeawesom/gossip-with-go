@@ -6,12 +6,20 @@ import { defaultError } from '../lib/constants';
 import type { ApiError } from '../types/auth';
 import type { NotificationType } from '../types/notification';
 
+export interface NotificationsRes {
+    notifs: NotificationType[];
+    unread: NotificationType[];
+    toggleView: (index: number) => Promise<void>;
+    toggleAllViewed: () => Promise<void>;
+}
+
 export default function useNotifications() {
     const [notifs, setNotifs] = useState<NotificationType[]>([]);
     const [loading, setLoading] = useState(true);
 
     const toggleView = async (index: number) => {
         // optimistic update
+        const prev = notifs;
         const newNotif = { ...notifs[index], viewed: true } as NotificationType;
 
         setNotifs((prev) =>
@@ -40,8 +48,35 @@ export default function useNotifications() {
 
             // toast error or default error
             toast.error(axiosError.response?.data?.message || defaultError.message);
+
+            // rollback
+            setNotifs(prev)
         }
     };
+
+    const toggleAlLViewed = async () => {
+        const prev = notifs;
+        // optimistic update
+        setNotifs((prev) =>
+            prev.map((item: NotificationType) => ({ ...item, viewed: true })
+            ),
+        );
+
+        try {
+            await notificationApi.toggleAllViewed();
+        } catch (err) {
+            // get full axios error
+            const axiosError = err as AxiosError<ApiError>;
+            console.log("[SIGN OUT ERROR]:", axiosError.response?.data);
+
+            // toast error or default error
+            toast.error(axiosError.response?.data?.message || defaultError.message);
+
+            // rollback
+            setNotifs(prev)
+        }
+
+    }
 
     const fetchNotifs = async () => {
         setLoading(true);
@@ -60,9 +95,11 @@ export default function useNotifications() {
         }
     };
 
+    const unread = notifs.filter((n: NotificationType) => !n.viewed)
+
     useEffect(() => {
         fetchNotifs();
     }, []);
 
-    return { loading, notifs, toggleView }
+    return { notifs, toggleView, unread, toggleAlLViewed }
 }
