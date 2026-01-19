@@ -21,7 +21,7 @@ func AuthRequired() gin.HandlerFunc {
 		accessToken, err := c.Cookie("access_token")
 		if err != nil {
 			log.Printf("[MIDDLEWARE] no access_token cookie found: %v", err)
-			utils.ErrorResponse(c, http.StatusUnauthorized, "Unauthorized - No token provided", nil)
+			utils.ErrorResponse(c, http.StatusUnauthorized, "Please sign in to use this function.", nil)
 			c.Abort()
 			return
 		}
@@ -33,7 +33,7 @@ func AuthRequired() gin.HandlerFunc {
 		claims, err := utils.ValidateToken(accessToken, cfg.JWTSecret)
 		if err != nil {
 			log.Printf("[MIDDLEWARE] token validation failed: %v", err)
-			utils.ErrorResponse(c, http.StatusUnauthorized, "Unauthorized - Invalid token", nil)
+			utils.ErrorResponse(c, http.StatusUnauthorized, "Please sign in to use this function.", nil)
 			c.Abort()
 			return
 		}
@@ -41,7 +41,7 @@ func AuthRequired() gin.HandlerFunc {
 		// check token type
 		if claims.Type != utils.AccessToken {
 			log.Printf("[MIDDLEWARE] wrong token type: %v", claims.Type)
-			utils.ErrorResponse(c, http.StatusUnauthorized, "Unauthorized - Invalid token type", nil)
+			utils.ErrorResponse(c, http.StatusUnauthorized, "Please sign in to use this function.", nil)
 			c.Abort()
 			return
 		}
