@@ -12,5 +12,11 @@ export const notificationApi = {
     toggleViewed: async (notification_id: number): Promise<ResponseType> => {
         const response = await apiClient.post(`/notifications/toggle-view/${notification_id}`)
         return response.data
+    },
+
+    // toggle all viewed
+    toggleAllViewed: async (): Promise<ResponseType> => {
+        const response = await apiClient.post("/notifications/toggle-all-view")
+        return response.data
     }
 }
