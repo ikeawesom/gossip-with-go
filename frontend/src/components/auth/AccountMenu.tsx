@@ -8,6 +8,7 @@ import { twMerge } from "tailwind-merge";
 import Logo from "../utils/Logo";
 import AuthButtons from "./AuthButtons";
 import NotificationsModal from "../profile/notifications/NotificationsModal";
+import useNotifications from "../../hooks/useNotifications";
 
 export default function AccountMenu({
   username,
@@ -15,6 +16,8 @@ export default function AccountMenu({
   username: string | undefined;
 }) {
   const [showMenu, setShowMenu] = useState<"none" | "menu" | "notif">("none");
+  const { unread, notifs, toggleView, toggleAlLViewed } = useNotifications();
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,9 +34,12 @@ export default function AccountMenu({
     <>
       <div
         onClick={() => setShowMenu("menu")}
-        className="hover:brightness-110 duration-150 cursor-pointer bg-white/60 flex items-center justify-center gap-1 backdrop-blur-md border border-white/20 rounded-full shadow-sm p-3"
+        className="relative hover:brightness-110 duration-150 cursor-pointer bg-white/60 flex items-center justify-center gap-1 backdrop-blur-md border border-white/20 rounded-full shadow-sm p-3"
       >
         <img alt="Menu" src="/icons/icon_menu.svg" width={30} height={30} />
+        {unread.length > 0 && (
+          <div className="w-3 h-3 absolute bg-red-light rounded-full top-0 right-0" />
+        )}
       </div>
       {showMenu === "menu" && (
         <Modal
@@ -82,7 +88,14 @@ export default function AccountMenu({
                 className="flex items-center justify-start gap-4 w-full rounded-md hover:bg-primary/10 duration-150 p-2 text-start cursor-pointer"
               >
                 <img src="/icons/icon_notif.svg" className="w-4" />
-                Notifications
+                <span className="flex items-center gap-2">
+                  Notifications
+                  {unread.length > 0 && (
+                    <span className="grid place-items-center min-w-6 h-6 rounded-full bg-red-light text-white text-xs">
+                      {unread.length > 9 ? "9+" : unread.length}
+                    </span>
+                  )}
+                </span>
               </button>
               <SignOutButton />
             </>
@@ -96,6 +109,10 @@ export default function AccountMenu({
       )}
       {showMenu === "notif" && (
         <NotificationsModal
+          notifs={notifs}
+          toggleAllViewed={toggleAlLViewed}
+          toggleView={toggleView}
+          unread={unread}
           back={() => setShowMenu("menu")}
           close={() => setShowMenu("none")}
         />
