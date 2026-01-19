@@ -129,6 +129,7 @@ func SetupRoutes(r *gin.Engine, authHandler *handlers.AuthHandler, userHandler *
 		{
 			notifications.GET("/me", middleware.AuthRequired(), notificationHandler.GetUserNotifications)
 			notifications.POST("/toggle-view/:notif_id", middleware.AuthRequired(), notificationHandler.ToggleViewed)
+			notifications.POST("/toggle-all-view", middleware.AuthRequired(), notificationHandler.ToggleAllViewed)
 		}
 
 		// private API routes example
