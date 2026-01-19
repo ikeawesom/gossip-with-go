@@ -171,3 +171,12 @@ func (s *NotificationService) ToggleView(notifID uint) (bool, error) {
 
 	return !notification.Viewed, nil
 }
+
+func (s *NotificationService) ToggleAllView(userID uint) error {
+	return s.DB.
+		Model(&models.Notification{}).
+		Where("user_id = ?", userID).
+		Where("viewed = false").
+		Update("viewed", true).
+		Error
+}

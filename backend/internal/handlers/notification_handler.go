@@ -53,3 +53,19 @@ func (h *NotificationHandler) ToggleViewed(c *gin.Context) {
 
 	utils.SuccessResponse(c, http.StatusOK, "Toggled notification view", gin.H{"viewed": viewed})
 }
+
+func (h *NotificationHandler) ToggleAllViewed(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		utils.ErrorResponse(c, http.StatusUnauthorized, "User not authenticated", nil)
+		return
+	}
+
+	err := h.notificationService.ToggleAllView(userID.(uint))
+	if err != nil {
+		utils.ErrorResponse(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Toggled all notification view", nil)
+}
