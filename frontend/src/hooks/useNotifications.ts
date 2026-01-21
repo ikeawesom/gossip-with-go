@@ -5,6 +5,8 @@ import { notificationApi } from '../api/notifications.api';
 import { defaultError } from '../lib/constants';
 import type { ApiError } from '../types/auth';
 import type { NotificationType } from '../types/notification';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../state/store';
 
 export interface NotificationsRes {
     notifs: NotificationType[];
@@ -15,6 +17,7 @@ export interface NotificationsRes {
 
 export default function useNotifications() {
     const [notifs, setNotifs] = useState<NotificationType[]>([]);
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth)
 
     const toggleView = async (index: number) => {
         // optimistic update
@@ -43,7 +46,7 @@ export default function useNotifications() {
         } catch (err) {
             // get full axios error
             const axiosError = err as AxiosError<ApiError>;
-            console.log("[SIGN OUT ERROR]:", axiosError.response?.data);
+            console.log("[NOTIFS ERROR]:", axiosError.response?.data);
 
             // toast error or default error
             toast.error(axiosError.response?.data?.message || defaultError.message);
@@ -66,7 +69,7 @@ export default function useNotifications() {
         } catch (err) {
             // get full axios error
             const axiosError = err as AxiosError<ApiError>;
-            console.log("[SIGN OUT ERROR]:", axiosError.response?.data);
+            console.log("[NOTIFS ERROR]:", axiosError.response?.data);
 
             // toast error or default error
             toast.error(axiosError.response?.data?.message || defaultError.message);
@@ -84,17 +87,14 @@ export default function useNotifications() {
         } catch (err) {
             // get full axios error
             const axiosError = err as AxiosError<ApiError>;
-            console.log("[SIGN OUT ERROR]:", axiosError.response?.data);
-
-            // toast error or default error
-            toast.error(axiosError.response?.data?.message || defaultError.message);
+            console.log("[NOTIFS ERROR]:", axiosError.response?.data);
         }
     };
 
     const unread = notifs.filter((n: NotificationType) => !n.viewed)
 
     useEffect(() => {
-        fetchNotifs();
+        if (isAuthenticated) fetchNotifs();
     }, []);
 
     return { notifs, toggleView, unread, toggleAlLViewed }
