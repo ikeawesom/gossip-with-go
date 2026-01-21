@@ -29,16 +29,21 @@ export default function RegisterForm() {
   const { isLoading } = useAuth();
 
   // username must be between 8 to 16 characters long
-  const valid_username =
+  const valid_username_length =
     registerDetails.username.length > 7 && registerDetails.username.length < 17;
+
+  // username cannot have spacing
+  const valid_username_char = registerDetails.username.split(" ").length === 1;
 
   const { valid_password } = useCheckPassword(password);
 
   const empty_password = password === "" && confirm_password === "";
   const password_mismatch = password !== confirm_password;
 
+  // disable register button with following criterias
   const disabled =
-    !valid_username ||
+    !valid_username_length ||
+    !valid_username_char ||
     !valid_password ||
     isLoading ||
     password_mismatch ||
@@ -62,7 +67,7 @@ export default function RegisterForm() {
         email,
         password,
         username,
-      })
+      }),
     );
 
     if (signupUser.fulfilled.match(result)) {
@@ -71,6 +76,8 @@ export default function RegisterForm() {
       toast.success("Verification email sent!");
     } else {
       const error = result.payload as string;
+
+      // set error messages based on payload error
       if (error.includes("registered")) {
         setError({
           type: "email",
@@ -83,6 +90,8 @@ export default function RegisterForm() {
         });
       } else {
         console.log("[SIGN UP ERROR]", error);
+
+        // error is non-specific, send default error message
         toast.error(defaultError.message);
       }
     }
@@ -106,7 +115,7 @@ export default function RegisterForm() {
                   "text-sm text-primary duration-150",
                   isLoading && sent
                     ? "cursor-not-allowed opacity-50"
-                    : "hover:opacity-70 cursor-pointer"
+                    : "hover:opacity-70 cursor-pointer",
                 )}
               >
                 {isLoading ? "Sending..." : "Resend."}
@@ -159,10 +168,19 @@ export default function RegisterForm() {
                 <li
                   className={twMerge(
                     "text-xs md:text-sm list-disc ml-6",
-                    valid_username ? "text-green" : "text-red"
+                    valid_username_length ? "text-green" : "text-red",
                   )}
                 >
                   Must be at 8 to 16 characters long.
+                </li>
+
+                <li
+                  className={twMerge(
+                    "text-xs md:text-sm list-disc ml-6",
+                    valid_username_char ? "text-green" : "text-red",
+                  )}
+                >
+                  Must have no spacing.
                 </li>
               </ul>
             )}
