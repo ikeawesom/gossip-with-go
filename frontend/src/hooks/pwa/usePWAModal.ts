@@ -9,6 +9,7 @@ export default function usePWAModal() {
     };
 
     useEffect(() => {
+        // use localstorage to detemine modal for PWA
         const shownPwa = localStorage.getItem("pwaPromptDismissed");
         if (!shownPwa) {
             setShowPWA(true);

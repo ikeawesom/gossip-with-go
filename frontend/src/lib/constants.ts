@@ -24,6 +24,7 @@ interface colorsType {
     text: string;
 }
 
+// default colours array for topics
 export const COLORS_ARR = {
     "red": {
         title: "Red",

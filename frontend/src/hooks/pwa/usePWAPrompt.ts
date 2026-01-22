@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { isIOS, isStandalone } from "../../lib/helpers"
 
 export function usePWAPrompt() {
+    // detect if PWA is installable on current device
     const [installable, setInstallable] = useState(false)
     const [isIOSDevice, setIOS] = useState(false)
 

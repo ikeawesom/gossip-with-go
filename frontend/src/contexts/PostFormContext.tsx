@@ -9,18 +9,23 @@ import type { CreatePostRequest, PostType } from "../types/post";
 
 type PostStep = "content" | "media" | "summary";
 
+// init interface for post content
 interface PostFormContextType {
   postDetails: CreatePostRequest;
   setPostDetails: React.Dispatch<React.SetStateAction<CreatePostRequest>>;
-  postStep: PostStep;
-  setPostStep: React.Dispatch<React.SetStateAction<PostStep>>;
-  postLoad: boolean;
-  setPostLoad: React.Dispatch<React.SetStateAction<boolean>>;
   updateField: (field: keyof CreatePostRequest, value: any) => void;
+
+  // functions to handle images
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   removeImage: (index: number) => void;
-  canProceed: boolean;
   cleanupImages: () => void;
+
+  postStep: PostStep;
+  setPostStep: React.Dispatch<React.SetStateAction<PostStep>>;
+  canProceed: boolean;
+
+  postLoad: boolean;
+  setPostLoad: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PostFormContext = createContext<PostFormContextType | null>(null);

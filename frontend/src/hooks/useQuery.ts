@@ -22,6 +22,7 @@ export default function useQuery(searchQuery: string, queryType: QueryType) {
         setLoading(false);
     }
 
+    // added debounce to reduce API calls
     const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
     useEffect(() => {
@@ -49,7 +50,7 @@ export default function useQuery(searchQuery: string, queryType: QueryType) {
             } catch (err: any) {
                 // get full axios error
                 const axiosError = err as AxiosError<ApiError>;
-                console.log("[EDIT PROFILE ERROR]:", axiosError.response?.data);
+                console.log("[QUERY ERROR]:", axiosError.response?.data);
 
                 // toast error or default error
                 toast.error(axiosError.response?.data?.message || "A search error has occurred. Please try again later.");

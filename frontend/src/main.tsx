@@ -4,18 +4,21 @@ import App from "./App.tsx";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthPage, PostPage } from "./pages/index";
+import {
+  AuthPage,
+  PostPage,
+  NotFound,
+  ProfilePage,
+  TopicPage,
+  TrendingPostsPage,
+  FollowingPage,
+} from "./pages/index";
 import { Toaster } from "sonner";
 import "./index.css";
 import { persistor, store } from "./state/store.ts";
 import AuthInitializer from "./components/auth/AuthInit.tsx";
-import ProfilePage from "./pages/ProfilePage.tsx";
-import NavSection from "./components/nav/NavSection.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import TopicPage from "./pages/TopicPage.tsx";
-import TrendingPostsPage from "./pages/TrendingPostsPage.tsx";
-import FollowingPage from "./pages/FollowingPage.tsx";
 import { registerSW } from "virtual:pwa-register";
+import NavSection from "./components/nav/NavSection.tsx";
 // import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 
 createRoot(document.getElementById("root")!).render(
@@ -47,7 +50,7 @@ createRoot(document.getElementById("root")!).render(
         </BrowserRouter>
       </PersistGate>
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 );
 
 registerSW({

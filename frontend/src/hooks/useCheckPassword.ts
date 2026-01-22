@@ -1,10 +1,12 @@
 export default function useCheckPassword(password: string) {
+    // criterias for valid password
     const password_length = password.length > 8;
     const password_number = /[0-9]/.test(password);
     const password_uppercase = /[A-Z]/.test(password);
     const password_lowercase = /[a-z]/.test(password);
     const password_special = /[^A-Za-z0-9]/.test(password);
 
+    // array of password criterias for iteration
     const passwordCriteria = [
         {
             label: "Must be at least 8 characters.",

@@ -29,7 +29,7 @@ export default function useShowReplies(id: number) {
             setHasMore(data.has_more);
             if (!data.has_more) {
                 setAllLoaded(true);
-                console.log("all loaded")
+                console.log("all replies loaded")
             }
             setOffset((e) => e + limit);
         } catch (err: any) {

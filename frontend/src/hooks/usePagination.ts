@@ -12,6 +12,7 @@ export function usePagination(limit: number, type: PaginationType) {
     const [error, setError] = useState<string | null>(null);
     const [hasMore, setHasMore] = useState(true);
 
+    // ref instead of state for loading for immediate updates
     const isLoadingRef = useRef(false);
     const cursorRef = useRef<number | null>(null);
     const initialLoadRef = useRef(false);
@@ -39,9 +40,9 @@ export function usePagination(limit: number, type: PaginationType) {
                 return [...prev, ...newPosts];
             });
 
+            // move cursor to last post
             cursorRef.current = data.next_cursor || null;
             setHasMore(data.has_more);
-
         } catch (err) {
             const axiosError = AxiosError<ApiError>
             setError('Failed to fetch posts.');
@@ -52,7 +53,7 @@ export function usePagination(limit: number, type: PaginationType) {
         }
     }, [hasMore, limit]);
 
-    // Load more posts
+    // load more posts
     const loadMore = useCallback(() => {
         fetchPosts();
     }, [fetchPosts]);

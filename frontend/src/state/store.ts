@@ -18,9 +18,10 @@ const persistConfig = {
     key: 'root',
     version: 1,
     storage,
-    whitelist: ['auth'],
+    whitelist: ['auth'], // only auth states are persisted
 };
 
+// saves part of state to localstorage and restore it when the app reloads (persists)
 const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 
 export const store = configureStore({
@@ -31,7 +32,7 @@ export const store = configureStore({
     middleware: (getDefault) =>
         getDefault({
             serializableCheck: {
-                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER], // rehydrates auth sate during lifecycle actions
             },
         }),
 })
