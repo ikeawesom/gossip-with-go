@@ -1,6 +1,7 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+Check out the full release notes [here](https://github.com/ikeawesom/gossip-with-go/releases).
 
 ---
 
