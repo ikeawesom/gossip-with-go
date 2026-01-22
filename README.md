@@ -8,9 +8,15 @@
 
 Welcome to **Gossip With Go**! My name is Ike and I have built this modern and responsive web application designed to facilitate meaningful discussions through posts, topics, and nested comments! Discover content via topic-based categorisation and fellow users for interaction. It is designed to resemble the interaction patterns of modern social platforms such as Instagram and Reddit, while remaining lightweight, performant and developer-friendly.
 
-Check out the deployment [here](https://go-gossip.vercel.app)!
+Check out the deployment [here](https://go-gossip.vercel.app) and the demo videos below!
 
-## 🚀 Highlighted Features
+## 🖥 Desktop Demo
+https://github.com/user-attachments/assets/11f6f471-db16-437f-a8b2-3546d42cc23a
+
+## 📱 Mobile Demo
+https://github.com/user-attachments/assets/f0891971-368e-4aa3-bcaf-f8302e1212ff
+
+# 🚀 Highlighted Features
 
 👤 Create new accounts as Gossipers
 
