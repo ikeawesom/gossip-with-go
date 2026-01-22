@@ -6,7 +6,7 @@
 ![Go Version](https://img.shields.io/badge/go-1.25.5-blue)
 ![React](https://img.shields.io/badge/react-19.2-blue)
 
-Welcome to **Gossip With Go**! My name is Ike and I have built this modern and responsive web application designed to facilitate meaningful discussions through posts, topics, and nested comments! Discover content via topic-based categorisation and fellow users for interaction. It is designed to resemble the interaction patterns of modern social platforms such as Instagram and Reddit, while remaining lightweight, performant and developer-friendly.
+Welcome to **Gossip With Go**! My name is **Ike Lim** and I have built this modern and responsive web application designed to facilitate meaningful discussions through posts, topics, and nested comments! Discover content via topic-based categorisation and fellow users for interaction. It is designed to resemble the interaction patterns of modern social platforms such as Instagram and Reddit, while remaining lightweight, performant and developer-friendly.
 
 Check out the deployment [here](https://go-gossip.vercel.app) and the demo videos below!
 
