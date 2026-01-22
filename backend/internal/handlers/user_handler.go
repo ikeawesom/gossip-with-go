@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type UserHandler struct {
 	UserService *services.UserService
 }
@@ -24,6 +25,7 @@ func NewUserHandler(userService *services.UserService) *UserHandler {
 	}
 }
 
+// POST /users/edit-profile
 func (h* UserHandler) EditProfile(c *gin.Context) {
 	currentUserID, exists := c.Get("userID")
 	if !exists {
@@ -49,12 +51,14 @@ func (h* UserHandler) EditProfile(c *gin.Context) {
         return
     }
 
+	// handling profile picture
 	file, avatarErr := c.FormFile("avatar")
 	var avatarURL *string = nil
+
+	// set a limit to file size to save storage in cloudinary
 	const maxAvatarSize = 5 << 20 // 5MB
 
 	if avatarErr == nil {
-		// file must be under 5MB (save storage space for project)
 		if file.Size > maxAvatarSize {
 			utils.ErrorResponse(c, 400, "Image must be under 5MB", nil)
 			return
@@ -69,12 +73,13 @@ func (h* UserHandler) EditProfile(c *gin.Context) {
 
 		fileType := http.DetectContentType(buff)
 
+		// restrict profile pictures to only be images
 		if !strings.HasPrefix(fileType, "image/") {
 			utils.ErrorResponse(c, 400, "Only image files are allowed", nil)
 			return
 		}
 
-		// open file
+		// open file again
         opened_second, _ := file.Open()
         defer opened_second.Close()
 		
@@ -93,6 +98,7 @@ func (h* UserHandler) EditProfile(c *gin.Context) {
             return
         }
 
+		// obtain image URL to store in DB
         avatarURL = &upload.SecureURL
     }
 
@@ -114,9 +120,10 @@ func (h* UserHandler) EditProfile(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "User updated successfully", nil)
 }
 
+// GET /users/:username
 func (h *UserHandler) GetUserByUsername(c *gin.Context) {
+	// optional auth for interactions
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
@@ -136,6 +143,7 @@ func (h *UserHandler) GetUserByUsername(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "User retrieved successfully", gin.H{"user": user})
 }
 
+// GET /users/:username/followers
 func (h *UserHandler) GetFollowersByUsername(c *gin.Context) {
 	req := services.GetUserRequest{
 		Username: c.Param("username"),
@@ -151,6 +159,7 @@ func (h *UserHandler) GetFollowersByUsername(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "User retrieved successfully", gin.H{"user": user})
 }
 
+// GET /users/:username/followings
 func (h *UserHandler) GetFollowingsByUsername(c *gin.Context) {
 	req := services.GetUserRequest{
 		Username: c.Param("username"),

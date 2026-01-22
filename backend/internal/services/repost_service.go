@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// init services
 type RepostService struct {
 	DB *gorm.DB
 	PostService *PostService
@@ -23,6 +24,7 @@ func NewRepostService(db *gorm.DB, postService *PostService) *RepostService {
 	}
 }
 
+// declare struct types
 type RepostedPosts struct {
 	PostID      uint      `json:"post_id"`
 	Title       string    `json:"title"`
@@ -94,19 +96,6 @@ func (s *RepostService) ToggleRepost(userID uint, postID uint, visibility string
 	return false, fmt.Errorf("database error: %w", result.Error)
 }
 
-func (s *RepostService) incrementRepostCount(postID uint) error {
-	return s.DB.Table("posts").
-		Where("id = ?", postID).
-		Update("repost_count", gorm.Expr("repost_count + ?", 1)).
-		Error
-}
-
-func (s *RepostService) decrementRepostCount(postID uint) error {
-	return s.DB.Table("posts").
-		Where("id = ? AND repost_count > 0", postID).
-		Update("repost_count", gorm.Expr("repost_count - ?", 1)).
-		Error
-}
 
 func (s *RepostService) GetRepostStatus(userID uint, postID uint) (bool, error) {
 	var count int64
@@ -215,7 +204,6 @@ var posts []PostWithTopic
 	return postsWithTime, nil
 }
 
-
 func (s *RepostService) UpdateRepostVisibility(userID uint, postID uint, visibility string) error {
 	// validate visibility
 	if visibility != "public" && visibility != "friends" && visibility != "private" {
@@ -235,4 +223,19 @@ func (s *RepostService) UpdateRepostVisibility(userID uint, postID uint, visibil
 	}
 
 	return nil
+}
+
+// helper functions to increment/decrement count
+func (s *RepostService) incrementRepostCount(postID uint) error {
+	return s.DB.Table("posts").
+		Where("id = ?", postID).
+		Update("repost_count", gorm.Expr("repost_count + ?", 1)).
+		Error
+}
+
+func (s *RepostService) decrementRepostCount(postID uint) error {
+	return s.DB.Table("posts").
+		Where("id = ? AND repost_count > 0", postID).
+		Update("repost_count", gorm.Expr("repost_count - ?", 1)).
+		Error
 }

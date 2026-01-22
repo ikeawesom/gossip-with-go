@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type TopicHandler struct {
 	TopicService *services.TopicsService
 }
@@ -19,9 +20,10 @@ func NewTopicHandler(topicService *services.TopicsService) *TopicHandler {
 	}
 }
 
+// GET /topics/:topicID
 func (h* TopicHandler) GetTopicByID(c *gin.Context) {
+	// optional auth for interactions
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
@@ -42,6 +44,7 @@ func (h* TopicHandler) GetTopicByID(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Topic fetched successfully", gin.H{"topic": topic})
 }
 
+// POST /topics/create
 func (h* TopicHandler) CreateTopic(c *gin.Context) {
 	userID, exists := c.Get("userID");
 	if !exists {
@@ -49,6 +52,7 @@ func (h* TopicHandler) CreateTopic(c *gin.Context) {
         return
 	}
 
+	// temporary struct for request
 	var request struct {
 		TopicName string `json:"title" binding:"required"`
 		TopicDesc string `json:"desc" binding:"required"`
@@ -69,6 +73,7 @@ func (h* TopicHandler) CreateTopic(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Topic created successfully", gin.H{"topic": topic})
 }
 
+// POST /topics/delete/:topicID
 func (h *TopicHandler) DeletePost(c *gin.Context) {
 	userID, exists := c.Get("userID");
 	if !exists {
@@ -86,7 +91,6 @@ func (h *TopicHandler) DeletePost(c *gin.Context) {
 	err = h.TopicService.DeleteTopics(userID.(uint), uint(topicID))
 
     if err != nil {
-        
         if err.Error() == "post not found" {
             utils.ErrorResponse(c, http.StatusNotFound, err.Error(), nil)
             return
@@ -103,6 +107,7 @@ func (h *TopicHandler) DeletePost(c *gin.Context) {
 
 }
 
+// GET /topics/trending
 func (h *TopicHandler) GetTrendingTopics(c *gin.Context) {
 	topics, err := h.TopicService.GetTrendingTopics()
 	if err != nil {

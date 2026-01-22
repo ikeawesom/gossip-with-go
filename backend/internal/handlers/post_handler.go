@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type PostHandler struct {
 	PostService *services.PostService
 }
@@ -20,6 +21,7 @@ func NewPostHandler(postService *services.PostService) *PostHandler {
 	}
 }
 
+// declare request struct types
 type GetPostByUsernameRequest struct {
 	Username string `json:"username" binding:"required"`
 }
@@ -35,9 +37,10 @@ type CreatePostRequest struct {
 	Username string `json:"username" binding:"required"`
 }
 
+// GET /posts/users/:username
 func (h *PostHandler) GetPostsByUsername(c *gin.Context) {
+	// optional auth for interactions
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
@@ -55,9 +58,10 @@ func (h *PostHandler) GetPostsByUsername(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"posts": posts})
 }
 
+// GET /posts/topic/:topic
 func (h *PostHandler) GetPostsByTopic(c *gin.Context) {
+	// optional auth for interactions
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
@@ -79,9 +83,10 @@ func (h *PostHandler) GetPostsByTopic(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"posts": posts})
 }
 
+// GET /posts/users/:username/:postID
 func (h *PostHandler) GetUserPostByID(c *gin.Context) {
+	// optional auth for interactions
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
@@ -104,13 +109,15 @@ func (h *PostHandler) GetUserPostByID(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Post retrieved successfully", gin.H{"post": post})
 }
 
+// GET /posts/trending
 func (h *PostHandler) GetTrendingPosts(c *gin.Context) {
+	// optional auth for interactions
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
 
+	// fallback to default limit and cursor for pagination
 	limitStr := c.DefaultQuery("limit", utils.GetLimitStr()) 
 	cursorStr := c.Query("cursor")              // empty string if not provided
 
@@ -145,13 +152,15 @@ func (h *PostHandler) GetTrendingPosts(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", result)
 }
 
+// GET /posts/following
 func (h *PostHandler) GetFollowingPosts(c *gin.Context) {
+	// optional auth for interactions and posts
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
 
+	// fallback to default limit and cursor for pagination
 	limitStr := c.DefaultQuery("limit", utils.GetLimitStr()) 
 	cursorStr := c.Query("cursor")              // empty string if not provided
 
@@ -186,6 +195,7 @@ func (h *PostHandler) GetFollowingPosts(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", result)
 }
 
+// POST /posts/create
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	_, exists := c.Get("username")
     if !exists {
@@ -207,10 +217,15 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 
 	topic, _ := strconv.ParseUint(topicStr, 10, 64)
 	imgNo, _:= strconv.ParseUint(imgNoStr, 10, 64)
+	
+	// create empty array for image files
 	var imgFiles []*multipart.FileHeader = make([]*multipart.FileHeader, imgNo)
 
+	// add each file to the array declared
 	for i := range imgNo {
 		i_str := strconv.FormatUint(i, 10)
+		
+		// frontend naming convention image_[image_index]
 		imageName := "image_" + i_str
 		
 		file, imgErr := c.FormFile(imageName)
@@ -218,8 +233,6 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 			imgFiles[i] = file
 		}
 	}
-
-	utils.DebugLog("images:", imgFiles)
 
 	postID, err := h.PostService.CreatePost(username, title, content, uint(topic), imgFiles)
 	if err != nil {
@@ -230,6 +243,7 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusCreated, "Post created successfully", gin.H{"data":postID})
 }
 
+// POST /posts/edit
 func (h *PostHandler) EditPost(c *gin.Context) {
     postIDStr := c.PostForm("postID")
     postID, err := strconv.ParseUint(postIDStr, 10, 32)
@@ -265,6 +279,7 @@ func (h *PostHandler) EditPost(c *gin.Context) {
     utils.SuccessResponse(c, http.StatusOK, "Post updated successfully", nil)
 }
 
+// POST /posts/delete/:postID
 func (h *PostHandler) DeletePost(c *gin.Context) {
 	postIDStr := c.Param("postID")
     postID, err := strconv.ParseUint(postIDStr, 10, 32)

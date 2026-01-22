@@ -7,6 +7,7 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
+// init services
 type EmailService struct {
 	SMTPHost      string
 	SMTPPort      string
@@ -29,11 +30,12 @@ func NewEmailService(host, port, username, password, from, fromName string) *Ema
 }
 
 func (s *EmailService) SendEmail(to, subject, body string) error {
+	// utilising gomail for emails
 	m := gomail.NewMessage()
 	m.SetHeader("From", m.FormatAddress(s.EmailFrom, s.EmailFromName))
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
-	m.SetBody("text/html", body)
+	m.SetBody("text/html", body) // build email structure with HTML
 
 	port, err := strconv.Atoi(s.SMTPPort)
 	if err != nil {
@@ -52,6 +54,7 @@ func (s *EmailService) SendEmail(to, subject, body string) error {
 func (s *EmailService) SendVerificationEmail(to, username, token, verifyURL string) error {
 	verificationLink := fmt.Sprintf("%s/%s", verifyURL, token)
 	
+	// using HTML to craft email body
 	subject := "Verify Your Email - Gossip With Go"
 	body := fmt.Sprintf(`
 		<html>
@@ -80,7 +83,8 @@ func (s *EmailService) SendVerificationEmail(to, username, token, verifyURL stri
 
 func (s *EmailService) SendPasswordResetEmail(to, username, token, resetURL string) error {
 	resetLink := fmt.Sprintf("%s/%s", resetURL, token)
-	
+
+	// using HTML to craft email body
 	subject := "Reset Your Password - Gossip With Go"
 	body := fmt.Sprintf(`
 		<html>

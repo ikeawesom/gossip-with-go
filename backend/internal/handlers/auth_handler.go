@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type AuthHandler struct {
 	AuthService *services.AuthService
 }
@@ -21,6 +22,7 @@ func NewAuthHandler(authService *services.AuthService) *AuthHandler {
 	}
 }
 
+// declare request struct types
 type SignupRequest struct {
 	Username        string `json:"username" binding:"required"`
 	Email           string `json:"email" binding:"required,email"`
@@ -51,6 +53,7 @@ type ResetPasswordRequest struct {
 	ConfirmPassword string `json:"confirm_password" binding:"required"`
 }
 
+// POST /api/auth/signup
 func (h *AuthHandler) Signup(c *gin.Context) {
 	var req SignupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -75,6 +78,7 @@ func (h *AuthHandler) Signup(c *gin.Context) {
 	})
 }
 
+// POST /api/auth/login
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -113,12 +117,14 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	})
 }
 
+// POST /api/auth/logout
 func (h *AuthHandler) Logout(c *gin.Context) {
 	// clear cookies
 	clearTokenCookies(c)
 	utils.SuccessResponse(c, http.StatusOK, "Logout successful", nil)
 }
 
+// POST /api/auth/me
 func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -137,6 +143,7 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 	})
 }
 
+// POST /api/auth/refresh
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	refreshToken, err := c.Cookie("refresh_token")
 	if err != nil {
@@ -177,6 +184,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Token refreshed", nil)
 }
 
+// POST /api/auth/verify-email
 func (h *AuthHandler) VerifyEmail(c *gin.Context) {
 	var req VerifyEmailRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -192,6 +200,7 @@ func (h *AuthHandler) VerifyEmail(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Email verified successfully!", nil)
 }
 
+// POST /api/auth/resend-verification
 func (h *AuthHandler) ResendVerification(c *gin.Context) {
 	var req ResendVerificationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -206,6 +215,8 @@ func (h *AuthHandler) ResendVerification(c *gin.Context) {
 
 	utils.SuccessResponse(c, http.StatusOK, "Verification email sent!", nil)
 }
+
+// POST /api/auth/check-reset-token
 func (h *AuthHandler) CheckResetToken(c *gin.Context) {
 	var req VerifyEmailRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -219,6 +230,7 @@ func (h *AuthHandler) CheckResetToken(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Reset token is valid", nil)
 }
 
+// POST /api/auth/forgot-password
 func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	var req ForgotPasswordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -234,6 +246,7 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "If the email exists, a password reset link has been sent", nil)
 }
 
+// POST /api/auth/reset-password
 func (h *AuthHandler) ResetPassword(c *gin.Context) {
 	var req ResetPasswordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -254,14 +267,12 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Password reset successful!", nil)
 }
 
+// helper functions for cookies
 func setTokenCookies(c *gin.Context, accessToken, refreshToken string) {
 	cfg := config.AppConfig
 
 	// determine SameSite mode based on environment
 	sameSiteMode := http.SameSiteLaxMode // default for development
-	// if cfg.CookieDomain != "localhost" {
-	// 	sameSiteMode = http.SameSiteNoneMode
-	// }
 
 	// access token cookie
 	c.SetSameSite(sameSiteMode) 
@@ -293,9 +304,6 @@ func setAccessTokenCookie(c *gin.Context, accessToken string) {
 
 	// determine SameSite mode based on environment
 	sameSiteMode := http.SameSiteLaxMode // default for development
-	// if cfg.CookieDomain != "localhost" {
-	// 	sameSiteMode = http.SameSiteNoneMode
-	// }
 
 	c.SetSameSite(sameSiteMode) 
 	c.SetCookie(
@@ -314,9 +322,6 @@ func clearTokenCookies(c *gin.Context) {
 
 	// determine SameSite mode based on environment
 	sameSiteMode := http.SameSiteLaxMode // default for development
-	// if cfg.CookieDomain != "localhost" {
-	// 	sameSiteMode = http.SameSiteNoneMode
-	// }
 
 	c.SetSameSite(sameSiteMode) 
 	c.SetCookie("access_token", "", -1, "/", cfg.CookieDomain, cfg.CookieSecure, true)

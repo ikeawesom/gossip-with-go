@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type RepostHandler struct {
 	repostService *services.RepostService
 }
@@ -19,6 +20,7 @@ func NewRepostHandler(repostService *services.RepostService) *RepostHandler {
 	}
 }
 
+// POST /reposts/toggle
 func (h *RepostHandler) ToggleRepost(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -26,6 +28,7 @@ func (h *RepostHandler) ToggleRepost(c *gin.Context) {
 		return
 	}
 	
+	// temporary struct for request
 	var request struct {
 		PostID     uint   `json:"post_id" binding:"required"`
 		Visibility string `json:"visibility" binding:"required"` // public, friends or private
@@ -53,6 +56,7 @@ func (h *RepostHandler) ToggleRepost(c *gin.Context) {
 	})
 }
 
+// GET /reposts/status
 func (h *RepostHandler) GetRepostStatus(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -83,8 +87,11 @@ func (h *RepostHandler) GetRepostStatus(c *gin.Context) {
 	})
 }
 
+// GET /reposts/reposters
 func (h *RepostHandler) GetReposters(c *gin.Context) {
 	postIDStr := c.Query("post_id")
+	
+	// fallback to default limit and offset
 	limitStr := c.DefaultQuery("limit", utils.GetLimitStr())
 	offsetStr := c.DefaultQuery("offset", utils.GetOffsetStr())
 
@@ -130,9 +137,10 @@ func (h *RepostHandler) GetReposters(c *gin.Context) {
 	})
 }
 
+// GET reposts/user/:userID
 func (h *RepostHandler) GetUserReposts(c *gin.Context) {
+	// optional auth for interactions and posts
 	var currentUserID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		currentUserID = v.(uint)
 	}
@@ -158,6 +166,7 @@ func (h *RepostHandler) GetUserReposts(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"posts": posts})
 }
 
+// POST /reposts/update-visibility
 func (h *RepostHandler) UpdateRepostVisibility(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -165,6 +174,7 @@ func (h *RepostHandler) UpdateRepostVisibility(c *gin.Context) {
 		return
 	}
 
+	// temporary struct for request
 	var request struct {
 		PostID     uint   `json:"post_id" binding:"required"`
 		Visibility string `json:"visibility" binding:"required"`

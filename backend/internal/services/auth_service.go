@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// init services
 type AuthService struct {
 	DB           *gorm.DB
 	EmailService *EmailService

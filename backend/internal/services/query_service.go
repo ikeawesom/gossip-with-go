@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// init services
 type QueryService struct {
 	DB *gorm.DB
 }
@@ -17,6 +18,7 @@ func NewQueryService(db *gorm.DB) *QueryService {
 	}
 }
 
+// declare struct types
 type Query struct {
 	query string
 }

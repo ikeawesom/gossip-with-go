@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type CommentHandler struct {
 	commentService *services.CommentService
 }
@@ -19,6 +20,7 @@ func NewCommentHandler(commentService *services.CommentService) *CommentHandler 
 	}
 }
 
+// POST /comments/root
 func (h *CommentHandler) CreateRootComment(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -26,6 +28,7 @@ func (h *CommentHandler) CreateRootComment(c *gin.Context) {
 		return
 	}
 
+	// create temporary struct for request
 	var request struct {
 		PostID  uint   `json:"post_id" binding:"required"`
 		Content string `json:"content" binding:"required"`
@@ -48,6 +51,7 @@ func (h *CommentHandler) CreateRootComment(c *gin.Context) {
 	})
 }
 
+// POST /comments/reply
 func (h *CommentHandler) CreateReply(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -55,6 +59,7 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 		return
 	}
 
+	// create temporary struct for request
 	var request struct {
 		ParentCommentID uint   `json:"parent_comment_id" binding:"required"`
 		Content         string `json:"content" binding:"required"`
@@ -77,7 +82,9 @@ func (h *CommentHandler) CreateReply(c *gin.Context) {
 	})
 }
 
+// GET /comments/user/:userID
 func (h *CommentHandler) GetCommentsByUserID(c *gin.Context) {
+	// get current user ID and target userID for ownsership verification
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -108,9 +115,10 @@ func (h *CommentHandler) GetCommentsByUserID(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Posts retrieved successfully", gin.H{"comments": comments})
 }
 
+// GET /comments/post/:postID
 func (h *CommentHandler) GetRootComments(c *gin.Context) {
+	// optional auth for interactions
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
@@ -122,6 +130,7 @@ func (h *CommentHandler) GetRootComments(c *gin.Context) {
 		return
 	}
 
+	// fallback to default utility constants
 	limitStr := c.DefaultQuery("limit", utils.GetLimitStr())
 	offsetStr := c.DefaultQuery("offset", utils.GetOffsetStr())
 
@@ -175,9 +184,10 @@ func (h *CommentHandler) GetRootComments(c *gin.Context) {
 	})
 }
 
+// GET /comments/:id/replies
 func (h *CommentHandler) GetReplies(c *gin.Context) {
+	// optional auth for interactions
 	var userID uint = 0
-
 	if v, exists := c.Get("userID"); exists {
 		userID = v.(uint)
 	}
@@ -189,6 +199,7 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 		return
 	}
 
+	// fallback to default utility constants
 	limitStr := c.DefaultQuery("limit", utils.GetRepliesLimitStr())
 	offsetStr := c.DefaultQuery("offset", utils.GetOffsetStr())
 
@@ -228,7 +239,9 @@ func (h *CommentHandler) GetReplies(c *gin.Context) {
 	})
 }
 
+// GET /comments/toggle-pin/:id
 func (h *CommentHandler) PinComment(c *gin.Context) {
+	// optional auth for interactions
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -253,6 +266,7 @@ func (h *CommentHandler) PinComment(c *gin.Context) {
 	})
 }
 
+// DELETE /comments/:id
 func (h *CommentHandler) DeleteComment(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {

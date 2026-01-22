@@ -13,7 +13,7 @@ import (
 // middleware validates JWT token from cookie
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Log all cookies received
+		// log all cookies received
 		log.Printf("[MIDDLEWARE] cookies received: %s", c.Request.Header.Get("Cookie"))
 		log.Printf("[MIDDLEWARE] user-agent: %s", c.Request.Header.Get("User-Agent"))
 		

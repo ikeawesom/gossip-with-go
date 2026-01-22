@@ -9,24 +9,9 @@ import (
 	"gorm.io/gorm"
 )
 
+// init services
 type TopicsService struct {
 	DB *gorm.DB
-}
-
-type TopicsWithUsername struct {
-	models.Topic
-
-	Username string `json:"username"`
-
-	UserHasFollowed bool     `gorm:"-" json:"user_has_followed"`
-	Followers 		[]string `gorm:"-" json:"followers"`
-}
-
-type TopicWithScore struct {
-	TopicsWithUsername
-
-	RecentPostCount  int    `gorm:"-" json:"recent_post_count,omitempty"`
-	Score            float64 `gorm:"-" json:"score,omitempty"`
 }
 
 func NewTopicService(db *gorm.DB) *TopicsService {
@@ -35,15 +20,31 @@ func NewTopicService(db *gorm.DB) *TopicsService {
 	}
 }
 
+// declare struct types
+type TopicsWithUsername struct {
+	models.Topic
+	Username string `json:"username"`
+
+	UserHasFollowed bool     `gorm:"-" json:"user_has_followed"`
+	Followers 		[]string `gorm:"-" json:"followers"`
+}
+
+type TopicWithScore struct {
+	TopicsWithUsername
+	RecentPostCount  int    `gorm:"-" json:"recent_post_count,omitempty"`
+	Score            float64 `gorm:"-" json:"score,omitempty"`
+}
+
+
 func (s *TopicsService) GetTopicByID(currentUser uint, topicID uint) (*TopicsWithUsername, error) {
 	var topic TopicsWithUsername
 	if err := s.DB.Table("topics").
-				Select("topics.*, users.username").
-				Joins("JOIN users ON topics.created_by = users.id").
-				Where("topics.id = ?", topicID).
-				First(&topic).Error; err != nil {
-		return nil, err
-	}
+			Select("topics.*, users.username").
+			Joins("JOIN users ON topics.created_by = users.id").
+			Where("topics.id = ?", topicID).
+			First(&topic).Error; err != nil {
+				return nil, err
+			}
 
 	// enrich topic with follow information
 	if err := s.enrichTopicFollowers(&topic, currentUser); err != nil {
@@ -138,7 +139,7 @@ func (s *TopicsService) enrichTopicFollowers(topic *TopicsWithUsername, currentU
 }
 
 func (s *TopicsService) GetTrendingTopics() (*[]TopicWithScore, error) {
-	// Calculate the timestamp for recent activity (last 7 days)
+	// calculate the timestamp for recent activity (last 7 days)
 	recentThreshold := time.Now().AddDate(0, 0, -RECENT_DAYS_THRESHOLD)
 
 	query := s.DB.
@@ -164,7 +165,7 @@ func (s *TopicsService) GetTrendingTopics() (*[]TopicWithScore, error) {
 		return nil, err
 	}
 
-	// Calculate scores and sort
+	// calculate scores and sort
 	topics = CalculateTopicScores(topics)
 	sortTopicsByScore(topics)
 

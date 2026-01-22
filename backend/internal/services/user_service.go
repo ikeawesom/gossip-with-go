@@ -12,6 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// init services
 type UserService struct {
 	DB *gorm.DB
 }
@@ -22,9 +23,10 @@ func NewUserService(db *gorm.DB) *UserService {
 	}
 }
 
+// declare struct types
 type UserWithFollowers struct {
 	models.User
-	
+
 	UserHasFollowed     bool     `gorm:"-" json:"user_has_followed"`
 	UserIsBeingFollowed bool     `gorm:"-" json:"user_is_being_followed"`
 	Followers           []string `gorm:"-" json:"followers"`

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type LikeHandler struct {
 	likeService *services.LikeService
 }
@@ -19,6 +20,7 @@ func NewLikeHandler(likeService *services.LikeService) *LikeHandler {
 	}
 }
 
+// POST /likes/toggle
 func (h *LikeHandler) ToggleLike(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -26,6 +28,7 @@ func (h *LikeHandler) ToggleLike(c *gin.Context) {
 		return
 	}
 
+	// temporary struct for request
 	var request struct {
 		TargetID     uint   `json:"target_id" binding:"required"` // post or comment ID
 		Type string `json:"type" binding:"required"` // post or comment
@@ -53,6 +56,7 @@ func (h *LikeHandler) ToggleLike(c *gin.Context) {
 	})
 }
 
+// GET /likes/status
 func (h *LikeHandler) GetLikeStatus(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -86,7 +90,9 @@ func (h *LikeHandler) GetLikeStatus(c *gin.Context) {
 	})
 }
 
+// GET /likes/likers
 func (h *LikeHandler) GetLikers(c *gin.Context) {
+	// extract query params from context URL
 	likeableType := c.Query("type")     // "post" or "comment"
 	likeableIDStr := c.Query("id")      // the post or comment ID
 	limitStr := c.DefaultQuery("limit", utils.GetLimitStr())
@@ -104,11 +110,13 @@ func (h *LikeHandler) GetLikers(c *gin.Context) {
 		return
 	}
 
+	// fallback to default limit
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil || limit < 1 || limit > 100 {
 		limit, err = strconv.Atoi(utils.GetLimitStr())
 	}
 
+	// fallback to default offset
 	offset, err := strconv.Atoi(offsetStr)
 	if err != nil || offset < 0 {
 		offset, err = strconv.Atoi(utils.GetOffsetStr())
@@ -134,6 +142,7 @@ func (h *LikeHandler) GetLikers(c *gin.Context) {
 	})
 }
 
+// POST /likes/by_type/:userID/:likeableType
 func (h *LikeHandler) GetLikesByUserID(c *gin.Context) {
 	currentUser, exists := c.Get("userID")
 	if !exists {

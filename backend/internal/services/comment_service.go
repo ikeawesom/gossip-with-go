@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// init services
 type CommentService struct {
 	DB *gorm.DB
 }
@@ -17,6 +18,7 @@ func NewCommentService(db *gorm.DB) *CommentService {
 	return &CommentService{DB: db}
 }
 
+// declare struct types
 type CommentWithUsername struct {
 	models.Comment
 	Username string `json:"username"`
@@ -117,6 +119,8 @@ func (s *CommentService) incrementPostCommentCount(postID uint) error {
 func (s *CommentService) GetCommentsByUserID(userID uint) ([]UserComments, error) {
 	var comments []UserComments
 
+	// using complex DISTINCT ON query to fetch latest
+	// updates of comments due to soft deletes
 	err := s.DB.
 		Table("comments").
 		Select(`
@@ -164,8 +168,11 @@ func (s *CommentService) GetRootCommentsByPostID(postID uint, limit int, offset 
 		Find(&comments).
 		Error
 
-	if err := s.encrichWithInteractionData(comments, currentUser); err != nil {
-		return nil, err
+	// only enrich if user is authenticated
+	if currentUser > 0 {
+		if err := s.encrichWithInteractionData(comments, currentUser); err != nil {
+			return nil, err
+		}
 	}
 	
 	return comments, err
@@ -219,8 +226,11 @@ func (s *CommentService) GetRepliesByCommentID(commentID uint, limit int, offset
 		Find(&replies).
 		Error
 
-	if err := s.encrichWithInteractionData(replies, currentUser); err != nil {
-		return nil, err
+	// only enrich if user is authenticated
+	if currentUser > 0 {
+		if err := s.encrichWithInteractionData(replies, currentUser); err != nil {
+			return nil, err
+		}
 	}
 	
 	return replies, err
@@ -282,6 +292,7 @@ func (s *CommentService) DeleteComment(commentID uint, userID uint) error {
 	return nil
 }
 
+// helper function for decrementing
 func (s *CommentService) decrementPostCommentCount(postID uint) error {
 	return s.DB.Table("posts").
 		Where("id = ? AND comment_count > 0", postID).

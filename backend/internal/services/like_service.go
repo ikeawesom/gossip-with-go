@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// init services
 type LikeService struct {
 	DB *gorm.DB
 }
@@ -32,6 +33,8 @@ type LikedComments struct {
 func (s *LikeService) GetCommentsLikedByUserID(userID uint) ([]LikedComments, error) {
 	var comments []LikedComments
 
+	// using complex DISTINCT ON query to fetch latest
+	// updates of likes and comments due to soft deletes
 	err := s.DB.
 		Table("likes").
 		Select(`DISTINCT ON (comments.id)
@@ -150,12 +153,14 @@ func (s *LikeService) incrementLikeCount(likeableType string, likeableID uint) e
 func (s *LikeService) decrementLikeCount(likeableType string, likeableID uint) error {
 	var table string
 	
+	// switch case to determine likeable type
 	switch likeableType {
 	case "post":
 		table = "posts"
 	case "comment":
 		table = "comments"
 	default:
+		// fallback if likeable type is invalid
 		return errors.New("invalid likeable_type")
 	}
 

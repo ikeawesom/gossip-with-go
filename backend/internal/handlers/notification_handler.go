@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type NotificationHandler struct {
 	notificationService *services.NotificationService
 }
@@ -19,6 +20,7 @@ func NewNotificationHandler(notificationService *services.NotificationService) *
 	}
 }
 
+// GET /notifications/me
 func (h *NotificationHandler) GetUserNotifications(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -35,6 +37,7 @@ func (h *NotificationHandler) GetUserNotifications(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Notifications retrieved successfully", gin.H{"notifications": notifications})
 }
 
+// POST /notifications/toggle-view/:notif_id
 func (h *NotificationHandler) ToggleViewed(c *gin.Context) {
 	_, exists := c.Get("userID")
 	if !exists {
@@ -54,6 +57,7 @@ func (h *NotificationHandler) ToggleViewed(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Toggled notification view", gin.H{"viewed": viewed})
 }
 
+// POST /notifications/toggle-all-view
 func (h *NotificationHandler) ToggleAllViewed(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {

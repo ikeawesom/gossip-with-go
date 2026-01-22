@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handlers
 type FollowHandler struct {
 	followService *services.FollowService
 }

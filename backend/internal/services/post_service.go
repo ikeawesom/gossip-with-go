@@ -17,10 +17,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// init service
 type PostService struct {
 	DB *gorm.DB
 }
 
+func NewPostService(db *gorm.DB) *PostService {
+	return &PostService{
+		DB: db,
+	}
+}
+
+// declare struct types
 type NewPost struct {
 	Username string
 	Topic    string
@@ -57,12 +65,6 @@ type PaginationParams struct {
 	UserID uint
 }
 
-func NewPostService(db *gorm.DB) *PostService {
-	return &PostService{
-		DB: db,
-	}
-}
-
 func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint) ([]PostWithTopic, error) {
 	var author models.User
 	if err := s.DB.Where("username = ?", authorUsername).First(&author).Error; err != nil {
@@ -74,50 +76,54 @@ func (s *PostService) GetPostByUsername(authorUsername string, currentUser uint)
 
 	var posts []PostWithTopic
 	if err := s.DB.
-				Table("posts").
-				Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
-				Joins("JOIN topics ON posts.topic = topics.id").
-				Joins("JOIN users ON users.id = posts.user_id").
-				Where("posts.user_id = ?", author.ID).
-				Order("posts.created_at DESC").
-				Find(&posts).Error; err != nil {
-					if errors.Is(err, gorm.ErrRecordNotFound) {
-						return nil, errors.New("posts not found")
-					}
-					return nil, err
+			Table("posts").
+			Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
+			Joins("JOIN topics ON posts.topic = topics.id").
+			Joins("JOIN users ON users.id = posts.user_id").
+			Where("posts.user_id = ?", author.ID).
+			Order("posts.created_at DESC").
+			Find(&posts).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					return nil, errors.New("posts not found")
 				}
+				return nil, err
+			}
 
-	if err := s.encrichWithInteractionData(posts, currentUser); err != nil {
-		return nil, err
-	}	
+	// enrich with interactions on posts if user is authenticated
+	if currentUser > 0 {
+		if err := s.encrichWithInteractionData(posts, currentUser); err != nil {
+			return nil, err
+		}	
+	}
 
-	// enrich with media on posts
 	if err := s.enrichWithMedia(posts); err != nil {
 		return nil, err
 	}
 
-	utils.DebugLog("Posts:", posts)
 	return posts, nil
 }
 
 func (s *PostService) GetPostByTopic(topicID int, currentUser uint) ([]PostWithTopic, error) {
 	var posts []PostWithTopic
 	if err := s.DB.
-				Table("posts").
-				Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
-				Joins("JOIN topics ON posts.topic = topics.id").
-				Joins("JOIN users ON users.id = posts.user_id").
-				Where("topics.id = ?", topicID).
-				Order("created_at DESC").
-				Find(&posts).Error; err != nil {
-					if errors.Is(err, gorm.ErrRecordNotFound) {
-						return nil, errors.New("posts not found")
-					}
-					return nil, err
+			Table("posts").
+			Select("posts.*, users.username, users.pfp, topics.id as topic_id, topics.topic_name, topics.topic_class").
+			Joins("JOIN topics ON posts.topic = topics.id").
+			Joins("JOIN users ON users.id = posts.user_id").
+			Where("topics.id = ?", topicID).
+			Order("created_at DESC").
+			Find(&posts).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					return nil, errors.New("posts not found")
 				}
+				return nil, err
+			}
 
-	if err := s.encrichWithInteractionData(posts, currentUser); err != nil {
-		return nil, err
+	// enrich with interactions on posts if user is authenticated
+	if currentUser > 0 {
+		if err := s.encrichWithInteractionData(posts, currentUser); err != nil {
+			return nil, err
+		}
 	}
 
 	// enrich with media on posts
@@ -153,8 +159,11 @@ func (s *PostService) GetUserPostByID(authorUsername string, postID uint, curren
 
 	var post_array = []PostWithTopic{post}
 
-	if err := s.encrichWithInteractionData(post_array, currentUser); err != nil {
-		return nil, err
+	// enrich with interactions on posts if user is authenticated
+	if currentUser > 0 {
+		if err := s.encrichWithInteractionData(post_array, currentUser); err != nil {
+			return nil, err
+		}
 	}
 
 	// enrich with media on posts
@@ -185,19 +194,15 @@ func (s *PostService) CreatePost(username, title, content string, topic uint, im
 		return 0, err
 	}
 	
-	log.Println("[SERVICE] Added post")
-
 	// increment post count on topic
 	if err := s.DB.
-	Table("topics").
-	Where("id = ?", topic).
-	Update("post_count", gorm.Expr("post_count + ?", 1)).
-	Error; err != nil {
-		return 0, err
-			}
+		Table("topics").
+		Where("id = ?", topic).
+		Update("post_count", gorm.Expr("post_count + ?", 1)).
+		Error; err != nil {
+					return 0, err
+				}
 			
-	log.Println("[SERVICE] Incremented topic")	
-
 	const maxImgSize = 5 << 20 // 5MB
 
 	for i, file := range imgFiles {
@@ -508,7 +513,7 @@ func (s *PostService) encrichWithInteractionData(posts []PostWithTopic, currentU
 		postIDs[i] = post.ID
 	}
 
-	// get current user's likes in ONE query
+	// get current user's likes
 	var userLikes []models.Like
 	if currentUserID > 0 {
 		s.DB.Where("user_id = ? AND likeable_type = ? AND likeable_id IN ?", 
@@ -593,7 +598,7 @@ func (s *PostService) enrichWithMedia(posts []PostWithTopic) error {
 
 	type MediaPerPost struct {
 		models.Media
-		PostID  uint   			  `json:"post_id"`
+		PostID  uint `json:"post_id"`
 	}
 
 	var media []MediaPerPost

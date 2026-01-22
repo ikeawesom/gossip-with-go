@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// init handler
 type QueryHandler struct {
 	QueryService *services.QueryService
 }
@@ -18,11 +19,13 @@ func NewQueryHandler(queryService *services.QueryService) *QueryHandler {
 	}
 }
 
+// declare search req struct
 type SearchRequest struct {
 	Query     string
 	QueryType string
 }
 
+// GET /query
 func (h *QueryHandler) GetResultsByType(c *gin.Context) {
 	req := SearchRequest{
 		Query:     c.Query("value"),
@@ -34,25 +37,23 @@ func (h *QueryHandler) GetResultsByType(c *gin.Context) {
 		err     error
 	)
 
+	// switch case to switch between query types
 	switch req.QueryType {
-
-	case "users":
-		results, err = h.QueryService.QueryUsers(req.Query)
-
-	case "posts":
-		results, err = h.QueryService.QueryPosts(req.Query)
-
-	case "topics":
-		results, err = h.QueryService.QueryTopics(req.Query)
-
-	default:
-		utils.ErrorResponse(
-			c,
-			http.StatusBadRequest,
-			"invalid query type",
-			nil,
-		)
-		return
+		case "users":
+			results, err = h.QueryService.QueryUsers(req.Query)
+		case "posts":
+			results, err = h.QueryService.QueryPosts(req.Query)
+		case "topics":
+			results, err = h.QueryService.QueryTopics(req.Query)
+		default:
+			// fallback error if query type is invalid
+			utils.ErrorResponse(
+				c,
+				http.StatusBadRequest,
+				"invalid query type",
+				nil,
+			)
+			return
 	}
 
 	if err != nil {
