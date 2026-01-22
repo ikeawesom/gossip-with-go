@@ -3,7 +3,6 @@
 # Gossip With Go
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-blue)
 ![Go Version](https://img.shields.io/badge/go-1.25.5-blue)
 ![React](https://img.shields.io/badge/react-19.2-blue)
 
@@ -11,7 +10,7 @@ Welcome to **Gossip With Go**! My name is Ike and I have built this modern and r
 
 Check out the deployment [here](https://go-gossip.vercel.app)!
 
-## Highlighted Features
+## 🚀 Highlighted Features
 
 👤 Create new accounts as Gossipers
 
@@ -30,7 +29,7 @@ Check out the deployment [here](https://go-gossip.vercel.app)!
 
 📱 **Responsive UI** optimised for desktop and mobile devices
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
 
@@ -51,7 +50,7 @@ Check out the deployment [here](https://go-gossip.vercel.app)!
 - Neon PostgreSQL for database
 - Cloudinary Storage Buckets
 
-## Setup & Installation
+## ⚙️ Setup & Installation
 
 ### Prerequisites
 
@@ -62,34 +61,22 @@ Ensure you have the following installed:
 - Docker (optional, for deployment)
 - Git
 
-1. Clone this repository
+### 1. Clone this repository
 
 ```git
 git clone https://github.com/ikeawesom/gossip-with-go.git gossip-with-go
+cd gossip-with-go
 ```
 
-2. Local Development
-
-### Backend
-
-```bash
-cd backend
-go run main.go
-```
-
-### Frontend
-
+### 2. Install Dependencies
 ```bash
 cd frontend
 npm install
-npm run dev
 ```
 
-The application should now be running locally.
+### 3. Setting up **environment variables**
 
-## Environment Variables
-
-Create a `.env` in `backend`:
+Create an `.env` in `./backend`:
 
 ```bash
 # server config
@@ -130,9 +117,38 @@ FRONTEND_VERIFY_EMAIL_URL=http://localhost:5173/auth/register
 FRONTEND_RESET_PASSWORD_URL=http://localhost:5173/auth/forgot-password
 ```
 
-As this project uses same-site cookies, no **frontend** `.env` files are required for API URLs.
+Create an `.env.local` in `./frontend`:
+```
+# API Base URL
+VITE_API_URL=http://localhost:8080
+```
+_NOTE: This is only for local development server. Do not put a API URL in your deployed domain._
 
-## Security
+### 4. Start development server
+Open 2 terminals in `./gossip-with-go`.
+
+In the first terminal, run:
+```bash
+cd backend
+go run main.go
+```
+
+Backend server will be running locally on `http://localhost:8080`.
+
+In the second terminal, run:
+```bash
+cd frontend
+npm run dev
+```
+
+Frontend will be running locally on `http://localhost:5173`.
+
+### 5. Testing the status of server
+```bash
+curl http://localhost:8080/api/health
+```
+
+## 🔒 Security
 
 ✅ JWT authentication with httpOnly cookies
 
@@ -144,14 +160,13 @@ As this project uses same-site cookies, no **frontend** `.env` files are require
 
 ✅ Bcrypt password hashing
 
-## API Documentation
+## 📓 API Documentation
 
 ### Base URL
 
 ```
 /api
 ```
-
 ### Important Endpoints
 
 | Method   | Endpoint  | Auth Required   | Description                       |
@@ -164,7 +179,7 @@ As this project uses same-site cookies, no **frontend** `.env` files are require
 
 _View the full API docs [here](https://github.com/ikeawesom/gossip-with-go/blob/main/backend/internal/routes/API.md)_.
 
-## AI Usage Documentation
+## 🌐 AI Usage Documentation
 
 ### Architecture
 
@@ -216,7 +231,7 @@ constructive feedback to improve my code in terms of functionality,
 efficiency and readability.
 ```
 
-## Acknowledgments
+## 💯 Acknowledgments
 
 - UI inspired by Reddit, Instragram and Facebook
 - Icons from [IconScout](https://iconscout.com)
@@ -224,12 +239,10 @@ efficiency and readability.
 - Database by [Neon](https://neon.tech)
 - Storage buckets by [Cloudinary](https://cloudinary.com)
 
-## Contact
+## ☎️ Contact
 
 **Developer**: Ike Lim
 
 - GitHub: [@ikeawesom](https://github.com/ikeawesom)
 - LinkedIn: [Ike Lim](https://www.linkedin.com/in/ike-lim)
 - Email: ikebusinessoff@gmail.com
-
-**Project Link**: [https://github.com/ikeawesom/gossip-with-go](https://github.com/ikeawesom/gossip-with-go)
