@@ -202,18 +202,21 @@ along with their descriptions, pros and cons in a table format.
 As I am a beginner in Go, I used AI to explain to me the basics of Go, along with its similarities with other languages I am familiar with (e.g. Python, JavaScript, etc.)
 
 ```
-I am a beginner in Go and I want to learn more about this lanuage.
-Explain in detail, what are the basic functionality and syntax of Go?
-I am well-versed in Python and JavaScript, you may use these lanugages as reference in your explanation.
+I am a beginner in Go and I want to learn more about this language.
+Explain in detail, what are the basic functionality and syntax of Go,
+as well as the differences with other languages?
+I am well-versed in Python and JavaScript, you may use these
+languages as reference in your explanation.
 ```
 
 ### JWT-Cookies
 
-It is first time developing authenticaion using JWT cookies, so using AI to teach me more about the lifecycle of such authentication was beneificial for me.
+It is first time developing authenticaion using JWT cookies, so using AI to teach me more about the lifecycle of such authentication was beneficial for me.
 
 ```
-For my web application, I am using JWT cookies for authentication. Explain to me the process
-of authentication of JWT cookies from user to database and back to the user.
+For my web application, I am using JWT cookies for authentication.
+Explain to me the process of authentication of JWT cookies
+from user to database and back to the user.
 ```
 
 ### Development
@@ -232,9 +235,10 @@ Generate for me an array of 10 dummy users.
 I used AI to review some of my code with complex logic to figure out any loopholes or edge cases I might need to reconsider.
 
 ```
-Here is a code snippet of my React component. Give me a review on it and
-constructive feedback to improve my code in terms of functionality,
-efficiency and readability.
+Here is a code snippet of my React component.
+Give me a review on it and constructive feedback to
+improve my code in terms of functionality, efficiency
+and readability.
 ```
 
 ## 💯 Acknowledgments
