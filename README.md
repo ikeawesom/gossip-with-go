@@ -40,13 +40,15 @@ https://github.com/user-attachments/assets/f0891971-368e-4aa3-bcaf-f8302e1212ff
 ### Frontend
 
 - React + TypeScript
-- TailwindCSS for styling
+- Redux Toolkit
+- TailwindCSS
 - Deployed on [Vercel](https://vercel.com)
 
 ### Backend
 
-- Go
-- Gin for API Handling
+- Golang
+- Gin Framework
+- GORM ORM
 - Deployed on [Fly.io](https://fly.io/)
 
 ### Infrastructure
@@ -55,6 +57,7 @@ https://github.com/user-attachments/assets/f0891971-368e-4aa3-bcaf-f8302e1212ff
 - Git
 - Neon PostgreSQL for database
 - Cloudinary Storage Buckets
+- SMTP integration
 
 ## ⚙️ Setup & Installation
 
